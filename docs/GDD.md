@@ -1,178 +1,189 @@
-# Game Design Document — Runemark
+# 游戏设计文档 — Wardstep
 
-> Status: Concept Phase  
-> Last updated: 2026-08-31
-
----
-
-## 1. Elevator Pitch
-
-A knight patrols the ramparts of a crumbling castle. The player places magic rune cards along the patrol path — each card fires its effect when the knight steps on it. Monster waves assault the castle gates. Build a synergistic deck of runes, collect powerful relics, and survive as long as possible in a procedurally generated roguelite run.
-
-**Genre:** Roguelite · Deckbuilder · Tower Defense  
-**Platform:** PC (Steam)  
-**Engine:** TBD (Godot recommended for 2D)
+> 状态：概念阶段  
+> 最后更新：2026-08-31
 
 ---
 
-## 2. Core Loop
+## 1. 一句话介绍
+
+玩家在一张不断扩展的格子地图上放置符文，守卫中心核心。小人沿格子路径自动巡逻，踩到格子时触发该格的符文效果，拦截从四面涌来的怪物。购买铲子可向任意方向扩展格子，获得更多符文槽位。Roguelite 肉鸽构筑，8 大关，每关三级难度。
+
+**类型：** Roguelite · 卡牌构筑 · 塔防  
+**平台：** PC（Steam）  
+**引擎：** 待定（推荐 Godot）
+
+---
+
+## 2. 核心机制
+
+### 格子系统
+
+地图由若干**格子**组成，每个格子是一个**符文槽位**。小人在所有格子上自动走一条覆盖全部格子的**环形路径**，踩到某格时触发该格的符文效果（若符文在冷却中则跳过）。
+
+**起始状态：** 田字格（2×2，共 4 个槽位）
 
 ```
-Wave starts
-  → Monsters march toward the castle gate
-  → Knight patrols back and forth on the rampart track
-  → Cards on the track fire when the knight steps on them
-  → Effects hit monsters (damage, slow, push, etc.)
-Wave ends
-  → Shop phase: buy / upgrade / remove cards
-  → Random event: pick one of 3 risk/reward options
-Next wave
+  ┌────┬────┐
+  │ 符 │ 符 │
+  ├────╬────┤   ╬ = 核心（有 HP）
+  │ 符 │ 符 │
+  └────┴────┘
 ```
 
-Every **3 waves = 1 Act**. The 3rd wave of each Act is a **Boss wave** with a random modifier.
+核心位于初始田字格的几何中心（四格交汇点），HP 归零则游戏结束。
 
----
+### 小人路径
 
-## 3. The Track
+系统自动规划一条**哈密顿环**（经过所有格子恰好一次后回到起点），循环往复。格子形状改变时路径自动重新计算，玩家无需手动规划路径。
 
-The track is a horizontal path the knight walks back and forth on. Cards are placed in **slots** on the track.
+### 敌人行动
 
-| Act | Track Slots | Description |
-|-----|-------------|-------------|
-| 1   | 6 slots     | Single lane |
-| 2   | 8 slots     | Single lane extended |
-| 3   | 10 slots + branch | Knight can switch lanes at a fork |
-| 4   | Dual lane   | Two parallel tracks, knight switches |
-| 5   | Full map    | Complex layout, final boss |
+怪物从地图**四个方向的边缘**随机生成，自动寻路向核心移动。抵达核心时造成伤害。
 
-**Key rule:** Cards placed on the track **never disappear between waves or Acts**. Slot count only ever increases. The player's build accumulates across the entire run.
-
----
-
-## 4. Cards (Runes)
-
-Cards are placed in track slots and trigger when the knight steps on them. They have a **cooldown** before they can fire again.
-
-### Base Card Types (draft)
-
-| Card | Effect | Cooldown |
-|------|--------|----------|
-| Arrow Rune | Fires a projectile at the nearest monster | Short |
-| Frost Rune | Slows all monsters for 2s | Medium |
-| Blade Rune | Damages all monsters in a zone | Medium |
-| Haste Rune | Knight moves faster for 3s (steps on more cards) | Short |
-| Gold Rune | Generates gold | Long |
-| Shield Rune | Absorbs next hit to castle gate | Long |
-| Bomb Rune | AoE explosion after 1s delay | Long |
-| Echo Rune | Next card the knight steps on fires twice | Short |
-
-### Card Upgrades
-
-Cards can be upgraded 1–2 times:
+### 触发逻辑
 
 ```
-Arrow Rune → Silver Arrow (fires 2 projectiles) → Chain Arrow (chains between monsters)
-Frost Rune → Deep Frost (slows harder) → Blizzard (AoE slow + damage)
+小人进入某格
+  → 该格有符文 且 符文冷却结束？
+    → 是：触发符文效果，进入冷却
+    → 否：跳过，继续走
 ```
 
-### Card Synergies (Fusion)
+---
 
-Collecting 2 specific cards unlocks a **fusion option** in the shop:
+## 3. 铲子系统（地图扩展）
 
-| Cards | Fusion Result |
-|-------|---------------|
-| Arrow + Echo | Volley Rune (fires 5 arrows) |
-| Frost + Bomb | Cryo Bomb (freeze + shatter) |
-| Haste + Gold | Merchant Step (gold per step) |
+铲子在**商店**中随机刷新（不是每次都有）。购买后，玩家从高亮显示的**合法扩展位置**中选择一格挖出来，扩展规则：
+
+- 新格子必须与现有格子**至少共享一条边**（不能斜角）
+- 新格子加入后路径自动重新规划
+- 新格子初始为**空槽位**，需再买符文放入
+
+每买一把铲子 = 新增一个符文槽位的空间 + 怪物需要多绕一步才到核心。铲子本身是战略资源，出现时机随机，制造"要不要等这一关"的决策。
 
 ---
 
-## 5. Relics
-
-Relics are passive global effects, collected from boss rewards, events, and rare shop items. They are the main source of build identity.
-
-Each relic modifies the run permanently. Examples:
-
-| Relic | Effect |
-|-------|--------|
-| Iron Boots | Knight's steps have a 15% chance to trigger the card twice |
-| Bloodstone | Each kill heals 1 castle HP |
-| Echo Crystal | All Echo-type effects trigger one extra time |
-| Miser's Coin | Each Gold Rune also adds 1 card draw at shop |
-| Thorn Crown | When castle takes damage, all Blade Runes trigger immediately |
-| Runic Compass | Reveal 2 extra cards in every shop |
-
-Target: ~60 relics at launch, ~20 available per run.
-
----
-
-## 6. Run Structure
+## 4. 经济循环
 
 ```
-Run
-├── Act 1 (Waves 1-2: normal, Wave 3: Boss)
-│     ├── Wave end → Shop
-│     ├── Wave end → Random Event
-│     └── Boss → Big reward (relic or rare card) + track expands
-├── Act 2 (harder, same structure)
-├── Act 3
-├── Act 4
-└── Act 5 (Final Boss — unique mechanics)
+波次中：怪物死亡 → 在原地掉落金币图标 → 自动收集
+波次结束 → 商店开启（每小关/中关/大关各开一次）
+商店 → 花金币买符文、铲子、升级、遗物
 ```
 
-### Boss Modifiers (random per boss)
+### 商店售卖内容
 
-- "Monster HP scales +10% each second"
-- "All Frost cards are disabled this wave"
-- "Monsters move in two directions simultaneously"
-- "Your knight moves at half speed"
-- "Every 5th monster spawns a shield"
-
-### Random Events (3-choice, every 2 waves)
-
-- *The Merchant:* Pay 30 gold → Get a relic of your choice from 3 options
-- *The Gamble:* Flip a coin — heads: rare card, tails: lose 10 castle HP
-- *The Forge:* Remove any card from your track → upgrade another card for free
-- *The Horde:* Next wave has 2x monsters — reward is also 2x gold
-- *The Gift:* Gain a random relic (no cost)
+| 商品 | 说明 | 价格参考 |
+|------|------|---------|
+| 符文卡牌 | 随机刷新 4 张，可花金币刷新 | 10–25 金 |
+| 铲子 | 购买后扩展一格 | 30–40 金 |
+| 符文升级 | 对已放置的符文升一级 | 20–35 金 |
+| 移除符文 | 取走一张符文，返还部分金币 | 返金 |
+| 遗物 | 精英关后偶尔出现 | 50+ 金 |
 
 ---
 
-## 7. Meta-Progression (Cross-Run Unlocks)
+## 5. 符文卡牌
 
-Earned by completing runs, achieving milestones, or losing with style:
+每格放置一张符文，小人踩到时触发。每张卡可**升级两次**，特定组合可在商店中**融合**。
 
-- **New card types** enter the card pool
-- **New relic types** become available
-- **New knight characters** (different starting speed, HP, or passive)
-- **New boss modifiers** added to the rotation
-- **New track shapes** unlocked for later Acts
+### 基础符文列表
+
+| 符文 | 效果 | 冷却 |
+|------|------|------|
+| 箭矢符文 | 向最近的怪物发射一枚箭矢 | 短（2s） |
+| 冰霜符文 | 使所有怪物减速 2 秒 | 中（3s） |
+| 刀刃符文 | 以本格为中心 AOE 伤害周围怪物 | 中（2.5s） |
+| 急行符文 | 小人移速 +60% 持续 3 秒，触发更多格 | 短（1.5s） |
+| 黄金符文 | 立即获得 3 枚金币 | 长（5s） |
+| 盾壁符文 | 格挡下一只到达核心的怪物 | 长（6s） |
+| 炸弹符文 | 1 秒后爆炸，大范围高伤害 | 长（5s） |
+| 回响符文 | 下一格触发的符文效果翻倍 | 极短（1s） |
+
+### 升级路线示例
+
+```
+箭矢符文 → 银箭（同时射 2 枚）→ 连锁箭（在 3 个目标间跳跃）
+冰霜符文 → 深层冰霜（减速更强）→ 暴风雪（范围减速 + 伤害）
+回响符文 → 共鸣（接下来 2 格各翻倍）→ 连锁（传递至所有相邻格）
+```
+
+### 融合卡（两张特定符文 → 商店合成）
+
+| 材料 | 融合结果 |
+|------|----------|
+| 箭矢 + 回响 | 箭雨符文（同时发射 5 枚） |
+| 冰霜 + 炸弹 | 冰炸弹（冰冻 + 碎裂） |
+| 急行 + 黄金 | 商人步（每步获得金币） |
 
 ---
 
-## 8. Lose Condition
+## 6. 遗物系统
 
-The castle gate has HP (e.g., 20). Monsters that reach the gate deal damage. When gate HP = 0, run ends.
+遗物是永久被动效果，来自精英关击败奖励、商店稀有刷新。首发目标约 60 件，每局约 15–20 件可获得。
 
-Between Acts, the player can spend gold to repair gate HP.
-
----
-
-## 9. Aesthetic Direction (TBD)
-
-Candidates:
-- **Dark fantasy castle** — stone ramparts, glowing runes, medieval monsters
-- **Steampunk fortress** — iron walkways, mechanical cards, clockwork monsters
-- **Arcane academy** — floating towers, magical creatures, mystical atmosphere
-
-Western market preference: dark fantasy or steampunk tend to perform best on Steam.
+| 遗物 | 效果 |
+|------|------|
+| 铁靴 | 每格被踩到时，15% 概率额外触发一次 |
+| 血石 | 每击杀一只怪物，恢复 1 点核心 HP |
+| 符文罗盘 | 商店每次额外展示 2 张符文 |
+| 守财金币 | 黄金符文触发时，额外为商店抽 1 张牌 |
+| 荆棘王冠 | 核心每次受到伤害，立即触发所有刀刃符文 |
+| 回响水晶 | 所有回响符文效果再额外多触发一次 |
 
 ---
 
-## 10. Open Questions
+## 7. 关卡结构（8 大关）
 
-- [ ] What does the knight character look like? (race, gender, style)
-- [ ] How many cards at launch? (target: ~80 unique cards)
-- [ ] Multiplier system? (Balatro's mult mechanic has a satisfying feel — equivalent?)
-- [ ] Should the track be visible/scrollable or a fixed viewport?
-- [ ] Sound design direction?
+每大关分三个难度层：
+
+```
+大关
+├── 小关 × 2–3 波（普通怪）→ 商店 → 掉金币
+├── 中关（精英关）→ 商店 → 掉落「遗物」
+└── 大关（Boss）→ 商店 → 掉落「稀有符文三选一」
+```
+
+### 8 大关主题
+
+| 关卡 | 主题 | 新机制 |
+|------|------|--------|
+| 第 1 关 | 边境哨所 | 教学，仅南/北两侧来怪 |
+| 第 2 关 | 外围防线 | 四面来怪，铲子首次出现 |
+| 第 3 关 | 迷雾荒原 | 快速小怪混装甲大怪 |
+| 第 4 关 | 熔岩峡谷 | 精英怪有护盾，Boss 会分裂 |
+| 第 5 关 | 腐化森林 | 毒怪（对核心持续 DoT） |
+| 第 6 关 | 暗影要塞 | 隐形怪（符文触发才显形） |
+| 第 7 关 | 天空堡垒 | 飞行怪（仅部分符文有效） |
+| 第 8 关 | 深渊之门 | 最终 Boss，三阶段，每阶段换机制 |
+
+### Boss 专属技能示例
+
+- **封锁：** 随机封印 2 个格子，本波次无法触发
+- **强袭：** 派出一支穿透小队，绕过外围格直冲核心
+- **反制：** 每次冰霜符文触发时，自身获得一层免疫
+- **分裂：** 击杀后分裂为 2 个小版本
+
+---
+
+## 8. 元进度（跨局解锁）
+
+每局结束（胜负皆可）解锁：
+- 新符文类型进入卡池
+- 新遗物进入遗物池
+- 新角色（不同初始移速/HP/被动）
+- 新 Boss 技能加入轮换
+- 新格子形态起始解锁
+
+---
+
+## 9. 待定决策
+
+- [ ] 小人角色外观（骑士？其他？）是否影响玩法
+- [ ] 首发符文总量目标（约 80 张？）
+- [ ] 核心数值倍增器：Wardstep 的"爽点数字"是什么
+- [ ] 跑道/格子视角：俯视图还是斜45度视角
+- [ ] 美术风格：暗黑石制城堡 / 蒸汽朋克 / 奥术学院
+- [ ] 怪物阵容设计（种类、外观、特殊机制）
+- [ ] 引擎：Godot 还是 Unity
