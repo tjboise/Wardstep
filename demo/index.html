@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wardstep — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;background:#0a0d14;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;}
+body{padding:16px 0 40px;gap:12px;}
+
+h1.logo{font-family:'Cinzel',serif;font-size:1.6rem;letter-spacing:.2em;color:#c8a040;text-shadow:0 0 20px rgba(200,160,64,.4);}
+.subtitle{font-family:'Noto Serif SC',serif;font-size:.75rem;color:#404e68;letter-spacing:.1em;}
+
+#wrap{position:relative;width:min(800px,100vw);flex-shrink:0;}
+canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
+
+/* ── OVERLAYS ── */
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:rgba(8,10,18,.88);backdrop-filter:blur(4px);}
+.overlay.hidden{display:none;}
+
+.ov-title{font-family:'Cinzel',serif;font-size:clamp(1.4rem,4vw,2.2rem);letter-spacing:.1em;color:#c8a040;text-wrap:balance;text-align:center;}
+.ov-sub{font-family:'Noto Serif SC',serif;font-size:.85rem;color:#7888a8;text-align:center;max-width:34em;line-height:1.8;}
+.ov-stat{font-family:'Cinzel',serif;font-size:1.1rem;color:#ddd0b0;letter-spacing:.06em;}
+
+.btn{font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.14em;padding:12px 32px;border:1px solid #c8a040;background:rgba(200,160,64,.1);color:#c8a040;cursor:pointer;border-radius:2px;transition:background .2s;}
+.btn:hover{background:rgba(200,160,64,.22);}
+.btn-danger{border-color:#c04848;background:rgba(192,72,72,.1);color:#c04848;}
+.btn-danger:hover{background:rgba(192,72,72,.22);}
+
+/* ── SHOP ── */
+#shop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(8,10,18,.92);}
+#shop.hidden{display:none;}
+.shop-title{font-family:'Cinzel',serif;font-size:1.1rem;letter-spacing:.1em;color:#c8a040;}
+.shop-sub{font-family:'Noto Serif SC',serif;font-size:.78rem;color:#7888a8;}
+.shop-gold{font-family:'Cinzel',serif;font-size:.9rem;color:#f0c040;letter-spacing:.06em;}
+.shop-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+
+.shop-card{width:150px;background:#1d2438;border:1px solid #334060;border-radius:4px;padding:16px 14px 12px;cursor:pointer;transition:transform .15s,border-color .2s;position:relative;overflow:hidden;text-align:left;}
+.shop-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--col,#c8a040);}
+.shop-card:hover{transform:translateY(-4px);border-color:var(--col,#c8a040);}
+.shop-card.cant-afford{opacity:.45;cursor:not-allowed;}
+.shop-card.cant-afford:hover{transform:none;}
+.sc-sym{font-size:1.8rem;display:block;margin-bottom:8px;}
+.sc-name{font-family:'Noto Serif SC',serif;font-weight:600;font-size:.82rem;color:#ddd0b0;margin-bottom:4px;}
+.sc-cost{font-family:'Cinzel',serif;font-size:.72rem;color:#f0c040;margin-bottom:6px;}
+.sc-desc{font-size:.72rem;color:#7888a8;line-height:1.5;}
+.sc-badge{font-size:.58rem;letter-spacing:.08em;padding:2px 6px;border-radius:2px;display:inline-block;margin-top:6px;}
+.badge-rune{background:rgba(200,160,64,.12);border:1px solid rgba(200,160,64,.3);color:#c8a040;}
+.badge-shovel{background:rgba(82,168,112,.12);border:1px solid rgba(82,168,112,.3);color:#52a870;}
+.badge-upgrade{background:rgba(86,174,208,.12);border:1px solid rgba(86,174,208,.3);color:#56aed0;}
+
+.shop-skip{font-family:'Noto Serif SC',serif;font-size:.75rem;color:#404e68;cursor:pointer;text-decoration:underline;}
+.shop-skip:hover{color:#7888a8;}
+
+/* ── PLACE PROMPT ── */
+#place-prompt{position:absolute;top:45px;left:50%;transform:translateX(-50%);background:#26304a;border:1px solid #c8a040;padding:8px 20px;border-radius:3px;font-family:'Noto Serif SC',serif;font-size:.78rem;color:#c8a040;pointer-events:none;white-space:nowrap;}
+#place-prompt.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div class="logo-row" style="text-align:center">
+  <h1 class="logo">WARDSTEP</h1>
+  <div class="subtitle">DEMO · 网页试玩版</div>
+</div>
+
+<div id="wrap">
+  <canvas id="c"></canvas>
+
+  <!-- start -->
+  <div class="overlay" id="ov-start">
+    <div class="ov-title">守卫核心</div>
+    <div class="ov-sub">在 2×2 的格子上放置符文，小人自动巡逻触发效果。怪物从四面涌来，守住中心核心。每波结束后购买新符文或扩展格子。</div>
+    <div style="font-family:'Noto Serif SC',serif;font-size:.8rem;color:#404e68;text-align:center;line-height:1.8">
+      初始符文：箭矢（左上） · 冰霜（右上）<br>
+      两个空格等你填满 · 共 3 波敌人
+    </div>
+    <button class="btn" id="btn-start">开始游戏</button>
+  </div>
+
+  <!-- shop -->
+  <div id="shop" class="hidden">
+    <div class="shop-title" id="shop-title">第一波结束</div>
+    <div class="shop-gold" id="shop-gold">💰 金币：0</div>
+    <div class="shop-sub">选择一项购买，或直接跳过</div>
+    <div class="shop-cards" id="shop-cards"></div>
+    <div class="shop-skip" id="shop-skip">跳过，开始下一波 →</div>
+  </div>
+
+  <!-- place prompt -->
+  <div id="place-prompt" class="hidden">点击一个格子放置符文</div>
+
+  <!-- gameover -->
+  <div class="overlay hidden" id="ov-gameover">
+    <div class="ov-title" style="color:#c04848">核心已陷落</div>
+    <div class="ov-stat" id="go-stat"></div>
+    <button class="btn btn-danger" id="btn-restart">再试一次</button>
+  </div>
+
+  <!-- victory -->
+  <div class="overlay hidden" id="ov-victory">
+    <div class="ov-title">守住了！</div>
+    <div class="ov-stat" id="vic-stat"></div>
+    <div class="ov-sub">这只是 Demo 的三波试玩。完整游戏将有 8 大关，每关三级难度。</div>
+    <button class="btn" id="btn-again">再玩一次</button>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const W = 800, H = 520;
+const CELL = 86;
+const KNIGHT_SPEED = 82;
+const INIT_HP = 20;
+const SHIELD_DURATION = 8; // seconds a shield block lasts
+
+// ═══════════════════════════════════════════════════════════
+//  RUNE DATABASE
+// ═══════════════════════════════════════════════════════════
+const RUNES = {
+  arrow:  { id:'arrow',  name:'箭矢符文', sym:'⟶', col:'#c8a040', cd:2.0, cost:12, desc:'向最近的怪物发射一枚箭矢' },
+  frost:  { id:'frost',  name:'冰霜符文', sym:'❄',  col:'#56aed0', cd:3.0, cost:18, desc:'使所有怪物减速 2.5 秒' },
+  blade:  { id:'blade',  name:'刀刃符文', sym:'✦',  col:'#c04848', cd:2.5, cost:15, desc:'以本格为中心 AOE 伤害' },
+  haste:  { id:'haste',  name:'急行符文', sym:'≫',  col:'#d4a843', cd:1.5, cost:14, desc:'小人移速 +70% 持续 3 秒' },
+  gold:   { id:'gold',   name:'黄金符文', sym:'◆',  col:'#f0c040', cd:5.0, cost:10, desc:'立即获得 4 枚金币' },
+  shield: { id:'shield', name:'盾壁符文', sym:'⬡',  col:'#52a870', cd:6.0, cost:20, desc:'格挡下一只到达核心的怪物' },
+  bomb:   { id:'bomb',   name:'炸弹符文', sym:'◉',  col:'#e06030', cd:5.0, cost:22, desc:'1 秒后在怪群中央爆炸' },
+  echo:   { id:'echo',   name:'回响符文', sym:'∿',  col:'#9070d0', cd:1.0, cost:16, desc:'下一格符文效果翻倍触发' },
+};
+
+// wave configs: [{count, hp, spd, type}]
+const WAVES = [
+  { enemies:[{count:6,hp:4,spd:30,type:'normal'},{count:2,hp:10,spd:18,type:'armored'}] },
+  { enemies:[{count:8,hp:5,spd:35,type:'normal'},{count:4,hp:12,spd:20,type:'armored'},{count:2,hp:6,spd:55,type:'fast'}] },
+  { enemies:[{count:10,hp:6,spd:38,type:'normal'},{count:4,hp:14,spd:22,type:'armored'},{count:1,hp:60,spd:15,type:'boss'}] },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  CANVAS SETUP
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+canvas.width = W; canvas.height = H;
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let state = 'start'; // start | wave | shop | placing | gameover | victory
+let waveIdx = 0;
+let gold = 5;
+let coreHP = INIT_HP;
+let shieldActive = false;
+let shieldTimer = 0;
+let echoNext = false; // echo effect pending
+let hasteMul = 1;    // haste multiplier
+let hasteTimer = 0;
+let totalKills = 0;
+let t = 0;
+
+// grid: array of cell objects
+let grid = [];
+let pathOrder = []; // indices into grid
+
+// knight
+let knight = { x:0, y:0, pathIdx:0 };
+
+// collections
+let enemies = [];
+let projectiles = [];
+let explosions = []; // {x,y,r,maxR,t,maxT,col}
+let coins = [];      // {x,y,vy,t,maxT}
+let glows = [];      // {x,y,r,col,t,maxT}
+let numbers = [];    // {x,y,val,col,t,maxT} floating text
+let lastFired = [];  // parallel to grid, last fire time
+
+// enemy spawn queue
+let spawnQueue = [];
+let spawnTimer = 0;
+let waveCleared = false;
+
+// shop state
+let pendingRune = null; // rune being placed
+
+// ═══════════════════════════════════════════════════════════
+//  GRID HELPERS
+// ═══════════════════════════════════════════════════════════
+function gridCenter() { return { x: W/2, y: H/2 - 10 }; }
+
+function cellPos(row, col) {
+  const gc = gridCenter();
+  const cols = Math.max(...grid.map(c=>c.col)) + 1;
+  const rows = Math.max(...grid.map(c=>c.row)) + 1;
+  const offX = (cols * CELL) / 2 - CELL/2;
+  const offY = (rows * CELL) / 2 - CELL/2;
+  return { x: gc.x + col*CELL - offX, y: gc.y + row*CELL - offY };
+}
+
+function corePos() {
+  const gc = gridCenter();
+  return gc;
+}
+
+function computePath() {
+  // Simple Hamiltonian-ish path for small grids
+  // Sort by row then col for a snake pattern
+  const sorted = [...grid].sort((a,b) => a.row===b.row ? a.col-b.col : a.row-b.row);
+  // Snake: even rows left-to-right, odd rows right-to-left
+  const byRow = {};
+  sorted.forEach(c=>{ if(!byRow[c.row]) byRow[c.row] = []; byRow[c.row].push(c); });
+  const result = [];
+  Object.keys(byRow).sort((a,b)=>+a-+b).forEach((row,i)=>{
+    const row_cells = byRow[row];
+    if(i%2===0) result.push(...row_cells); else result.push(...row_cells.reverse());
+  });
+  pathOrder = result.map(c => grid.indexOf(c));
+}
+
+function initGrid() {
+  grid = [
+    { row:0, col:0, rune: {...RUNES.arrow}  },
+    { row:0, col:1, rune: {...RUNES.frost}  },
+    { row:1, col:0, rune: null              },
+    { row:1, col:1, rune: null              },
+  ];
+  lastFired = grid.map(()=> -99);
+  computePath();
+  const start = cellPos(grid[pathOrder[0]].row, grid[pathOrder[0]].col);
+  knight.x = start.x; knight.y = start.y; knight.pathIdx = 0;
+}
+
+function expandGrid() {
+  // find a valid expansion: prefer bottom, then right
+  const rows = grid.map(c=>c.row), cols = grid.map(c=>c.col);
+  const maxRow = Math.max(...rows), maxCol = Math.max(...cols);
+  // try adding a cell below the bottom-left cell
+  if(maxRow < 2) {
+    grid.push({row: maxRow+1, col:0, rune:null});
+    lastFired.push(-99);
+    computePath();
+    return true;
+  }
+  if(maxCol < 2) {
+    grid.push({row:0, col: maxCol+1, rune:null});
+    lastFired.push(-99);
+    computePath();
+    return true;
+  }
+  return false;
+}
+
+function emptyCells() { return grid.filter(c=>!c.rune); }
+
+// ═══════════════════════════════════════════════════════════
+//  ENEMY SPAWNING
+// ═══════════════════════════════════════════════════════════
+function buildSpawnQueue(waveConfig) {
+  const queue = [];
+  waveConfig.enemies.forEach(group=>{
+    for(let i=0;i<group.count;i++) {
+      queue.push({hp:group.hp, maxHp:group.hp, spd:group.spd, type:group.type, slowed:0});
+    }
+  });
+  // shuffle
+  for(let i=queue.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [queue[i],queue[j]]=[queue[j],queue[i]];
+  }
+  return queue;
+}
+
+function spawnEnemy(template) {
+  const side = Math.floor(Math.random()*4);
+  let x,y;
+  if(side===0){x=80+Math.random()*(W-160);y=10;}
+  else if(side===1){x=80+Math.random()*(W-160);y=H-10;}
+  else if(side===2){x=10;y=80+Math.random()*(H-160);}
+  else{x=W-10;y=80+Math.random()*(H-160);}
+  enemies.push({...template, x, y, slowed:0, shield:template.type==='armored'?1:0});
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RUNE EFFECTS
+// ═══════════════════════════════════════════════════════════
+function fireRune(cellIdx, rune) {
+  const cell = grid[cellIdx];
+  const p = cellPos(cell.row, cell.col);
+  const mul = echoNext ? 2 : 1;
+  echoNext = false;
+
+  glows.push({x:p.x, y:p.y, r:28, col:rune.col, t:0, maxT:0.35});
+
+  switch(rune.id) {
+    case 'arrow': {
+      let nearest=null, nd=99999;
+      enemies.forEach(e=>{ const d=Math.hypot(e.x-p.x,e.y-p.y); if(d<nd){nd=d;nearest=e;}});
+      if(nearest) {
+        const angle=Math.atan2(nearest.y-p.y,nearest.x-p.x);
+        for(let m=0;m<mul;m++)
+          projectiles.push({x:p.x,y:p.y,vx:Math.cos(angle)*300,vy:Math.sin(angle)*300,dmg:3,col:rune.col,target:nearest});
+      }
+      break;
+    }
+    case 'frost': {
+      for(let m=0;m<mul;m++) {
+        enemies.forEach(e=>{ e.slowed=2.5*m || 2.5; });
+        glows.push({x:corePos().x,y:corePos().y,r:120,col:rune.col,t:0,maxT:0.6});
+      }
+      break;
+    }
+    case 'blade': {
+      enemies.forEach(e=>{
+        if(Math.hypot(e.x-p.x,e.y-p.y)<100) {
+          dealDamage(e, 4*mul);
+        }
+      });
+      glows.push({x:p.x,y:p.y,r:80,col:rune.col,t:0,maxT:0.5});
+      break;
+    }
+    case 'haste': {
+      hasteMul = 1 + 0.7*mul;
+      hasteTimer = 3*mul;
+      numbers.push({x:p.x,y:p.y-20,val:'急行!',col:rune.col,t:0,maxT:1.2});
+      break;
+    }
+    case 'gold': {
+      const earned = 4*mul;
+      gold += earned;
+      numbers.push({x:p.x,y:p.y-20,val:`+${earned}💰`,col:'#f0c040',t:0,maxT:1.2});
+      break;
+    }
+    case 'shield': {
+      shieldActive = true;
+      shieldTimer = SHIELD_DURATION;
+      numbers.push({x:p.x,y:p.y-20,val:'盾!',col:rune.col,t:0,maxT:1.2});
+      break;
+    }
+    case 'bomb': {
+      // delayed explosion
+      setTimeout(()=>{
+        let cx2=0,cy2=0,cnt=0;
+        enemies.forEach(e=>{cx2+=e.x;cy2+=e.y;cnt++;});
+        if(cnt>0){cx2/=cnt;cy2/=cnt;}
+        else{cx2=p.x;cy2=p.y;}
+        explosions.push({x:cx2,y:cy2,r:0,maxR:90*mul,t:0,maxT:0.5,col:rune.col});
+        enemies.forEach(e=>{
+          if(Math.hypot(e.x-cx2,e.y-cy2)<90*mul) dealDamage(e,8*mul);
+        });
+      }, 800);
+      numbers.push({x:p.x,y:p.y-20,val:'💣',col:rune.col,t:0,maxT:1.0});
+      break;
+    }
+    case 'echo': {
+      echoNext = true;
+      numbers.push({x:p.x,y:p.y-20,val:'回响!',col:rune.col,t:0,maxT:1.0});
+      break;
+    }
+  }
+}
+
+function dealDamage(e, dmg) {
+  if(e.shield>0){ e.shield--; glows.push({x:e.x,y:e.y,r:20,col:'#7888a8',t:0,maxT:0.3}); return; }
+  e.hp -= dmg;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UPDATE
+// ═══════════════════════════════════════════════════════════
+function update(dt) {
+  t += dt;
+  hasteTimer = Math.max(0, hasteTimer-dt);
+  if(hasteTimer<=0) hasteMul=1;
+  if(shieldTimer>0) shieldTimer-=dt;
+  if(shieldTimer<=0) shieldActive=false;
+
+  // knight movement
+  if(pathOrder.length>0) {
+    const targetCellIdx = pathOrder[knight.pathIdx % pathOrder.length];
+    const tc = grid[targetCellIdx];
+    const tp = cellPos(tc.row, tc.col);
+    const dx=tp.x-knight.x, dy=tp.y-knight.y;
+    const dist=Math.hypot(dx,dy);
+    const speed = KNIGHT_SPEED * hasteMul;
+
+    if(dist < 4) {
+      knight.x=tp.x; knight.y=tp.y;
+      // fire rune
+      const ci = targetCellIdx;
+      const cell = grid[ci];
+      if(cell.rune && t-lastFired[ci] >= cell.rune.cd) {
+        lastFired[ci] = t;
+        fireRune(ci, cell.rune);
+      }
+      knight.pathIdx++;
+    } else {
+      knight.x += (dx/dist)*speed*dt;
+      knight.y += (dy/dist)*speed*dt;
+    }
+  }
+
+  // spawn enemies
+  if(state==='wave' && spawnQueue.length>0) {
+    spawnTimer -= dt;
+    if(spawnTimer<=0) {
+      spawnEnemy(spawnQueue.pop());
+      spawnTimer = 0.5 + Math.random()*0.6;
+    }
+  }
+
+  // move enemies
+  const cp = corePos();
+  enemies.forEach(e=>{
+    const spd = e.slowed>0 ? e.spd*0.3 : e.spd;
+    const dx=cp.x-e.x, dy=cp.y-e.y;
+    const dist=Math.hypot(dx,dy);
+    if(dist>14) { e.x+=(dx/dist)*spd*dt; e.y+=(dy/dist)*spd*dt; }
+    if(e.slowed>0) e.slowed-=dt;
+  });
+
+  // projectiles
+  projectiles = projectiles.filter(p=>{
+    p.x+=p.vx*dt; p.y+=p.vy*dt;
+    if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20) return false;
+    for(let i=enemies.length-1;i>=0;i--){
+      const e=enemies[i];
+      if(Math.hypot(p.x-e.x,p.y-e.y)<14){
+        dealDamage(e,p.dmg);
+        glows.push({x:e.x,y:e.y,r:14,col:p.col,t:0,maxT:0.2});
+        return false;
+      }
+    }
+    return true;
+  });
+
+  // enemy deaths + core damage
+  enemies = enemies.filter(e=>{
+    if(e.hp<=0){
+      totalKills++;
+      const g = e.type==='boss'?8 : e.type==='armored'?3:1;
+      gold += g;
+      coins.push({x:e.x,y:e.y,vy:-60,t:0,maxT:0.9,val:g});
+      glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,maxT:0.3});
+      return false;
+    }
+    if(Math.hypot(e.x-cp.x,e.y-cp.y)<16){
+      if(shieldActive) {
+        shieldActive=false; shieldTimer=0;
+        numbers.push({x:cp.x,y:cp.y-30,val:'格挡!',col:'#52a870',t:0,maxT:1.2});
+        glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,maxT:0.5});
+      } else {
+        const dmg = e.type==='boss'?4:1;
+        coreHP = Math.max(0, coreHP-dmg);
+        glows.push({x:cp.x,y:cp.y,r:50,col:'#c04848',t:0,maxT:0.45});
+        numbers.push({x:cp.x,y:cp.y-30,val:`-${dmg}`,col:'#c04848',t:0,maxT:0.9});
+      }
+      return false;
+    }
+    return true;
+  });
+
+  // check wave clear
+  if(state==='wave' && spawnQueue.length===0 && enemies.length===0 && !waveCleared) {
+    waveCleared = true;
+    setTimeout(openShop, 600);
+  }
+
+  // check game over
+  if(coreHP<=0 && state==='wave') { state='gameover'; showGameOver(); }
+
+  // effects
+  glows=glows.filter(g=>{g.t+=dt;return g.t<g.maxT;});
+  coins=coins.filter(c=>{c.t+=dt;c.y+=c.vy*dt;c.vy+=120*dt;return c.t<c.maxT;});
+  numbers=numbers.filter(n=>{n.t+=dt;return n.t<n.maxT;});
+  explosions=explosions.filter(ex=>{ex.t+=dt;ex.r=ex.maxR*(ex.t/ex.maxT);return ex.t<ex.maxT;});
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════
+const C = {
+  bg:'#111620', bg2:'#0e1018', surface:'#1d2438', raised:'#26304a',
+  border:'#334060', dim:'#404e68', text:'#ddd0b0', muted:'#7888a8',
+  accent:'#c8a040', core:'#c8a040', hp:'#52a870', hpBg:'#1a2028',
+  danger:'#c04848',
+};
+
+function drawBg() {
+  // subtle grid lines in bg
+  ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(51,64,96,0.25)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function drawGlows() {
+  glows.forEach(g=>{
+    const a=1-g.t/g.maxT;
+    const rr=g.r*(1+g.t/g.maxT*0.5);
+    const grad=ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,rr);
+    grad.addColorStop(0,g.col+Math.round(a*150).toString(16).padStart(2,'0'));
+    grad.addColorStop(1,g.col+'00');
+    ctx.beginPath();ctx.arc(g.x,g.y,rr,0,Math.PI*2);
+    ctx.fillStyle=grad;ctx.fill();
+  });
+  // explosions
+  explosions.forEach(ex=>{
+    const a=1-ex.t/ex.maxT;
+    const grad=ctx.createRadialGradient(ex.x,ex.y,0,ex.x,ex.y,ex.r);
+    grad.addColorStop(0,ex.col+Math.round(a*180).toString(16).padStart(2,'0'));
+    grad.addColorStop(0.5,ex.col+Math.round(a*80).toString(16).padStart(2,'0'));
+    grad.addColorStop(1,ex.col+'00');
+    ctx.beginPath();ctx.arc(ex.x,ex.y,ex.r,0,Math.PI*2);
+    ctx.fillStyle=grad;ctx.fill();
+  });
+}
+
+function drawGrid() {
+  // path dashes between cells
+  ctx.setLineDash([4,5]); ctx.strokeStyle=C.dim+'55'; ctx.lineWidth=1;
+  pathOrder.forEach((ci,idx)=>{
+    const ni=pathOrder[(idx+1)%pathOrder.length];
+    const a=cellPos(grid[ci].row,grid[ci].col);
+    const b=cellPos(grid[ni].row,grid[ni].col);
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // cells
+  grid.forEach((cell,ci)=>{
+    const p=cellPos(cell.row,cell.col);
+    const hs=CELL/2;
+
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,0.4)';
+    ctx.fillRect(p.x-hs+3,p.y-hs+3,CELL-4,CELL-4);
+
+    // cell bg
+    ctx.fillStyle=C.surface;
+    ctx.fillRect(p.x-hs,p.y-hs,CELL,CELL);
+    ctx.strokeStyle=C.border; ctx.lineWidth=1;
+    ctx.strokeRect(p.x-hs,p.y-hs,CELL,CELL);
+
+    // top highlight
+    ctx.fillStyle=C.raised;
+    ctx.fillRect(p.x-hs,p.y-hs,CELL,3);
+
+    if(cell.rune) {
+      const rune=cell.rune;
+      const frac=Math.min(1,(t-lastFired[ci])/rune.cd);
+      const ready=frac>=1;
+
+      // cooldown arc
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,22,-Math.PI/2,-Math.PI/2+Math.PI*2*frac);
+      ctx.strokeStyle=rune.col+(ready?'cc':'44');
+      ctx.lineWidth=3; ctx.stroke();
+
+      // rune symbol
+      if(ready){ctx.shadowColor=rune.col;ctx.shadowBlur=12;}
+      ctx.font=`${ready?'bold':'normal'} 20px serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=ready?rune.col:C.dim;
+      ctx.fillText(rune.sym,p.x,p.y+1);
+      ctx.shadowBlur=0;
+
+      // rune name tiny
+      ctx.font='9px Noto Serif SC,serif';
+      ctx.fillStyle=C.muted; ctx.textBaseline='bottom';
+      ctx.fillText(rune.name.replace('符文',''),p.x,p.y+hs-4);
+    } else {
+      ctx.font='11px Noto Serif SC,serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=C.dim; ctx.fillText('空',p.x,p.y);
+    }
+  });
+}
+
+function drawCore() {
+  const cp=corePos();
+  const pulse=0.7+0.3*Math.sin(t*3.5);
+  const grad=ctx.createRadialGradient(cp.x,cp.y,0,cp.x,cp.y,30*pulse);
+  grad.addColorStop(0,shieldActive?'rgba(82,168,112,.7)':'rgba(200,160,64,.65)');
+  grad.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.arc(cp.x,cp.y,30*pulse,0,Math.PI*2);
+  ctx.fillStyle=grad;ctx.fill();
+
+  ctx.beginPath();ctx.arc(cp.x,cp.y,7,0,Math.PI*2);
+  ctx.fillStyle=shieldActive?'#52a870':C.core;ctx.fill();
+
+  // hp bar
+  const bw=52,bh=5,bx=cp.x-bw/2,by=cp.y+14;
+  ctx.fillStyle=C.hpBg;ctx.fillRect(bx,by,bw,bh);
+  const hpFrac=coreHP/INIT_HP;
+  ctx.fillStyle=hpFrac>0.5?C.hp:hpFrac>0.25?'#d4a843':C.danger;
+  ctx.fillRect(bx,by,bw*hpFrac,bh);
+  ctx.font='9px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillStyle=C.muted;ctx.fillText(`核心 ${coreHP}/${INIT_HP}`,cp.x,by+7);
+
+  // shield indicator
+  if(shieldActive) {
+    ctx.beginPath();ctx.arc(cp.x,cp.y,20,0,Math.PI*2);
+    ctx.strokeStyle='#52a870aa';ctx.lineWidth=2;ctx.stroke();
+  }
+}
+
+function drawKnight() {
+  const x=Math.round(knight.x), y=Math.round(knight.y);
+  const moving = Math.abs(knight.x - cellPos(grid[pathOrder[knight.pathIdx%pathOrder.length]].row, grid[pathOrder[knight.pathIdx%pathOrder.length]].col).x) > 5;
+  const legPhase = moving ? Math.sin(t*8)*4 : 0;
+
+  // shadow
+  ctx.beginPath();ctx.ellipse(x,y+3,9,4,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fill();
+  // legs
+  ctx.fillStyle='#6878a0';
+  ctx.fillRect(x-4+legPhase,y-8,4,9);
+  ctx.fillRect(x+0-legPhase,y-8,4,9);
+  // body
+  ctx.fillStyle='#8898b8';ctx.fillRect(x-5,y-20,10,13);
+  ctx.fillStyle='rgba(200,160,64,.3)';ctx.fillRect(x-3,y-19,6,11);
+  // head/helmet
+  ctx.fillStyle='#8898b8';
+  ctx.beginPath();ctx.arc(x,y-24,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=C.bg;ctx.fillRect(x-4,y-26,8,2);
+  // haste glow
+  if(hasteMul>1){
+    ctx.beginPath();ctx.arc(x,y-15,14,0,Math.PI*2);
+    ctx.strokeStyle='#d4a84355';ctx.lineWidth=2;ctx.stroke();
+  }
+}
+
+function drawEnemies() {
+  enemies.forEach(e=>{
+    const slowed=e.slowed>0;
+    const isBoss=e.type==='boss';
+    const sz=isBoss?18:e.type==='armored'?11:9;
+    const col=slowed?'#1a3a50':isBoss?'#6a1a1a':e.type==='armored'?'#2a3050':'#7a2020';
+    const border=slowed?'#56aed0':isBoss?'#e06060':e.type==='armored'?'#5070b0':'#c04848';
+
+    // shadow
+    ctx.beginPath();ctx.ellipse(e.x,e.y+2,sz,sz*0.4,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fill();
+    // body
+    ctx.fillStyle=col;
+    ctx.fillRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
+    ctx.strokeStyle=border;ctx.lineWidth=isBoss?2:1.5;
+    ctx.strokeRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
+    // eyes
+    ctx.fillStyle=slowed?'#56aed0':'#ff5555';
+    ctx.fillRect(e.x-sz*0.5,e.y-sz*1.5,sz*0.35,sz*0.35);
+    ctx.fillRect(e.x+sz*0.15,e.y-sz*1.5,sz*0.35,sz*0.35);
+    // shield indicator
+    if(e.shield>0) {
+      ctx.strokeStyle='#7888a8';ctx.lineWidth=2;
+      ctx.strokeRect(e.x-sz-2,e.y-sz*2-2,sz*2+4,sz*2+4);
+    }
+    // hp bar
+    const bw=sz*2+4;
+    ctx.fillStyle=C.hpBg;ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw,4);
+    ctx.fillStyle=e.type==='armored'?'#5070b0':border;
+    ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw*(e.hp/e.maxHp),4);
+  });
+}
+
+function drawProjectiles() {
+  projectiles.forEach(p=>{
+    const trail=6;
+    ctx.beginPath();
+    ctx.moveTo(p.x-p.vx/300*trail,p.y-p.vy/300*trail);
+    ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle=p.col+'66';ctx.lineWidth=2;ctx.stroke();
+    ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
+    ctx.fillStyle=p.col;ctx.fill();
+  });
+}
+
+function drawCoins() {
+  coins.forEach(c=>{
+    const a=1-c.t/c.maxT;
+    ctx.globalAlpha=a;
+    ctx.beginPath();ctx.arc(c.x,c.y,5,0,Math.PI*2);
+    ctx.fillStyle='#f0c040';ctx.fill();
+    ctx.font='bold 9px serif';ctx.textAlign='center';
+    ctx.fillStyle='#fff';ctx.textBaseline='bottom';
+    ctx.fillText(`+${c.val}`,c.x,c.y-8);
+    ctx.globalAlpha=1;
+  });
+}
+
+function drawNumbers() {
+  numbers.forEach(n=>{
+    const a=1-n.t/n.maxT;
+    ctx.globalAlpha=a;
+    ctx.font='bold 13px Noto Serif SC,serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=n.col;
+    ctx.fillText(n.val,n.x,n.y-n.t*30);
+    ctx.globalAlpha=1;
+  });
+}
+
+function drawHUD() {
+  // top bar bg
+  ctx.fillStyle='rgba(10,13,20,0.88)';ctx.fillRect(0,0,W,40);
+  ctx.fillStyle=C.border;ctx.fillRect(0,39,W,1);
+
+  ctx.textBaseline='middle';
+  // wave
+  ctx.font='600 13px Cinzel,serif';ctx.textAlign='left';
+  ctx.fillStyle=C.accent;
+  const wl=waveIdx<WAVES.length?`第 ${waveIdx+1} 波 / ${WAVES.length}`:'全部通关';
+  ctx.fillText(wl,16,20);
+  // gold
+  ctx.textAlign='center';
+  ctx.fillStyle='#f0c040';
+  ctx.fillText(`💰 ${gold}`,W/2,20);
+  // kills
+  ctx.textAlign='right';
+  ctx.fillStyle=C.muted;ctx.font='12px Noto Serif SC,serif';
+  ctx.fillText(`击杀 ${totalKills}`,W-16,20);
+
+  // bottom bar
+  ctx.fillStyle='rgba(10,13,20,0.75)';ctx.fillRect(0,H-36,W,36);
+  ctx.fillStyle=C.border;ctx.fillRect(0,H-36,W,1);
+  ctx.font='11px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle=C.dim;
+  const tips=['小人踩到格子时触发符文','波次结束后可进行购买','怪物死亡时自动掉落金币'];
+  ctx.fillText(tips[waveIdx%tips.length],W/2,H-18);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════════════════════
+let lastTs=null;
+function loop(ts) {
+  if(!lastTs)lastTs=ts;
+  const dt=Math.min((ts-lastTs)/1000,0.1);lastTs=ts;
+
+  if(state==='wave'||state==='placing'){
+    update(dt);
+  }
+
+  ctx.clearRect(0,0,W,H);
+  drawBg();
+  drawGlows();
+  drawGrid();
+  drawCore();
+  drawEnemies();
+  drawProjectiles();
+  drawKnight();
+  drawCoins();
+  drawNumbers();
+  drawHUD();
+
+  requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SHOP
+// ═══════════════════════════════════════════════════════════
+function openShop() {
+  if(waveIdx+1 >= WAVES.length) { state='victory'; showVictory(); return; }
+  state='shop';
+  const shopEl=document.getElementById('shop');
+  document.getElementById('shop-title').textContent=`第 ${waveIdx+1} 波结束`;
+  document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
+  shopEl.classList.remove('hidden');
+  renderShopCards();
+}
+
+function renderShopCards() {
+  document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
+  const container=document.getElementById('shop-cards');
+  container.innerHTML='';
+
+  // pick 3 random runes not already placed
+  const placedIds=grid.filter(c=>c.rune).map(c=>c.rune.id);
+  const available=Object.values(RUNES).filter(r=>!placedIds.includes(r.id)||true); // allow duplicates
+  const picks=[];
+  const pool=[...available];
+  while(picks.length<3&&pool.length>0){
+    const i=Math.floor(Math.random()*pool.length);
+    picks.push(pool.splice(i,1)[0]);
+  }
+
+  // shovel option
+  const shovelCost=30;
+  const allItems=[...picks.map(r=>({type:'rune',data:r})), {type:'shovel',data:{cost:shovelCost}}];
+
+  allItems.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='shop-card';
+    const cost=item.type==='rune'?item.data.cost:item.data.cost;
+    const canAfford=gold>=cost;
+    if(!canAfford)card.classList.add('cant-afford');
+
+    if(item.type==='rune'){
+      const r=item.data;
+      card.style.setProperty('--col',r.col);
+      card.innerHTML=`
+        <span class="sc-sym">${r.sym}</span>
+        <div class="sc-name">${r.name}</div>
+        <div class="sc-cost">💰 ${r.cost} 金币</div>
+        <div class="sc-desc">${r.desc}</div>
+        <span class="sc-badge badge-rune">符文</span>`;
+      if(canAfford) card.addEventListener('click',()=>buyRune(r));
+    } else {
+      card.style.setProperty('--col','#52a870');
+      card.innerHTML=`
+        <span class="sc-sym">⛏</span>
+        <div class="sc-name">铲子</div>
+        <div class="sc-cost">💰 ${shovelCost} 金币</div>
+        <div class="sc-desc">扩展格子地图一格，新增一个符文槽位</div>
+        <span class="sc-badge badge-shovel">扩展</span>`;
+      if(canAfford) card.addEventListener('click',()=>buyShovel());
+    }
+    container.appendChild(card);
+  });
+}
+
+function buyRune(rune) {
+  if(gold<rune.cost)return;
+  gold-=rune.cost;
+  document.getElementById('shop').classList.add('hidden');
+  // if empty slots exist, go to placing mode
+  if(emptyCells().length>0){
+    pendingRune=rune;
+    state='placing';
+    document.getElementById('place-prompt').classList.remove('hidden');
+  } else {
+    // no empty slots, ask which to replace — for demo just place in BL
+    const target=grid.find(c=>c.rune)||grid[0];
+    target.rune={...rune};
+    advanceWave();
+  }
+}
+
+function buyShovel() {
+  const cost=30;
+  if(gold<cost)return;
+  gold-=cost;
+  expandGrid();
+  document.getElementById('shop').classList.add('hidden');
+  advanceWave();
+}
+
+canvas.addEventListener('click', e=>{
+  if(state!=='placing'||!pendingRune) return;
+  const rect=canvas.getBoundingClientRect();
+  const scaleX=W/rect.width, scaleY=H/rect.height;
+  const mx=(e.clientX-rect.left)*scaleX;
+  const my=(e.clientY-rect.top)*scaleY;
+
+  // find clicked empty cell
+  const clicked=grid.find(cell=>{
+    if(cell.rune) return false;
+    const p=cellPos(cell.row,cell.col);
+    return Math.abs(mx-p.x)<CELL/2&&Math.abs(my-p.y)<CELL/2;
+  });
+  if(clicked){
+    clicked.rune={...pendingRune};
+    pendingRune=null;
+    document.getElementById('place-prompt').classList.add('hidden');
+    advanceWave();
+  }
+});
+
+function advanceWave() {
+  waveIdx++;
+  waveCleared=false;
+  if(waveIdx>=WAVES.length){ state='victory'; showVictory(); return; }
+  spawnQueue=buildSpawnQueue(WAVES[waveIdx]);
+  spawnTimer=1.5;
+  state='wave';
+}
+
+document.getElementById('shop-skip').addEventListener('click',()=>{
+  document.getElementById('shop').classList.add('hidden');
+  advanceWave();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  END SCREENS
+// ═══════════════════════════════════════════════════════════
+function showGameOver() {
+  document.getElementById('go-stat').textContent=`波次 ${waveIdx+1}  · 击杀 ${totalKills}  · 金币 ${gold}`;
+  document.getElementById('ov-gameover').classList.remove('hidden');
+}
+function showVictory() {
+  document.getElementById('vic-stat').textContent=`全部 ${WAVES.length} 波通关  · 击杀 ${totalKills}  · 剩余金币 ${gold}`;
+  document.getElementById('ov-victory').classList.remove('hidden');
+}
+
+function resetGame() {
+  document.querySelectorAll('.overlay').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('shop').classList.add('hidden');
+  document.getElementById('place-prompt').classList.add('hidden');
+  enemies=[]; projectiles=[]; coins=[]; glows=[]; numbers=[]; explosions=[];
+  pendingRune=null; echoNext=false; hasteMul=1; hasteTimer=0;
+  shieldActive=false; shieldTimer=0;
+  waveIdx=0; gold=5; coreHP=INIT_HP; totalKills=0; t=0;
+  waveCleared=false;
+  initGrid();
+  state='wave';
+  spawnQueue=buildSpawnQueue(WAVES[0]);
+  spawnTimer=1.5;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+document.getElementById('btn-start').addEventListener('click',()=>{
+  document.getElementById('ov-start').classList.add('hidden');
+  resetGame();
+});
+document.getElementById('btn-restart').addEventListener('click',()=>{
+  document.getElementById('ov-gameover').classList.add('hidden');
+  resetGame();
+});
+document.getElementById('btn-again').addEventListener('click',()=>{
+  document.getElementById('ov-victory').classList.add('hidden');
+  resetGame();
+});
+
+initGrid();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
