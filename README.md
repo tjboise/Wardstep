@@ -1,26 +1,26 @@
-# Runemark *(working title)*
+# Wardstep
 
-A roguelite tower-defense deckbuilder for Steam.
+一款 Roguelite 卡牌构筑策略防御游戏，目标平台 Steam。
 
-A knight patrols the ramparts of a crumbling castle. You place magic rune cards on the path — they fire when the knight steps on them. Waves of monsters pour in. Build your deck, chain combos, collect relics, and see how far you can run.
+在一张不断扩展的格子地图上放置符文，守卫中心核心。小人自动巡逻踩格触发符文效果，怪物从四面涌来。买铲子扩格子，买符文堆构筑，赢 Boss 拿稀有牌，撑过 8 大关。
 
 ---
 
-## Design Documents
+## 设计文档
 
-- [Game Design Document](docs/GDD.md) — full gameplay spec
-- [Card Reference](docs/cards.md) *(coming soon)*
-- [Act & Run Structure](docs/run-structure.md) *(coming soon)*
+- **[互动设计文档](https://tjboise.github.io/Wardstep/docs/design.html)** — 含格子演示、卡牌、关卡结构（网页版）
+- [游戏设计文档 GDD](docs/GDD.md) — 完整设计规格（Markdown）
 
-## Development Log
+## 开发日志
 
-| Date | Milestone |
-|------|-----------|
-| 2026-08-31 | Project started — core concept finalized |
+| 日期 | 里程碑 |
+|------|--------|
+| 2026-08-31 | 项目启动，核心玩法确定 |
+| 2026-08-31 | 格子系统、铲子机制、8大关结构确定 |
 
-## Inspiration
+## 灵感来源
 
-- **Balatro** — relic system, run structure, persistent accumulation
-- **Slay the Spire** — card upgrade paths, meta-progression
-- **Hades** — "every run has progress" feel
-- Original mobile game: runner + track placement mechanic
+- **Balatro** — 遗物系统、局内累积感、随机构筑
+- **Slay the Spire** — 卡牌升级路线、元进度
+- **Hades** — 每局都有成长感
+- 原版手机游戏 — 跑道 + 触发机制
