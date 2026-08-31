@@ -9,7 +9,17 @@
 ## 设计文档
 
 - **[互动设计文档](https://tjboise.github.io/Wardstep/docs/design.html)** — 含格子演示、卡牌、关卡结构（网页版）
-- [游戏设计文档 GDD](docs/GDD.md) — 完整设计规格（Markdown）
+- [游戏设计文档 GDD](docs/GDD.md) — 完整设计规格
+
+## 设计资源
+
+| 类别 | 页面 | 说明 |
+|------|------|------|
+| **[符文图鉴](https://tjboise.github.io/Wardstep/design/runes/)** | [design/runes/](design/runes/) | 所有符文的完整设计，可搜索筛选 |
+| 遗物图鉴 | [design/relics/](design/relics/) | 即将上线 |
+| 怪物图鉴 | [design/monsters/](design/monsters/) | 即将上线 |
+| 关卡设计 | [design/stages/](design/stages/) | 即将上线 |
+| 源代码 | [src/](src/) | 引擎待定 |
 
 ## 开发日志
 

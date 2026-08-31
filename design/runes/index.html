@@ -1,0 +1,383 @@
+<title>Wardstep · 符文图鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap">
+
+<style>
+:root {
+  --bg:#111620; --surface:#1d2438; --raised:#26304a;
+  --border:#334060; --border2:#253050;
+  --text:#ddd0b0; --muted:#7888a8; --dim:#404e68;
+  --accent:#c8a040; --accent-lo:rgba(200,160,64,.12);
+  --danger:#c04848; --frost:#56aed0; --emerald:#52a870;
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f0e4cc; --surface:#e0cca8; --raised:#d4be94;
+  --border:#b89e70; --border2:#c8ae80;
+  --text:#1c140a; --muted:#7a6040; --dim:#a89068;
+  --accent:#8a5c10; --accent-lo:rgba(138,92,16,.10);
+  --danger:#a82828; --frost:#1e72a0; --emerald:#2a7848;
+}}
+:root[data-theme="light"]{
+  --bg:#f0e4cc; --surface:#e0cca8; --raised:#d4be94;
+  --border:#b89e70; --border2:#c8ae80;
+  --text:#1c140a; --muted:#7a6040; --dim:#a89068;
+  --accent:#8a5c10; --accent-lo:rgba(138,92,16,.10);
+  --danger:#a82828; --frost:#1e72a0; --emerald:#2a7848;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun',serif;font-size:15px;line-height:1.7;min-height:100vh;}
+
+.page{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+
+/* header */
+.site-header{padding:40px 0 32px;border-bottom:1px solid var(--border2);margin-bottom:32px;}
+.breadcrumb{font-size:.7rem;letter-spacing:.16em;color:var(--dim);margin-bottom:12px;}
+.breadcrumb a{color:var(--dim);text-decoration:none;}
+.breadcrumb a:hover{color:var(--accent);}
+.header-row{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+.page-title{font-family:'Cinzel',serif;font-weight:700;font-size:2rem;letter-spacing:.1em;color:var(--accent);}
+.page-sub{color:var(--muted);font-size:.9rem;margin-left:auto;}
+
+/* stats bar */
+.stats-bar{display:flex;gap:32px;flex-wrap:wrap;margin-bottom:28px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:4px;}
+.stat{display:flex;flex-direction:column;gap:2px;}
+.stat-val{font-family:'Cinzel',serif;font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;}
+.stat-lbl{font-size:.68rem;letter-spacing:.1em;color:var(--muted);}
+
+/* controls */
+.controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;align-items:center;}
+.search{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:9px 14px;color:var(--text);font-family:inherit;font-size:.88rem;outline:none;}
+.search:focus{border-color:var(--accent);}
+.search::placeholder{color:var(--dim);}
+.filters{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'Noto Serif SC',serif;font-size:.72rem;letter-spacing:.08em;border-radius:2px;cursor:pointer;transition:all .15s;}
+.filter-btn:hover,.filter-btn.active{background:var(--accent-lo);border-color:var(--accent);color:var(--accent);}
+
+/* grid */
+.rune-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+
+/* card */
+.rune-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:transform .15s,border-color .2s;cursor:default;}
+.rune-card:hover{transform:translateY(-3px);border-color:var(--card-col,var(--accent));}
+.card-top{padding:18px 18px 14px;position:relative;}
+.card-top::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-col,var(--accent));}
+.card-sym-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.card-sym{font-size:2.2rem;line-height:1;width:44px;text-align:center;}
+.card-title-block{flex:1;}
+.card-name{font-weight:600;font-size:1rem;color:var(--text);margin-bottom:3px;line-height:1.2;}
+.card-cd{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;}
+.cd-bar{width:48px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.cd-fill{height:100%;background:var(--card-col,var(--accent));opacity:.55;}
+.card-effect{font-size:.88rem;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.tag{font-size:.62rem;letter-spacing:.08em;padding:3px 8px;border-radius:2px;border:1px solid var(--border2);color:var(--dim);}
+.card-bottom{padding:12px 18px;border-top:1px solid var(--border2);background:var(--raised);}
+.up-label{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.up-list{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.up-list li{font-size:.8rem;color:var(--muted);line-height:1.4;padding-left:10px;position:relative;}
+.up-list li::before{content:'→';position:absolute;left:0;color:var(--dim);}
+.fusion-row{margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);}
+.fusion-label{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.fusion-item{font-size:.78rem;color:var(--frost);line-height:1.4;}
+
+/* status badge */
+.status{position:absolute;top:12px;right:12px;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:2px;}
+.s-designed{background:var(--accent-lo);border:1px solid rgba(200,160,64,.3);color:var(--accent);}
+.s-todo{background:rgba(64,78,104,.3);border:1px solid var(--border);color:var(--dim);}
+.s-implemented{background:rgba(82,168,112,.15);border:1px solid rgba(82,168,112,.3);color:var(--emerald);}
+
+/* empty state */
+.empty{text-align:center;padding:60px 20px;color:var(--dim);font-size:.95rem;}
+
+@media(max-width:600px){.rune-grid{grid-template-columns:1fr;}.header-row{flex-direction:column;align-items:flex-start;}}
+</style>
+
+<div class="page">
+
+  <header class="site-header">
+    <div class="breadcrumb"><a href="../../README.md">Wardstep</a> / design / runes</div>
+    <div class="header-row">
+      <div class="page-title">符文图鉴</div>
+      <div class="page-sub">每张符文的完整设计规格 · 实时更新</div>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">已设计</div></div>
+    <div class="stat"><div class="stat-val" id="stat-impl">0</div><div class="stat-lbl">已实现</div></div>
+    <div class="stat"><div class="stat-val" id="stat-fusions">0</div><div class="stat-lbl">融合配方</div></div>
+    <div class="stat"><div class="stat-val" id="stat-tags">0</div><div class="stat-lbl">标签种类</div></div>
+  </div>
+
+  <div class="controls">
+    <input class="search" type="text" id="search" placeholder="搜索符文名称或效果…">
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-tag="全部">全部</button>
+    </div>
+  </div>
+
+  <div class="rune-grid" id="rune-grid"></div>
+  <div class="empty" id="empty" style="display:none">没有找到符合条件的符文</div>
+
+</div>
+
+<script>
+/* ── 符文数据库 ── 每次新增符文在这里添加一条 ───────────── */
+const RUNES = [
+  {
+    id: "arrow",
+    name: "箭矢符文",
+    symbol: "⟶",
+    color: "#c8a040",
+    cooldown: "2s",
+    cooldownPct: 30,
+    cooldownLevel: "短",
+    effect: "向最近的怪物发射一枚箭矢。",
+    upgrades: [
+      "银箭 — 同时发射 2 枚",
+      "连锁箭 — 在最多 3 个目标间跳跃"
+    ],
+    fusions: [
+      { needs: "回响符文", result: "箭雨符文 — 同时发射 5 枚" }
+    ],
+    tags: ["伤害", "单体", "远程"],
+    status: "designed"
+  },
+  {
+    id: "frost",
+    name: "冰霜符文",
+    symbol: "❄",
+    color: "#56aed0",
+    cooldown: "3s",
+    cooldownPct: 50,
+    cooldownLevel: "中",
+    effect: "使屏幕上所有怪物减速 2 秒。",
+    upgrades: [
+      "深层冰霜 — 减速幅度更强",
+      "暴风雪 — 范围减速 + 持续伤害"
+    ],
+    fusions: [
+      { needs: "炸弹符文", result: "冰炸弹 — 冰冻 + 碎裂伤害" }
+    ],
+    tags: ["控制", "减速", "范围"],
+    status: "designed"
+  },
+  {
+    id: "blade",
+    name: "刀刃符文",
+    symbol: "✦",
+    color: "#c04848",
+    cooldown: "2.5s",
+    cooldownPct: 42,
+    cooldownLevel: "中",
+    effect: "以本格为中心，AOE 伤害周围所有怪物。",
+    upgrades: [
+      "横扫 — AOE 范围翻倍",
+      "锋锐 — 秒杀低血量目标（HP < 20%）"
+    ],
+    fusions: [],
+    tags: ["伤害", "范围", "AOE"],
+    status: "designed"
+  },
+  {
+    id: "haste",
+    name: "急行符文",
+    symbol: "≫",
+    color: "#d4a843",
+    cooldown: "1.5s",
+    cooldownPct: 22,
+    cooldownLevel: "短",
+    effect: "小人移速 +60% 持续 3 秒，单次巡逻可触发更多格子。",
+    upgrades: [
+      "疾风步 — 移速 +80%，持续 4 秒",
+      "幻影步 — 留下残影，残影也可触发符文"
+    ],
+    fusions: [
+      { needs: "黄金符文", result: "商人步 — 每步自动获得金币" }
+    ],
+    tags: ["增益", "移速", "连锁"],
+    status: "designed"
+  },
+  {
+    id: "gold",
+    name: "黄金符文",
+    symbol: "◆",
+    color: "#c8a040",
+    cooldown: "5s",
+    cooldownPct: 78,
+    cooldownLevel: "长",
+    effect: "立即获得 3 枚金币。",
+    upgrades: [
+      "贵金符文 — 获得 5 枚金币",
+      "皇家符文 — 5 枚金币 + 商店额外抽 1 张牌"
+    ],
+    fusions: [
+      { needs: "急行符文", result: "商人步 — 每步自动获得金币" }
+    ],
+    tags: ["经济", "金币"],
+    status: "designed"
+  },
+  {
+    id: "shield",
+    name: "盾壁符文",
+    symbol: "⬡",
+    color: "#52a870",
+    cooldown: "6s",
+    cooldownPct: 90,
+    cooldownLevel: "长",
+    effect: "格挡下一只到达核心的怪物并使其眩晕，不造成伤害。",
+    upgrades: [
+      "神盾 — 格挡 2 只怪物",
+      "壁垒 — 格挡 + 反弹伤害为范围爆炸"
+    ],
+    fusions: [],
+    tags: ["防御", "格挡", "控制"],
+    status: "designed"
+  },
+  {
+    id: "bomb",
+    name: "炸弹符文",
+    symbol: "◉",
+    color: "#c04848",
+    cooldown: "5s",
+    cooldownPct: 78,
+    cooldownLevel: "长",
+    effect: "投下一颗炸弹，1 秒后在最密集的敌群处爆炸，大范围高伤害。",
+    upgrades: [
+      "集束炸弹 — 分裂为 3 个小爆炸",
+      "地狱火 — 爆炸后附加火焰持续伤害"
+    ],
+    fusions: [
+      { needs: "冰霜符文", result: "冰炸弹 — 冰冻 + 碎裂伤害" }
+    ],
+    tags: ["伤害", "范围", "延迟"],
+    status: "designed"
+  },
+  {
+    id: "echo",
+    name: "回响符文",
+    symbol: "∿",
+    color: "#9070d0",
+    cooldown: "1s",
+    cooldownPct: 12,
+    cooldownLevel: "极短",
+    effect: "小人踩到的下一格符文效果翻倍触发。放置顺序决定一切。",
+    upgrades: [
+      "共鸣 — 接下来 2 格各翻倍触发",
+      "连锁 — 双触效果传递至所有相邻格"
+    ],
+    fusions: [
+      { needs: "箭矢符文", result: "箭雨符文 — 同时发射 5 枚" }
+    ],
+    tags: ["增益", "倍增", "连锁"],
+    status: "designed"
+  }
+];
+/* ──────────────────────────────────────────────────────── */
+
+function statusLabel(s) {
+  if(s==='designed') return ['已设计','s-designed'];
+  if(s==='implemented') return ['已实现','s-implemented'];
+  return ['待设计','s-todo'];
+}
+
+function cdBarWidth(pct) { return Math.max(10, Math.min(95, pct)); }
+
+function renderCard(r) {
+  const [sLabel, sClass] = statusLabel(r.status);
+  const fusions = r.fusions.map(f =>
+    `<div class="fusion-item">+ ${f.needs} → ${f.result}</div>`
+  ).join('');
+  const fusionBlock = fusions ? `
+    <div class="fusion-row">
+      <div class="fusion-label">融合配方</div>
+      ${fusions}
+    </div>` : '';
+
+  return `
+  <div class="rune-card" style="--card-col:${r.color}" data-tags="${r.tags.join(',')}" data-name="${r.name}" data-effect="${r.effect}">
+    <div class="card-top">
+      <span class="status ${sClass}">${sLabel}</span>
+      <div class="card-sym-row">
+        <span class="card-sym">${r.symbol}</span>
+        <div class="card-title-block">
+          <div class="card-name">${r.name}</div>
+          <div class="card-cd">
+            <span>冷却 ${r.cooldown}</span>
+            <div class="cd-bar"><div class="cd-fill" style="width:${cdBarWidth(r.cooldownPct)}%"></div></div>
+            <span>${r.cooldownLevel}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-effect">${r.effect}</div>
+      <div class="card-tags">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+    <div class="card-bottom">
+      <div class="up-label">升级路线</div>
+      <ul class="up-list">
+        ${r.upgrades.map(u=>`<li>${u}</li>`).join('')}
+      </ul>
+      ${fusionBlock}
+    </div>
+  </div>`;
+}
+
+function buildFilters() {
+  const tagSet = new Set(['全部']);
+  RUNES.forEach(r => r.tags.forEach(t => tagSet.add(t)));
+  const container = document.getElementById('filters');
+  container.innerHTML = '';
+  tagSet.forEach(tag => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (tag==='全部'?' active':'');
+    btn.dataset.tag = tag;
+    btn.textContent = tag;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    });
+    container.appendChild(btn);
+  });
+}
+
+function applyFilters() {
+  const query = document.getElementById('search').value.toLowerCase();
+  const activeTag = document.querySelector('.filter-btn.active')?.dataset.tag || '全部';
+  const cards = document.querySelectorAll('.rune-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const tags = card.dataset.tags.split(',');
+    const name = card.dataset.name;
+    const effect = card.dataset.effect;
+    const tagMatch = activeTag==='全部' || tags.includes(activeTag);
+    const queryMatch = !query || name.includes(query) || effect.includes(query);
+    const show = tagMatch && queryMatch;
+    card.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+  document.getElementById('empty').style.display = visible===0 ? '' : 'none';
+}
+
+function updateStats() {
+  const designed = RUNES.filter(r=>r.status!=='todo').length;
+  const implemented = RUNES.filter(r=>r.status==='implemented').length;
+  const fusions = RUNES.reduce((n,r)=>n+r.fusions.length,0)/2; // each fusion counted twice
+  const allTags = new Set(RUNES.flatMap(r=>r.tags));
+  document.getElementById('stat-total').textContent = designed;
+  document.getElementById('stat-impl').textContent = implemented;
+  document.getElementById('stat-fusions').textContent = Math.ceil(fusions) || RUNES.reduce((n,r)=>n+r.fusions.length,0);
+  document.getElementById('stat-tags').textContent = allTags.size;
+}
+
+function init() {
+  const grid = document.getElementById('rune-grid');
+  grid.innerHTML = RUNES.map(renderCard).join('');
+  buildFilters();
+  updateStats();
+  document.getElementById('search').addEventListener('input', applyFilters);
+}
+
+init();
+</script>
