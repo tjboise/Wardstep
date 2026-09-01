@@ -39,7 +39,7 @@ canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
 .sc-sym{font-size:1.45rem;display:block;margin-bottom:4px;}
 .sc-name{font-family:'Noto Serif SC',serif;font-weight:600;font-size:.76rem;color:#ddd0b0;margin-bottom:2px;}
 .sc-cost{font-family:'Cinzel',serif;font-size:.68rem;color:#f0c040;margin-bottom:4px;}
-.sc-desc{font-size:.64rem;color:#7888a8;line-height:1.5;}
+.sc-desc{font-size:.62rem;color:#7888a8;line-height:1.45;}
 .sc-tag{font-size:.55rem;letter-spacing:.08em;padding:2px 5px;border-radius:2px;display:inline-block;margin-top:5px;}
 .tag-r{background:rgba(200,160,64,.12);border:1px solid rgba(200,160,64,.28);color:#c8a040;}
 .tag-s{background:rgba(82,168,112,.12);border:1px solid rgba(82,168,112,.28);color:#52a870;}
@@ -71,7 +71,8 @@ canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
 .hc{width:60px;background:#1d2438;border:1.5px solid #2a3850;border-top:2px solid var(--col,#c8a040);border-radius:3px;padding:7px 5px 5px;cursor:pointer;text-align:center;transition:transform .13s,box-shadow .13s;user-select:none;}
 .hc:hover{transform:translateY(-2px);}
 .hc.sel{border-color:var(--col,#c8a040);box-shadow:0 0 9px var(--col,#c8a040),0 3px 12px rgba(0,0,0,.5);transform:translateY(-5px);}
-.hc-sym{font-size:1.25rem;display:block;margin-bottom:3px;}
+.hc-sym{font-size:1.25rem;display:block;margin-bottom:1px;}
+.hc-lv{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.06em;margin-bottom:1px;}
 .hc-name{font-family:'Noto Serif SC',serif;font-size:.55rem;color:#7888a8;line-height:1.2;}
 .hand-empty{font-family:'Noto Serif SC',serif;font-size:.74rem;color:#3a4860;}
 
@@ -95,9 +96,10 @@ canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
     <div class="ov-title">守卫核心</div>
     <div class="ov-sub">怪物从四面涌来，守住格子中心的核心。小人自动巡逻踩格触发符文。</div>
     <div class="ov-info">
-      符文：箭矢 · 战刀（踩两次召唤战士）· 冰冻 · 炮弹 · 月刃（弹射）<br>
-      小关×2 → 精英关（三选一遗物）→ Boss关<br>
-      商店可花 2 金币刷新，可跳过
+      符文可升级 Lv1→Lv2→Lv3（商店买同类自动合成）<br>
+      连续触发不同符文可触发连携：冻射 · 寒爆 · 冰碎 · 血印 · 追踪 · 引爆 · 共振<br>
+      三连携：★绝对零度 · ★同归于尽 · ★永冻域<br>
+      小关×2 → 精英关（三选一遗物）→ Boss关
     </div>
     <button class="btn" id="btn-start">开始游戏</button>
   </div>
@@ -108,7 +110,7 @@ canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
     <div class="panel-gold" id="shop-gold">💰 0</div>
     <div class="card-row" id="shop-cards"></div>
     <div class="shop-row">
-      <button class="refresh-btn" id="shop-refresh">🔄 刷新 (2💰)</button>
+      <button class="refresh-btn" id="shop-refresh">🔄 刷新 (1💰)</button>
       <span class="skip-link" id="shop-skip">跳过 →</span>
     </div>
   </div>
@@ -153,11 +155,36 @@ const W=800,H=520,CELL=86,KSPD_BASE=82;
 
 // ── RUNE DATABASE ──
 const RUNES={
-  arrow:    {id:'arrow',    name:'箭矢', sym:'⟶', col:'#c8a040', cd:1.5, cost:12, desc:'向最近敌人射出一枚箭'},
-  blade:    {id:'blade',    name:'战刀', sym:'⚔', col:'#c04848', cd:0.9, cost:15, desc:'踩两次：首次蓄力，再次召唤持刀战士'},
-  frost:    {id:'frost',   name:'冰冻', sym:'❄', col:'#56aed0', cd:2.5, cost:18, desc:'全体敌人减速'},
-  bomb:     {id:'bomb',    name:'炮弹', sym:'◉', col:'#e06030', cd:5.0, cost:20, desc:'延迟爆炸，轰炸大范围，伤害极高'},
-  moonblade:{id:'moonblade',name:'月刃', sym:'☽', col:'#9070d0', cd:2.0, cost:16, desc:'弹射投掷物，在敌人间来回弹射'},
+  arrow:    {id:'arrow',    name:'箭矢', sym:'⟶', col:'#c8a040', cd:1.5, cost:12},
+  blade:    {id:'blade',    name:'战刀', sym:'⚔', col:'#c04848', cd:0.9, cost:15},
+  frost:    {id:'frost',   name:'冰冻', sym:'❄', col:'#56aed0', cd:2.5, cost:18},
+  bomb:     {id:'bomb',    name:'炮弹', sym:'◉', col:'#e06030', cd:5.0, cost:20},
+  moonblade:{id:'moonblade',name:'月刃', sym:'☽', col:'#9070d0', cd:2.0, cost:16},
+};
+
+// Level descriptions [lv1, lv2, lv3]
+const RUNE_DESCS={
+  arrow:    ['1枚箭 3伤','2枚箭 4伤','3枚穿透箭 6伤'],
+  blade:    ['召唤战士 HP20 ATK5','召唤精英 HP40 ATK8','召唤双战士 HP30 ATK7'],
+  frost:    ['减速70% 2.5秒','减速80% 4秒','冻结1.5秒+减速3秒'],
+  bomb:     ['爆炸12伤 r110','双重爆炸12伤','超级爆22伤 r150+火区'],
+  moonblade:['弹射2次','弹射4次+逐跳增伤','双刃各弹射3次'],
+};
+
+// ── COMBOS ──
+const COMBOS={
+  'frost+arrow':    {name:'冻射',   col:'#8cd4f0', desc:'箭矢打中所有减速敌人'},
+  'frost+bomb':     {name:'寒爆',   col:'#8cd4f0', desc:'爆炸后留下减速区域'},
+  'frost+moonblade':{name:'冰碎',   col:'#8cd4f0', desc:'月刃命中冻结敌人时溅射'},
+  'arrow+blade':    {name:'血印',   col:'#e06080', desc:'战士额外在箭矢目标处生成'},
+  'arrow+moonblade':{name:'追踪',   col:'#b090f0', desc:'月刃精准追踪箭矢目标'},
+  'blade+bomb':     {name:'引爆',   col:'#f07030', desc:'炮弹立刻在战士处爆炸'},
+  'bomb+moonblade': {name:'共振',   col:'#c090e8', desc:'月刃对已炸区域敌人双倍伤害'},
+};
+const CHAINS3={
+  'frost+arrow+moonblade':{name:'★绝对零度', col:'#c0f0ff'},
+  'arrow+blade+bomb':     {name:'★同归于尽', col:'#f09050'},
+  'frost+bomb+moonblade': {name:'★永冻域',   col:'#80d0ff'},
 };
 
 // ── RELICS ──
@@ -188,15 +215,21 @@ let state='start',waveIdx=0,gold=20,maxHP=20,coreHP=20;
 let shld=false,shldT=0,kills=0,t=0;
 let hand=[],selHand=-1,grid=[],path=[],lf=[],bladeCharge=[];
 let knight={x:0,y:0,pi:0};
-let enemies=[],warriors=[],proj=[],exps=[],coins=[],glows=[],nums=[];
+let enemies=[],warriors=[],proj=[],exps=[],coins=[],glows=[],nums=[],slowZones=[];
 let spawnQ=[],spawnT=0,cleared=false;
 let mouse={x:-999,y:-999};
 
 // Relic modifiers
 let ownedRelics=[];
-let extraProj=0, kSpdMul=1, dmgMul=1, frostDur=2.5;
+let extraProj=0,kSpdMul=1,dmgMul=1;
 
-// Boss summon interval
+// Shop state
+let shopRefreshCost=1;
+
+// Combo tracking
+let lastFiredId=null,prevFiredId=null,lastFiredT=-99,lastArrowTarget=null;
+
+// Boss summon
 let bossInterval=null;
 
 cv.addEventListener('mousemove',e=>{
@@ -242,9 +275,14 @@ function expandGrid(){
 }
 
 // ── ENEMIES ──
+function mkEnemy(g){
+  return{hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,
+         slowed:0,slowFactor:.3,frozenUntil:0,
+         sh:g.type==='a'?1:g.type==='e'?2:0};
+}
 function mkQ(wc){
   const q=[];
-  wc.enemies.forEach(g=>{for(let i=0;i<g.count;i++)q.push({hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,slowed:0,sh:g.type==='a'?1:g.type==='e'?2:0});});
+  wc.enemies.forEach(g=>{for(let i=0;i<g.count;i++)q.push(mkEnemy(g));});
   for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]];}
   return q;
 }
@@ -268,65 +306,186 @@ function dealDmg(e,d){
 }
 
 // ── WARRIORS ──
-function spawnWarrior(x,y){
-  warriors.push({x,y,hp:20,maxHp:20,atk:5,atkCd:1.0,atkT:0});
+function spawnWarrior(x,y,lv){
+  lv=lv||1;
+  const w={x,y,
+    hp:lv===3?30:lv===2?40:20,
+    maxHp:lv===3?30:lv===2?40:20,
+    atk:lv===3?7:lv===2?8:5,
+    atkCd:1.0,atkT:0,lv,
+    sh:lv===2?1:0};
+  warriors.push(w);
   glows.push({x,y,r:35,col:'#c04848',t:0,mt:.5});
-  nums.push({x,y:y-24,v:'战士召唤!',col:'#c04848',t:0,mt:1.2});
+  nums.push({x,y:y-24,v:lv>1?`战士 Lv${lv}!`:'战士召唤!',col:'#c04848',t:0,mt:1.2});
 }
+
+// ── COMBO HELPERS ──
+function checkCombo(id){
+  const chain=prevFiredId?`${prevFiredId}+${lastFiredId}+${id}`:null;
+  if(chain&&CHAINS3[chain])return{...CHAINS3[chain],type:'chain3'};
+  const pair=lastFiredId?`${lastFiredId}+${id}`:null;
+  if(pair&&COMBOS[pair])return{...COMBOS[pair],type:'combo'};
+  return null;
+}
+function showCombo(combo,p){
+  const big=combo.type==='chain3';
+  nums.push({x:W/2,y:big?H/2-50:H/2-38,v:combo.name,col:combo.col,t:0,mt:big?2.4:1.8,big});
+  glows.push({x:p.x,y:p.y,r:big?80:55,col:combo.col,t:0,mt:.6});
+}
+function updateComboState(id){prevFiredId=lastFiredId;lastFiredId=id;lastFiredT=t;}
 
 // ── RUNE EFFECTS ──
 function fireRune(ci,rune){
+  const lv=rune.lv||1;
   const cell=grid[ci],p=cp2(cell.row,cell.col);
+
+  // Blade is 2-step: combo check only on step 2
+  if(rune.id==='blade'){
+    if(!bladeCharge[ci]){
+      bladeCharge[ci]=1;
+      lf[ci]=t-rune.cd+0.6;
+      glows.push({x:p.x,y:p.y,r:18,col:rune.col,t:0,mt:.4});
+      nums.push({x:p.x,y:p.y-20,v:'蓄力…',col:rune.col,t:0,mt:1});
+    }else{
+      bladeCharge[ci]=0;lf[ci]=t;
+      const combo=checkCombo(rune.id);
+      if(combo)showCombo(combo,p);
+      glows.push({x:p.x,y:p.y,r:28,col:rune.col,t:0,mt:.4});
+      if(lv>=3){
+        spawnWarrior(p.x-14,p.y,lv);
+        spawnWarrior(p.x+14,p.y,lv);
+      }else{
+        spawnWarrior(p.x,p.y,lv);
+      }
+      // 血印: extra warrior at arrow target
+      if((combo?.name==='血印'||combo?.name==='★同归于尽')&&lastArrowTarget){
+        spawnWarrior(lastArrowTarget.x,lastArrowTarget.y,1);
+      }
+      updateComboState(rune.id);
+    }
+    return;
+  }
+
+  const combo=checkCombo(rune.id);
+  if(combo)showCombo(combo,p);
   glows.push({x:p.x,y:p.y,r:24,col:rune.col,t:0,mt:.3});
 
   if(rune.id==='arrow'){
-    const shots=1+extraProj;
-    // pick top N targets by distance
-    const sorted=enemies.slice().sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));
-    for(let i=0;i<Math.min(shots,sorted.length);i++){
-      const nn=sorted[i];
-      const a=Math.atan2(nn.y-p.y,nn.x-p.x);
-      proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:Math.round(3*dmgMul),col:rune.col,bounces:0});
-    }
-  } else if(rune.id==='blade'){
-    // 2-step: first trample charges, second spawns warrior
-    if(!bladeCharge[ci]){
-      bladeCharge[ci]=1;
-      lf[ci]=t-rune.cd+0.6; // allow next trigger after 0.6s
-      glows.push({x:p.x,y:p.y,r:18,col:rune.col,t:0,mt:.4});
-      nums.push({x:p.x,y:p.y-20,v:'蓄力…',col:rune.col,t:0,mt:1});
-    } else {
-      bladeCharge[ci]=0;
-      lf[ci]=t;
-      spawnWarrior(p.x,p.y);
-    }
-    return; // lf already managed above
-  } else if(rune.id==='frost'){
-    enemies.forEach(e=>e.slowed=frostDur);
-    glows.push({x:corePos().x,y:corePos().y,r:140,col:rune.col,t:0,mt:.7});
-  } else if(rune.id==='bomb'){
-    setTimeout(()=>{
-      if(state!=='wave')return;
-      let cx=p.x,cy=p.y,cnt=0;
-      enemies.forEach(e=>{cx+=e.x;cy+=e.y;cnt++;});
-      if(cnt>0){cx=(cx-p.x)/cnt;cy=(cy-p.y)/cnt;}else{cx=p.x;cy=p.y;}
-      const br=110;
-      exps.push({x:cx,y:cy,r:0,mr:br,t:0,mt:.55,col:rune.col});
-      enemies.forEach(e=>{if(Math.hypot(e.x-cx,e.y-cy)<br)dealDmg(e,Math.round(12*dmgMul));});
-    },900);
-    nums.push({x:p.x,y:p.y-20,v:'💣',col:rune.col,t:0,mt:1});
-  } else if(rune.id==='moonblade'){
-    const shots=1+extraProj;
-    for(let i=0;i<shots;i++){
-      let nn=null,nd=9999;
-      enemies.forEach(e=>{const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<nd){nd=d;nn=e;}});
-      if(nn){
+    let shots=lv===3?3:lv===2?2:1;
+    shots+=extraProj;
+    const dmg=Math.round((lv===3?6:lv===2?4:3)*dmgMul);
+    const pierce=lv>=3;
+    const isFrozenShot=combo?.name==='冻射'||combo?.name==='★绝对零度';
+
+    if(isFrozenShot){
+      const targets=enemies.filter(e=>e.slowed>0||e.frozenUntil>t);
+      if(targets.length===0){
+        // Fall back to normal if no slowed enemies
+        const sorted=enemies.slice().sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));
+        if(sorted.length>0){
+          const nn=sorted[0];
+          lastArrowTarget={x:nn.x,y:nn.y};
+          const a=Math.atan2(nn.y-p.y,nn.x-p.x);
+          proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:dmg,col:rune.col,bounces:0,pierce:false,hitSet:null});
+        }
+      }else{
+        targets.forEach((e,i)=>{
+          const a=Math.atan2(e.y-p.y,e.x-p.x);
+          proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:dmg,col:rune.col,bounces:0,pierce,hitSet:pierce?new Set():null});
+          if(i===0)lastArrowTarget={x:e.x,y:e.y};
+        });
+      }
+    }else{
+      const sorted=enemies.slice().sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));
+      for(let i=0;i<Math.min(shots,sorted.length);i++){
+        const nn=sorted[i];
         const a=Math.atan2(nn.y-p.y,nn.x-p.x);
-        const hs=new Set([nn]);
-        proj.push({x:p.x,y:p.y,vx:Math.cos(a)*260,vy:Math.sin(a)*260,d:Math.round(4*dmgMul),col:rune.col,bounces:2+extraProj,hitSet:hs});
+        proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:dmg,col:rune.col,bounces:0,pierce,hitSet:pierce?new Set():null});
+        if(i===0)lastArrowTarget={x:nn.x,y:nn.y};
+      }
+    }
+
+  }else if(rune.id==='frost'){
+    const slowFactor=lv>=2?0.2:0.3;
+    const slowDur=lv>=2?4:2.5;
+    enemies.forEach(e=>{
+      e.slowed=lv>=3?4.5:slowDur;
+      e.slowFactor=slowFactor;
+      if(lv>=3)e.frozenUntil=t+1.5;
+    });
+    glows.push({x:corePos().x,y:corePos().y,r:140,col:rune.col,t:0,mt:.7});
+
+  }else if(rune.id==='bomb'){
+    const leaveSlow=combo?.name==='寒爆'||combo?.name==='★永冻域';
+    const bladeCombo=combo?.name==='引爆'||combo?.name==='★同归于尽';
+    nums.push({x:p.x,y:p.y-20,v:'💣',col:rune.col,t:0,mt:1});
+
+    const getTgt=()=>{
+      let sx=0,sy=0,cnt=0;
+      enemies.forEach(e=>{sx+=e.x;sy+=e.y;cnt++;});
+      return cnt>0?{x:sx/cnt,y:sy/cnt}:{x:p.x,y:p.y};
+    };
+    const doExp=(tx,ty,d,dmgAmt,br)=>{
+      setTimeout(()=>{
+        if(state!=='wave')return;
+        exps.push({x:tx,y:ty,r:0,mr:br,t:0,mt:.55,col:rune.col});
+        enemies.forEach(e=>{if(Math.hypot(e.x-tx,e.y-ty)<br)dealDmg(e,Math.round(dmgAmt*dmgMul));});
+        if(leaveSlow)slowZones.push({x:tx,y:ty,r:br*.65,t:0,mt:3,fire:false});
+        if(lv>=3)slowZones.push({x:tx,y:ty,r:60,t:0,mt:4,fire:true});
+      },d);
+    };
+
+    if(bladeCombo&&warriors.length>0){
+      const w=warriors[0];
+      doExp(w.x,w.y,100,lv>=3?22:12,lv>=3?150:110);
+    }else if(lv===2){
+      setTimeout(()=>{
+        const tgt=getTgt();
+        doExp(tgt.x,tgt.y,0,12,100);
+        const a=Math.random()*Math.PI*2;
+        doExp(tgt.x+50*Math.cos(a),tgt.y+50*Math.sin(a),300,12,100);
+      },900);
+    }else{
+      setTimeout(()=>{
+        const tgt=getTgt();
+        doExp(tgt.x,tgt.y,0,lv>=3?22:12,lv>=3?150:110);
+      },900);
+    }
+
+  }else if(rune.id==='moonblade'){
+    const isTracking=combo?.name==='追踪'||combo?.name==='★绝对零度';
+    const isResonance=combo?.name==='共振';
+    const isIceFrag=combo?.name==='冰碎'||combo?.name==='★永冻域';
+    let shots=lv===3?2:1;
+    shots+=extraProj;
+    const bounces=lv===3?3:lv===2?4:2;
+    const baseDmg=Math.round((isResonance?8:4)*dmgMul);
+
+    for(let i=0;i<shots;i++){
+      let target=null;
+      if(isTracking&&lastArrowTarget){
+        target={a:Math.atan2(lastArrowTarget.y-p.y,lastArrowTarget.x-p.x)};
+      }else{
+        let nn=null,nd=9999;
+        enemies.forEach(e=>{const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<nd){nd=d;nn=e;}});
+        if(nn)target={a:Math.atan2(nn.y-p.y,nn.x-p.x)};
+      }
+      if(target){
+        const hs=new Set();
+        proj.push({
+          x:p.x,y:p.y,
+          vx:Math.cos(target.a)*260,vy:Math.sin(target.a)*260,
+          d:baseDmg,col:rune.col,
+          bounces,hitSet:hs,
+          iceFrag:isIceFrag,
+          dmgBonus:lv>=2?1:0,
+          pierce:false
+        });
       }
     }
   }
+
+  updateComboState(rune.id);
 }
 
 // ── RELICS ──
@@ -356,9 +515,8 @@ function update(dt){
       const cell=grid[tci];
       if(cell.rune){
         if(cell.rune.id==='blade'){
-          // blade manages its own lf
-          if(t-lf[tci]>=cell.rune.cd) fireRune(tci,cell.rune);
-        } else if(t-lf[tci]>=cell.rune.cd){
+          if(t-lf[tci]>=cell.rune.cd)fireRune(tci,cell.rune);
+        }else if(t-lf[tci]>=cell.rune.cd){
           lf[tci]=t;
           fireRune(tci,cell.rune);
         }
@@ -377,9 +535,27 @@ function update(dt){
 
   // enemy movement
   enemies.forEach(e=>{
-    const s=e.slowed>0?e.spd*.3:e.spd,dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
+    const frozen=e.frozenUntil>t;
+    const s=frozen?e.spd*.02:e.slowed>0?e.spd*(e.slowFactor||.3):e.spd;
+    const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
     if(d>14){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
     if(e.slowed>0)e.slowed-=dt;
+  });
+
+  // slow zones
+  slowZones=slowZones.filter(z=>{
+    z.t+=dt;
+    enemies.forEach(e=>{
+      if(Math.hypot(e.x-z.x,e.y-z.y)<z.r){
+        if(z.fire){
+          dealDmg(e,8*dt*dmgMul);
+        }else{
+          e.slowed=Math.max(e.slowed,.6);
+          e.slowFactor=Math.min(e.slowFactor||.3,.3);
+        }
+      }
+    });
+    return z.t<z.mt;
   });
 
   // warriors
@@ -408,13 +584,19 @@ function update(dt){
   proj=proj.filter(p=>{
     p.x+=p.vx*dt;p.y+=p.vy*dt;
     if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20)return false;
+    let consumed=false;
     for(let i=enemies.length-1;i>=0;i--){
       const e=enemies[i];
       if(p.hitSet&&p.hitSet.has(e))continue;
       if(Math.hypot(p.x-e.x,p.y-e.y)<14){
-        dealDmg(e,p.d);
+        const dmg=p.d+(p.dmgBonus||0)*p.bounces;
+        dealDmg(e,dmg);
         glows.push({x:e.x,y:e.y,r:14,col:p.col,t:0,mt:.2});
-        // bouncing moonblade
+        // ice frag combo
+        if(p.iceFrag&&(e.frozenUntil>t||e.slowed>0)){
+          exps.push({x:e.x,y:e.y,r:0,mr:55,t:0,mt:.4,col:'#56aed0'});
+          enemies.forEach(ne=>{if(ne!==e&&Math.hypot(ne.x-e.x,ne.y-e.y)<55)dealDmg(ne,Math.round(4*dmgMul));});
+        }
         if(p.bounces>0){
           if(!p.hitSet)p.hitSet=new Set();
           p.hitSet.add(e);
@@ -426,13 +608,19 @@ function update(dt){
           });
           if(nn2){
             const a2=Math.atan2(nn2.y-p.y,nn2.x-p.x);
-            proj.push({x:p.x,y:p.y,vx:Math.cos(a2)*260,vy:Math.sin(a2)*260,d:p.d,col:p.col,bounces:p.bounces-1,hitSet:p.hitSet});
+            proj.push({x:p.x,y:p.y,vx:Math.cos(a2)*260,vy:Math.sin(a2)*260,d:p.d,col:p.col,bounces:p.bounces-1,hitSet:p.hitSet,iceFrag:p.iceFrag,dmgBonus:p.dmgBonus});
           }
+          consumed=true;break;
+        }else if(p.pierce){
+          if(!p.hitSet)p.hitSet=new Set();
+          p.hitSet.add(e);
+          // don't consume
+        }else{
+          consumed=true;break;
         }
-        return false;
       }
     }
-    return true;
+    return !consumed;
   });
 
   // enemy death / reach core
@@ -488,6 +676,20 @@ function drawBg(){
   for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 }
 
+function drawSlowZones(){
+  slowZones.forEach(z=>{
+    const a=(1-z.t/z.mt)*.22;
+    const col=z.fire?`rgba(224,96,48,${a})`:`rgba(86,174,208,${a})`;
+    const gr=ctx.createRadialGradient(z.x,z.y,0,z.x,z.y,z.r);
+    gr.addColorStop(0,col);gr.addColorStop(1,z.fire?`rgba(224,96,48,0)`:`rgba(86,174,208,0)`);
+    ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+    if(z.fire){
+      ctx.strokeStyle=`rgba(224,96,48,${a*2})`;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,Math.PI*2);ctx.stroke();
+    }
+  });
+}
+
 function drawGlows(){
   glows.forEach(g=>{
     const a=1-g.t/g.mt,r2=g.r*(1+g.t/g.mt*.5);
@@ -534,26 +736,23 @@ function drawGrid(){
     ctx.fillStyle='#26304a';ctx.fillRect(p.x-hs,p.y-hs,CELL,3);
 
     if(cell.rune){
-      const rune=cell.rune;
-      // for blade, show charge state instead of normal cd ring
+      const rune=cell.rune,lv=rune.lv||1;
       if(rune.id==='blade'){
         const charged=bladeCharge[ci]===1;
-        // base dim ring
         ctx.beginPath();ctx.arc(p.x,p.y,22,-Math.PI/2,Math.PI*1.5);
         ctx.strokeStyle=rune.col+'22';ctx.lineWidth=3;ctx.stroke();
         if(charged){
-          // half-ring showing charge
           ctx.beginPath();ctx.arc(p.x,p.y,22,-Math.PI/2,Math.PI/2);
           ctx.strokeStyle=rune.col+'cc';ctx.lineWidth=4;ctx.stroke();
           ctx.beginPath();ctx.arc(p.x,p.y,22,Math.PI/2,Math.PI*1.5);
           ctx.strokeStyle=rune.col+'33';ctx.lineWidth=4;ctx.stroke();
           if(Math.sin(t*6)>.3){ctx.shadowColor=rune.col;ctx.shadowBlur=10;}
-        } else {
+        }else{
           const frac=Math.min(1,(t-lf[ci])/rune.cd);
           ctx.beginPath();ctx.arc(p.x,p.y,22,-Math.PI/2,-Math.PI/2+Math.PI*2*frac);
           ctx.strokeStyle=rune.col+(frac>=1?'cc':'44');ctx.lineWidth=3;ctx.stroke();
         }
-      } else {
+      }else{
         const frac=Math.min(1,(t-lf[ci])/rune.cd),ready=frac>=1;
         ctx.beginPath();ctx.arc(p.x,p.y,22,-Math.PI/2,-Math.PI/2+Math.PI*2*frac);
         ctx.strokeStyle=rune.col+(ready?'cc':'44');ctx.lineWidth=3;ctx.stroke();
@@ -565,6 +764,11 @@ function drawGrid(){
       ctx.fillText(cell.rune.sym,p.x,p.y+1);ctx.shadowBlur=0;
       ctx.font='8px Noto Serif SC,serif';ctx.fillStyle='#3a4860';ctx.textBaseline='bottom';
       ctx.fillText(cell.rune.name,p.x,p.y+hs-4);
+      // Level badge
+      if(lv>1){
+        ctx.font='bold 9px Cinzel,serif';ctx.textAlign='right';ctx.textBaseline='top';
+        ctx.fillStyle=rune.col;ctx.fillText(`L${lv}`,p.x+hs-5,p.y-hs+5);
+      }
     }else{
       ctx.font='10px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillStyle=state==='prep'?'#2e3c58':'#1d2438';ctx.fillText('空',p.x,p.y);
@@ -613,39 +817,49 @@ function drawWarriors(){
   warriors.forEach(w=>{
     const x=Math.round(w.x),y=Math.round(w.y);
     ctx.beginPath();ctx.ellipse(x,y+3,8,3.5,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
-    // legs
     ctx.fillStyle='#7a3838';ctx.fillRect(x-4,y-7,4,8);ctx.fillRect(x+1,y-7,4,8);
-    // body
-    ctx.fillStyle='#c04848';ctx.fillRect(x-5,y-19,10,12);
-    // head
+    const bodyCol=w.lv===3?'#e05858':w.lv===2?'#b03080':'#c04848';
+    ctx.fillStyle=bodyCol;ctx.fillRect(x-5,y-19,10,12);
     ctx.fillStyle='#b84040';ctx.beginPath();ctx.arc(x,y-23,5,0,Math.PI*2);ctx.fill();
-    // sword (angled line)
     ctx.strokeStyle='#e8e0b0';ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(x+5,y-20);ctx.lineTo(x+16,y-7);ctx.stroke();
     ctx.beginPath();ctx.arc(x+8,y-15,3,0,Math.PI*2);ctx.strokeStyle='#c8a040';ctx.lineWidth=1;ctx.stroke();
-    // hp bar
+    if(w.sh>0){
+      ctx.strokeStyle='#9070d0aa';ctx.lineWidth=2;
+      ctx.strokeRect(x-8,y-27,16,24);
+    }
     ctx.fillStyle='#1a2028';ctx.fillRect(x-10,y-31,20,3);
-    ctx.fillStyle='#c04848';ctx.fillRect(x-10,y-31,20*(w.hp/w.maxHp),3);
+    ctx.fillStyle=bodyCol;ctx.fillRect(x-10,y-31,20*(w.hp/w.maxHp),3);
+    if(w.lv>1){
+      ctx.font='bold 8px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillStyle=bodyCol;ctx.fillText(`L${w.lv}`,x,y-31);
+    }
   });
 }
 
 function drawEnemies(){
   enemies.forEach(e=>{
-    const sl=e.slowed>0,boss=e.type==='b',elite=e.type==='e';
+    const sl=e.slowed>0,frozen=e.frozenUntil>t,boss=e.type==='b',elite=e.type==='e';
     const sz=boss?20:elite?14:e.type==='a'?11:9;
-    const fill=sl?(boss?'#1a2a40':elite?'#2a1a40':'#1a3a50')
+    const fill=frozen?'#1a2848':sl?(boss?'#1a2a40':elite?'#2a1a40':'#1a3a50')
                :boss?'#6a1a1a':elite?'#3a1a5a':e.type==='a'?'#2a3050':'#7a2020';
-    const bdr=sl?'#56aed0':boss?'#e06060':elite?'#9060d0':e.type==='a'?'#5070b0':'#c04848';
+    const bdr=frozen?'#8cd4f0':sl?'#56aed0':boss?'#e06060':elite?'#9060d0':e.type==='a'?'#5070b0':'#c04848';
     ctx.beginPath();ctx.ellipse(e.x,e.y+2,sz,sz*.4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
     ctx.fillStyle=fill;ctx.fillRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
     ctx.strokeStyle=bdr;ctx.lineWidth=boss?2.5:elite?2:1.5;ctx.strokeRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
-    ctx.fillStyle=sl?'#56aed0':'#ff5555';
+    ctx.fillStyle=sl||frozen?'#56aed0':'#ff5555';
     ctx.fillRect(e.x-sz*.5,e.y-sz*1.5,sz*.35,sz*.35);
     ctx.fillRect(e.x+sz*.15,e.y-sz*1.5,sz*.35,sz*.35);
     if(e.sh>0){ctx.strokeStyle=elite?'#9060d0aa':'#7888a8aa';ctx.lineWidth=1.5;ctx.strokeRect(e.x-sz-2,e.y-sz*2-2,sz*2+4,sz*2+4);}
     if(boss){
       ctx.fillStyle='#f0c040';
       ctx.fillRect(e.x-8,e.y-sz*2-5,4,6);ctx.fillRect(e.x-2,e.y-sz*2-8,4,9);ctx.fillRect(e.x+4,e.y-sz*2-5,4,6);
+    }
+    if(frozen){
+      // Ice crystal overlay
+      ctx.strokeStyle='#8cd4f099';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(e.x-sz,e.y-sz*2);ctx.lineTo(e.x+sz,e.y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(e.x+sz,e.y-sz*2);ctx.lineTo(e.x-sz,e.y);ctx.stroke();
     }
     const bw=sz*2+4;
     ctx.fillStyle='#1a2028';ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw,4);
@@ -661,7 +875,7 @@ function drawProj(){
       ctx.strokeStyle=p.col+'88';ctx.lineWidth=3;ctx.stroke();
       ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();
       ctx.beginPath();ctx.arc(p.x,p.y,8,0.3,Math.PI-.3);ctx.strokeStyle=p.col+'66';ctx.lineWidth=1.5;ctx.stroke();
-    } else {
+    }else{
       ctx.beginPath();ctx.moveTo(p.x-p.vx/300*6,p.y-p.vy/300*6);ctx.lineTo(p.x,p.y);
       ctx.strokeStyle=p.col+'66';ctx.lineWidth=2;ctx.stroke();
       ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();
@@ -680,9 +894,21 @@ function drawCoins(){
 
 function drawNums(){
   nums.forEach(n=>{
-    const a=1-n.t/n.mt;ctx.globalAlpha=a;
-    ctx.font='bold 13px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle=n.col;ctx.fillText(n.v,n.x,n.y-n.t*28);ctx.globalAlpha=1;
+    const a=Math.max(0,1-n.t/n.mt);ctx.globalAlpha=a;
+    if(n.big){
+      ctx.font='bold 18px Noto Serif SC,serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor=n.col;ctx.shadowBlur=24;
+      ctx.fillStyle=n.col;
+      ctx.fillText(n.v,n.x,n.y-n.t*18);
+      ctx.shadowBlur=0;
+    }else{
+      ctx.font='bold 13px Noto Serif SC,serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=n.col;
+      ctx.fillText(n.v,n.x,n.y-n.t*28);
+    }
+    ctx.globalAlpha=1;
   });
 }
 
@@ -714,10 +940,11 @@ function renderHand(){
   const con=document.getElementById('hand-cards');con.innerHTML='';
   if(hand.length===0){con.innerHTML='<span class="hand-empty">手牌为空，可直接开始</span>';return;}
   hand.forEach((rune,i)=>{
+    const lv=rune.lv||1;
     const card=document.createElement('div');
     card.className='hc'+(i===selHand?' sel':'');
     card.style.setProperty('--col',rune.col);
-    card.innerHTML=`<span class="hc-sym">${rune.sym}</span><div class="hc-name">${rune.name}</div>`;
+    card.innerHTML=`<span class="hc-sym">${rune.sym}</span>${lv>1?`<div class="hc-lv" style="color:${rune.col}">Lv${lv}</div>`:''}<div class="hc-name">${rune.name}</div>`;
     card.addEventListener('click',()=>{selHand=selHand===i?-1:i;renderHand();});
     con.appendChild(card);
   });
@@ -751,7 +978,7 @@ document.getElementById('btn-go').addEventListener('click',()=>{
       if(!boss)return;
       for(let i=0;i<3;i++){
         const a=Math.random()*Math.PI*2,r=50+Math.random()*40;
-        enemies.push({hp:3,maxHp:3,spd:26,type:'n',slowed:0,sh:0,x:boss.x+Math.cos(a)*r,y:boss.y+Math.sin(a)*r});
+        enemies.push({hp:3,maxHp:3,spd:26,type:'n',slowed:0,slowFactor:.3,frozenUntil:0,sh:0,x:boss.x+Math.cos(a)*r,y:boss.y+Math.sin(a)*r});
       }
       nums.push({x:boss.x,y:boss.y-34,v:'召唤援军!',col:'#e06060',t:0,mt:1.5});
     },8000);
@@ -761,6 +988,7 @@ document.getElementById('btn-go').addEventListener('click',()=>{
 // ── SHOP ──
 function openShop(){
   state='shop';
+  shopRefreshCost=1;
   document.getElementById('shop-hdr').textContent=`${WAVES[waveIdx].label}结束`;
   document.getElementById('shop').classList.remove('hidden');
   mkShop();
@@ -768,23 +996,27 @@ function openShop(){
 
 function mkShop(){
   document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
+  document.getElementById('shop-refresh').textContent=`🔄 刷新 (${shopRefreshCost}💰)`;
   const con=document.getElementById('shop-cards');con.innerHTML='';
   const pool=Object.values(RUNES),picks=[],used=new Set();
   while(picks.length<3&&picks.length<pool.length){
     const i=Math.floor(Math.random()*pool.length);
     if(!used.has(pool[i].id)){picks.push(pool[i]);used.add(pool[i].id);}
   }
+  // Rune cards + shovel
   [...picks.map(r=>({type:'r',data:r})),{type:'s',data:{cost:28}}].forEach(item=>{
     const card=document.createElement('div'),cost=item.data.cost,can=gold>=cost;
     card.className='sc'+(can?'':' dim');
     if(item.type==='r'){
       const r=item.data;
       card.style.setProperty('--col',r.col);
-      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}</div><div class="sc-desc">${r.desc}</div><span class="sc-tag tag-r">符文</span>`;
-      card.addEventListener('click',()=>{
-        if(gold<r.cost){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
-        gold-=r.cost;hand.push({...r});closeShop();
-      });
+      // Preview merge result in hand
+      const hasLv1=hand.some(h=>h.id===r.id&&(h.lv||1)===1);
+      const hasLv2=hand.some(h=>h.id===r.id&&(h.lv||1)===2);
+      const mergeTag=hasLv1?(hasLv2?'→ Lv3合成':'→ Lv2合成'):'';
+      const desc=RUNE_DESCS[r.id]?.[0]||'';
+      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div><span class="sc-tag tag-r">Lv1 符文</span>`;
+      card.addEventListener('click',()=>buyRune(r));
     }else{
       card.style.setProperty('--col','#52a870');
       card.innerHTML=`<span class="sc-sym">⛏</span><div class="sc-name">铲子</div><div class="sc-cost">💰 28</div><div class="sc-desc">扩展格子，新增符文槽位</div><span class="sc-tag tag-s">扩展</span>`;
@@ -797,6 +1029,29 @@ function mkShop(){
   });
 }
 
+function buyRune(r){
+  if(gold<r.cost){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
+  gold-=r.cost;
+  // Auto-merge: same id same level → upgrade
+  let newRune={...r,lv:1};
+  const merge1=hand.findIndex(h=>h.id===r.id&&(h.lv||1)===1);
+  if(merge1>=0){
+    hand.splice(merge1,1);
+    newRune.lv=2;
+    const merge2=hand.findIndex(h=>h.id===r.id&&(h.lv||1)===2);
+    if(merge2>=0){
+      hand.splice(merge2,1);
+      newRune.lv=3;
+    }
+  }
+  hand.push(newRune);
+  if(newRune.lv>1){
+    nums.push({x:W/2,y:H/2-30,v:`${r.name} → Lv${newRune.lv}!`,col:r.col,t:0,mt:2.0});
+    glows.push({x:W/2,y:H/2,r:80,col:r.col,t:0,mt:.6});
+  }
+  closeShop();
+}
+
 function closeShop(){
   document.getElementById('shop').classList.add('hidden');
   waveIdx++;
@@ -804,8 +1059,10 @@ function closeShop(){
 }
 
 document.getElementById('shop-refresh').addEventListener('click',()=>{
-  if(gold<2){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
-  gold-=2;mkShop();
+  if(gold<shopRefreshCost){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
+  gold-=shopRefreshCost;
+  shopRefreshCost++;
+  mkShop();
 });
 document.getElementById('shop-skip').addEventListener('click',()=>{
   document.getElementById('shop').classList.add('hidden');
@@ -819,7 +1076,6 @@ function openRelicChoice(){
   const con=document.getElementById('relic-cards');con.innerHTML='';
   const ownedIds=ownedRelics.map(r=>r.id);
   const pool=ALL_RELICS.filter(r=>!ownedIds.includes(r.id));
-  // show all available (up to 3)
   const picks=pool.slice(0,3);
   picks.forEach(rel=>{
     const card=document.createElement('div');
@@ -849,12 +1105,14 @@ function reset(){
   document.querySelectorAll('.overlay').forEach(el=>el.classList.add('hidden'));
   ['shop','relic','prep'].forEach(id=>document.getElementById(id).classList.add('hidden'));
   stopBoss();
-  enemies=[];warriors=[];proj=[];coins=[];glows=[];nums=[];exps=[];
+  enemies=[];warriors=[];proj=[];coins=[];glows=[];nums=[];exps=[];slowZones=[];
   selHand=-1;shld=false;shldT=0;
   waveIdx=0;gold=20;maxHP=20;coreHP=20;kills=0;t=0;cleared=false;
-  ownedRelics=[];extraProj=0;kSpdMul=1;dmgMul=1;frostDur=2.5;
+  ownedRelics=[];extraProj=0;kSpdMul=1;dmgMul=1;
+  shopRefreshCost=1;
+  lastFiredId=null;prevFiredId=null;lastFiredT=-99;lastArrowTarget=null;
   renderRelicBar();
-  hand=[{...RUNES.arrow},{...RUNES.frost}];
+  hand=[{...RUNES.arrow,lv:1},{...RUNES.frost,lv:1}];
   initGrid();enterPrep();
 }
 
@@ -869,7 +1127,7 @@ function loop(ts){
   const dt=Math.min((ts-lastTs)/1000,.1);lastTs=ts;
   if(state==='wave')update(dt);
   ctx.clearRect(0,0,W,H);
-  drawBg();drawGlows();drawGrid();drawCore();
+  drawBg();drawSlowZones();drawGlows();drawGrid();drawCore();
   if(state==='wave'){drawEnemies();drawWarriors();}
   drawProj();drawKnight();drawCoins();drawNums();drawHUD();
   requestAnimationFrame(loop);
