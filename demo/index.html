@@ -10,59 +10,60 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;background:#0a0d14;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;}
 body{padding:16px 0 40px;gap:12px;}
-
 h1.logo{font-family:'Cinzel',serif;font-size:1.6rem;letter-spacing:.2em;color:#c8a040;text-shadow:0 0 20px rgba(200,160,64,.4);}
 .subtitle{font-family:'Noto Serif SC',serif;font-size:.75rem;color:#404e68;letter-spacing:.1em;}
-
 #wrap{position:relative;width:min(800px,100vw);flex-shrink:0;}
 canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
 
-/* ── OVERLAYS ── */
-.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:rgba(8,10,18,.88);backdrop-filter:blur(4px);}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(8,10,18,.9);backdrop-filter:blur(4px);}
 .overlay.hidden{display:none;}
-
-.ov-title{font-family:'Cinzel',serif;font-size:clamp(1.4rem,4vw,2.2rem);letter-spacing:.1em;color:#c8a040;text-wrap:balance;text-align:center;}
-.ov-sub{font-family:'Noto Serif SC',serif;font-size:.85rem;color:#7888a8;text-align:center;max-width:34em;line-height:1.8;}
-.ov-stat{font-family:'Cinzel',serif;font-size:1.1rem;color:#ddd0b0;letter-spacing:.06em;}
-
-.btn{font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.14em;padding:12px 32px;border:1px solid #c8a040;background:rgba(200,160,64,.1);color:#c8a040;cursor:pointer;border-radius:2px;transition:background .2s;}
+.ov-title{font-family:'Cinzel',serif;font-size:clamp(1.3rem,4vw,2rem);letter-spacing:.1em;color:#c8a040;text-align:center;}
+.ov-sub{font-family:'Noto Serif SC',serif;font-size:.82rem;color:#7888a8;text-align:center;max-width:32em;line-height:1.8;}
+.ov-info{font-family:'Noto Serif SC',serif;font-size:.76rem;color:#404e68;text-align:center;line-height:1.9;}
+.ov-stat{font-family:'Cinzel',serif;font-size:1rem;color:#ddd0b0;letter-spacing:.06em;}
+.btn{font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:.14em;padding:11px 28px;border:1px solid #c8a040;background:rgba(200,160,64,.1);color:#c8a040;cursor:pointer;border-radius:2px;transition:background .18s;}
 .btn:hover{background:rgba(200,160,64,.22);}
+.btn-sm{padding:7px 18px;font-size:.75rem;}
 .btn-danger{border-color:#c04848;background:rgba(192,72,72,.1);color:#c04848;}
 .btn-danger:hover{background:rgba(192,72,72,.22);}
 
-/* ── SHOP ── */
-#shop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(8,10,18,.92);}
+/* SHOP */
+#shop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;background:rgba(8,10,18,.93);}
 #shop.hidden{display:none;}
-.shop-title{font-family:'Cinzel',serif;font-size:1.1rem;letter-spacing:.1em;color:#c8a040;}
-.shop-sub{font-family:'Noto Serif SC',serif;font-size:.78rem;color:#7888a8;}
-.shop-gold{font-family:'Cinzel',serif;font-size:.9rem;color:#f0c040;letter-spacing:.06em;}
-.shop-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
-
-.shop-card{width:150px;background:#1d2438;border:1px solid #334060;border-radius:4px;padding:16px 14px 12px;cursor:pointer;transition:transform .15s,border-color .2s;position:relative;overflow:hidden;text-align:left;}
-.shop-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--col,#c8a040);}
-.shop-card:hover{transform:translateY(-4px);border-color:var(--col,#c8a040);}
-.shop-card.cant-afford{opacity:.45;cursor:not-allowed;}
-.shop-card.cant-afford:hover{transform:none;}
-.sc-sym{font-size:1.8rem;display:block;margin-bottom:8px;}
-.sc-name{font-family:'Noto Serif SC',serif;font-weight:600;font-size:.82rem;color:#ddd0b0;margin-bottom:4px;}
-.sc-cost{font-family:'Cinzel',serif;font-size:.72rem;color:#f0c040;margin-bottom:6px;}
-.sc-desc{font-size:.72rem;color:#7888a8;line-height:1.5;}
-.sc-badge{font-size:.58rem;letter-spacing:.08em;padding:2px 6px;border-radius:2px;display:inline-block;margin-top:6px;}
-.badge-rune{background:rgba(200,160,64,.12);border:1px solid rgba(200,160,64,.3);color:#c8a040;}
-.badge-shovel{background:rgba(82,168,112,.12);border:1px solid rgba(82,168,112,.3);color:#52a870;}
-.badge-upgrade{background:rgba(86,174,208,.12);border:1px solid rgba(86,174,208,.3);color:#56aed0;}
-
-.shop-skip{font-family:'Noto Serif SC',serif;font-size:.75rem;color:#404e68;cursor:pointer;text-decoration:underline;}
+.shop-hdr{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.1em;color:#c8a040;}
+.shop-gold{font-family:'Cinzel',serif;font-size:.88rem;color:#f0c040;}
+.shop-hint{font-family:'Noto Serif SC',serif;font-size:.74rem;color:#7888a8;}
+.shop-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.sc{width:136px;background:#1d2438;border:1px solid #334060;border-top:3px solid var(--col,#c8a040);border-radius:3px;padding:13px 11px 9px;cursor:pointer;transition:transform .14s,box-shadow .18s;user-select:none;}
+.sc:hover:not(.dim){transform:translateY(-4px);box-shadow:0 4px 16px rgba(0,0,0,.45);}
+.sc.dim{opacity:.35;cursor:not-allowed;}
+.sc-sym{font-size:1.6rem;display:block;margin-bottom:5px;}
+.sc-name{font-family:'Noto Serif SC',serif;font-weight:600;font-size:.78rem;color:#ddd0b0;margin-bottom:3px;}
+.sc-cost{font-family:'Cinzel',serif;font-size:.7rem;color:#f0c040;margin-bottom:5px;}
+.sc-desc{font-size:.68rem;color:#7888a8;line-height:1.5;}
+.sc-tag{font-size:.56rem;letter-spacing:.08em;padding:2px 5px;border-radius:2px;display:inline-block;margin-top:5px;}
+.tag-r{background:rgba(200,160,64,.12);border:1px solid rgba(200,160,64,.28);color:#c8a040;}
+.tag-s{background:rgba(82,168,112,.12);border:1px solid rgba(82,168,112,.28);color:#52a870;}
+.shop-skip{font-family:'Noto Serif SC',serif;font-size:.73rem;color:#3a4860;cursor:pointer;text-decoration:underline;}
 .shop-skip:hover{color:#7888a8;}
 
-/* ── PLACE PROMPT ── */
-#place-prompt{position:absolute;top:45px;left:50%;transform:translateX(-50%);background:#26304a;border:1px solid #c8a040;padding:8px 20px;border-radius:3px;font-family:'Noto Serif SC',serif;font-size:.78rem;color:#c8a040;pointer-events:none;white-space:nowrap;}
-#place-prompt.hidden{display:none;}
+/* PREP */
+#prep{position:absolute;bottom:0;left:0;right:0;background:rgba(6,8,14,.95);border-top:1px solid #2a3850;display:flex;flex-direction:column;align-items:center;gap:8px;padding:9px 16px 13px;}
+#prep.hidden{display:none;}
+.prep-top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;justify-content:center;}
+.prep-lbl{font-family:'Cinzel',serif;font-size:.86rem;letter-spacing:.1em;color:#c8a040;}
+.prep-hint{font-family:'Noto Serif SC',serif;font-size:.68rem;color:#3a4860;}
+.hand-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:70px;align-items:center;}
+.hc{width:60px;background:#1d2438;border:1.5px solid #2a3850;border-top:2px solid var(--col,#c8a040);border-radius:3px;padding:7px 5px 5px;cursor:pointer;text-align:center;transition:transform .13s,box-shadow .13s;user-select:none;}
+.hc:hover{transform:translateY(-2px);}
+.hc.sel{border-color:var(--col,#c8a040);box-shadow:0 0 9px var(--col,#c8a040),0 3px 12px rgba(0,0,0,.5);transform:translateY(-5px);}
+.hc-sym{font-size:1.25rem;display:block;margin-bottom:3px;}
+.hc-name{font-family:'Noto Serif SC',serif;font-size:.55rem;color:#7888a8;line-height:1.2;}
+.hand-empty{font-family:'Noto Serif SC',serif;font-size:.74rem;color:#3a4860;}
 </style>
 </head>
 <body>
-
-<div class="logo-row" style="text-align:center">
+<div style="text-align:center">
   <h1 class="logo">WARDSTEP</h1>
   <div class="subtitle">DEMO · 网页试玩版</div>
 </div>
@@ -70,865 +71,532 @@ canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
 <div id="wrap">
   <canvas id="c"></canvas>
 
-  <!-- start -->
   <div class="overlay" id="ov-start">
     <div class="ov-title">守卫核心</div>
-    <div class="ov-sub">在 2×2 的格子上放置符文，小人自动巡逻触发效果。怪物从四面涌来，守住中心核心。每波结束后购买新符文或扩展格子。</div>
-    <div style="font-family:'Noto Serif SC',serif;font-size:.8rem;color:#404e68;text-align:center;line-height:1.8">
-      初始符文：箭矢（左上） · 冰霜（右上）<br>
-      两个空格等你填满 · 共 3 波敌人
-    </div>
+    <div class="ov-sub">怪物从四面涌来，守住格子中心的核心。小人自动巡逻踩格触发符文，波间可购买新符文或扩展格子。</div>
+    <div class="ov-info">初始手牌：箭矢 · 冰霜<br>每波开始前自由布局 · 共 3 波</div>
     <button class="btn" id="btn-start">开始游戏</button>
   </div>
 
-  <!-- shop -->
   <div id="shop" class="hidden">
-    <div class="shop-title" id="shop-title">第一波结束</div>
-    <div class="shop-gold" id="shop-gold">💰 金币：0</div>
-    <div class="shop-sub">选择一项购买，或直接跳过</div>
-    <div class="shop-cards" id="shop-cards"></div>
-    <div class="shop-skip" id="shop-skip">跳过，开始下一波 →</div>
+    <div class="shop-hdr" id="shop-hdr">波次结束</div>
+    <div class="shop-gold" id="shop-gold">💰 0</div>
+    <div class="shop-hint">购买后进入布局阶段，或直接跳过</div>
+    <div class="shop-row" id="shop-cards"></div>
+    <div class="shop-skip" id="shop-skip">跳过，直接布局 →</div>
   </div>
 
-  <!-- place prompt -->
-  <div id="place-prompt" class="hidden">点击一个格子放置符文</div>
+  <div id="prep" class="hidden">
+    <div class="prep-top">
+      <span class="prep-lbl" id="prep-lbl">第 1 波 · 准备布局</span>
+      <span class="prep-hint">点手牌选中 → 再点格子放置；点格子取回符文</span>
+    </div>
+    <div class="hand-row" id="hand-cards"></div>
+    <button class="btn btn-sm" id="btn-go">开始本波 →</button>
+  </div>
 
-  <!-- gameover -->
-  <div class="overlay hidden" id="ov-gameover">
+  <div class="overlay hidden" id="ov-over">
     <div class="ov-title" style="color:#c04848">核心已陷落</div>
-    <div class="ov-stat" id="go-stat"></div>
-    <button class="btn btn-danger" id="btn-restart">再试一次</button>
+    <div class="ov-stat" id="over-stat"></div>
+    <button class="btn btn-danger" id="btn-retry">再试一次</button>
   </div>
 
-  <!-- victory -->
-  <div class="overlay hidden" id="ov-victory">
+  <div class="overlay hidden" id="ov-win">
     <div class="ov-title">守住了！</div>
-    <div class="ov-stat" id="vic-stat"></div>
-    <div class="ov-sub">这只是 Demo 的三波试玩。完整游戏将有 8 大关，每关三级难度。</div>
+    <div class="ov-stat" id="win-stat"></div>
+    <div class="ov-sub">三波 Demo 通关。完整游戏将有 8 大关。</div>
     <button class="btn" id="btn-again">再玩一次</button>
   </div>
-
 </div>
 
 <script>
 'use strict';
+const W=800,H=520,CELL=86,KSPD=82,INIT_HP=20;
 
-// ═══════════════════════════════════════════════════════════
-//  CONSTANTS
-// ═══════════════════════════════════════════════════════════
-const W = 800, H = 520;
-const CELL = 86;
-const KNIGHT_SPEED = 82;
-const INIT_HP = 20;
-const SHIELD_DURATION = 8; // seconds a shield block lasts
-
-// ═══════════════════════════════════════════════════════════
-//  RUNE DATABASE
-// ═══════════════════════════════════════════════════════════
-const RUNES = {
-  arrow:  { id:'arrow',  name:'箭矢符文', sym:'⟶', col:'#c8a040', cd:2.0, cost:12, desc:'向最近的怪物发射一枚箭矢' },
-  frost:  { id:'frost',  name:'冰霜符文', sym:'❄',  col:'#56aed0', cd:3.0, cost:18, desc:'使所有怪物减速 2.5 秒' },
-  blade:  { id:'blade',  name:'刀刃符文', sym:'✦',  col:'#c04848', cd:2.5, cost:15, desc:'以本格为中心 AOE 伤害' },
-  haste:  { id:'haste',  name:'急行符文', sym:'≫',  col:'#d4a843', cd:1.5, cost:14, desc:'小人移速 +70% 持续 3 秒' },
-  gold:   { id:'gold',   name:'黄金符文', sym:'◆',  col:'#f0c040', cd:5.0, cost:10, desc:'立即获得 4 枚金币' },
-  shield: { id:'shield', name:'盾壁符文', sym:'⬡',  col:'#52a870', cd:6.0, cost:20, desc:'格挡下一只到达核心的怪物' },
-  bomb:   { id:'bomb',   name:'炸弹符文', sym:'◉',  col:'#e06030', cd:5.0, cost:22, desc:'1 秒后在怪群中央爆炸' },
-  echo:   { id:'echo',   name:'回响符文', sym:'∿',  col:'#9070d0', cd:1.0, cost:16, desc:'下一格符文效果翻倍触发' },
+const RUNES={
+  arrow: {id:'arrow', name:'箭矢符文',sym:'⟶',col:'#c8a040',cd:1.5,cost:12,desc:'向最近的怪物发射一枚箭矢'},
+  frost: {id:'frost', name:'冰霜符文',sym:'❄', col:'#56aed0',cd:2.5,cost:18,desc:'全体减速 2.5 秒'},
+  blade: {id:'blade', name:'刀刃符文',sym:'✦', col:'#c04848',cd:2.5,cost:15,desc:'以本格为中心 AOE 伤害'},
+  haste: {id:'haste', name:'急行符文',sym:'≫', col:'#d4a843',cd:1.5,cost:14,desc:'小人急速移动 3 秒'},
+  gold:  {id:'gold',  name:'黄金符文',sym:'◆', col:'#f0c040',cd:5.0,cost:10,desc:'立即获得 4 枚金币'},
+  shield:{id:'shield',name:'盾壁符文',sym:'⬡', col:'#52a870',cd:6.0,cost:20,desc:'格挡下一只到达核心的怪物'},
+  bomb:  {id:'bomb',  name:'炸弹符文',sym:'◉', col:'#e06030',cd:5.0,cost:22,desc:'1 秒后在怪群中央爆炸'},
+  echo:  {id:'echo',  name:'回响符文',sym:'∿', col:'#9070d0',cd:1.0,cost:16,desc:'下一格符文效果翻倍'},
 };
 
-// wave configs: [{count, hp, spd, type}]
-const WAVES = [
-  { enemies:[{count:6,hp:4,spd:30,type:'normal'},{count:2,hp:10,spd:18,type:'armored'}] },
-  { enemies:[{count:8,hp:5,spd:35,type:'normal'},{count:4,hp:12,spd:20,type:'armored'},{count:2,hp:6,spd:55,type:'fast'}] },
-  { enemies:[{count:10,hp:6,spd:38,type:'normal'},{count:4,hp:14,spd:22,type:'armored'},{count:1,hp:60,spd:15,type:'boss'}] },
+const WAVES=[
+  {enemies:[{count:6,hp:4,spd:28,type:'n'},{count:2,hp:10,spd:18,type:'a'}]},
+  {enemies:[{count:8,hp:5,spd:32,type:'n'},{count:3,hp:12,spd:20,type:'a'},{count:2,hp:6,spd:50,type:'f'}]},
+  {enemies:[{count:10,hp:6,spd:35,type:'n'},{count:4,hp:14,spd:22,type:'a'},{count:1,hp:60,spd:14,type:'b'}]},
 ];
 
-// ═══════════════════════════════════════════════════════════
-//  CANVAS SETUP
-// ═══════════════════════════════════════════════════════════
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-canvas.width = W; canvas.height = H;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+cv.width=W; cv.height=H;
 
-// ═══════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════
-let state = 'start'; // start | wave | shop | placing | gameover | victory
-let waveIdx = 0;
-let gold = 5;
-let coreHP = INIT_HP;
-let shieldActive = false;
-let shieldTimer = 0;
-let echoNext = false; // echo effect pending
-let hasteMul = 1;    // haste multiplier
-let hasteTimer = 0;
-let totalKills = 0;
-let t = 0;
+let state='start',waveIdx=0,gold=20,coreHP=INIT_HP;
+let shld=false,shldT=0,echo=false,hasteMul=1,hasteT=0,kills=0,t=0;
+let hand=[],selHand=-1,grid=[],path=[],lf=[];
+let knight={x:0,y:0,pi:0};
+let enemies=[],proj=[],exps=[],coins=[],glows=[],nums=[];
+let spawnQ=[],spawnT=0,cleared=false;
+let mouse={x:-999,y:-999};
 
-// grid: array of cell objects
-let grid = [];
-let pathOrder = []; // indices into grid
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect();
+  mouse.x=(e.clientX-r.left)*(W/r.width);
+  mouse.y=(e.clientY-r.top)*(H/r.height);
+});
 
-// knight
-let knight = { x:0, y:0, pathIdx:0 };
-
-// collections
-let enemies = [];
-let projectiles = [];
-let explosions = []; // {x,y,r,maxR,t,maxT,col}
-let coins = [];      // {x,y,vy,t,maxT}
-let glows = [];      // {x,y,r,col,t,maxT}
-let numbers = [];    // {x,y,val,col,t,maxT} floating text
-let lastFired = [];  // parallel to grid, last fire time
-
-// enemy spawn queue
-let spawnQueue = [];
-let spawnTimer = 0;
-let waveCleared = false;
-
-// shop state
-let pendingRune = null; // rune being placed
-
-// ═══════════════════════════════════════════════════════════
-//  GRID HELPERS
-// ═══════════════════════════════════════════════════════════
-function gridCenter() { return { x: W/2, y: H/2 - 10 }; }
-
-function cellPos(row, col) {
-  const gc = gridCenter();
-  const cols = Math.max(...grid.map(c=>c.col)) + 1;
-  const rows = Math.max(...grid.map(c=>c.row)) + 1;
-  const offX = (cols * CELL) / 2 - CELL/2;
-  const offY = (rows * CELL) / 2 - CELL/2;
-  return { x: gc.x + col*CELL - offX, y: gc.y + row*CELL - offY };
+function gc(){return{x:W/2,y:195};}
+function cp2(row,col){
+  const g=gc(),nc=Math.max(...grid.map(c=>c.col))+1,nr=Math.max(...grid.map(c=>c.row))+1;
+  return{x:g.x+col*CELL-(nc*CELL/2-CELL/2),y:g.y+row*CELL-(nr*CELL/2-CELL/2)};
 }
+function corePos(){return gc();}
 
-function corePos() {
-  const gc = gridCenter();
-  return gc;
-}
-
-function computePath() {
-  // Simple Hamiltonian-ish path for small grids
-  // Sort by row then col for a snake pattern
-  const sorted = [...grid].sort((a,b) => a.row===b.row ? a.col-b.col : a.row-b.row);
-  // Snake: even rows left-to-right, odd rows right-to-left
-  const byRow = {};
-  sorted.forEach(c=>{ if(!byRow[c.row]) byRow[c.row] = []; byRow[c.row].push(c); });
-  const result = [];
-  Object.keys(byRow).sort((a,b)=>+a-+b).forEach((row,i)=>{
-    const row_cells = byRow[row];
-    if(i%2===0) result.push(...row_cells); else result.push(...row_cells.reverse());
+function mkPath(){
+  const byR={};
+  grid.forEach(c=>{if(!byR[c.row])byR[c.row]=[];byR[c.row].push(c);});
+  const res=[];
+  Object.keys(byR).sort((a,b)=>+a-+b).forEach((row,i)=>{
+    const cs=byR[row].slice().sort((a,b)=>a.col-b.col);
+    if(i%2===0)res.push(...cs);else res.push(...cs.reverse());
   });
-  pathOrder = result.map(c => grid.indexOf(c));
+  path=res.map(c=>grid.indexOf(c));
 }
 
-function initGrid() {
-  grid = [
-    { row:0, col:0, rune: {...RUNES.arrow}  },
-    { row:0, col:1, rune: {...RUNES.frost}  },
-    { row:1, col:0, rune: null              },
-    { row:1, col:1, rune: null              },
-  ];
-  lastFired = grid.map(()=> -99);
-  computePath();
-  const start = cellPos(grid[pathOrder[0]].row, grid[pathOrder[0]].col);
-  knight.x = start.x; knight.y = start.y; knight.pathIdx = 0;
+function initGrid(){
+  grid=[{row:0,col:0,rune:null},{row:0,col:1,rune:null},{row:1,col:0,rune:null},{row:1,col:1,rune:null}];
+  lf=grid.map(()=>-99);mkPath();
+  const p0=cp2(grid[path[0]].row,grid[path[0]].col);
+  knight.x=p0.x;knight.y=p0.y;knight.pi=0;
 }
 
-function expandGrid() {
-  // find a valid expansion: prefer bottom, then right
-  const rows = grid.map(c=>c.row), cols = grid.map(c=>c.col);
-  const maxRow = Math.max(...rows), maxCol = Math.max(...cols);
-  // try adding a cell below the bottom-left cell
-  if(maxRow < 2) {
-    grid.push({row: maxRow+1, col:0, rune:null});
-    lastFired.push(-99);
-    computePath();
-    return true;
-  }
-  if(maxCol < 2) {
-    grid.push({row:0, col: maxCol+1, rune:null});
-    lastFired.push(-99);
-    computePath();
-    return true;
-  }
-  return false;
+function expandGrid(){
+  const mr=Math.max(...grid.map(c=>c.row)),mc=Math.max(...grid.map(c=>c.col));
+  if(mr<2){grid.push({row:mr+1,col:0,rune:null});lf.push(-99);}
+  else if(mc<2){grid.push({row:0,col:mc+1,rune:null});lf.push(-99);}
+  mkPath();
 }
 
-function emptyCells() { return grid.filter(c=>!c.rune); }
-
-// ═══════════════════════════════════════════════════════════
-//  ENEMY SPAWNING
-// ═══════════════════════════════════════════════════════════
-function buildSpawnQueue(waveConfig) {
-  const queue = [];
-  waveConfig.enemies.forEach(group=>{
-    for(let i=0;i<group.count;i++) {
-      queue.push({hp:group.hp, maxHp:group.hp, spd:group.spd, type:group.type, slowed:0});
-    }
-  });
-  // shuffle
-  for(let i=queue.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [queue[i],queue[j]]=[queue[j],queue[i]];
-  }
-  return queue;
+function mkQ(wc){
+  const q=[];
+  wc.enemies.forEach(g=>{for(let i=0;i<g.count;i++)q.push({hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,slowed:0,sh:g.type==='a'?1:0});});
+  for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]];}
+  return q;
 }
 
-function spawnEnemy(template) {
-  const side = Math.floor(Math.random()*4);
+function spawnE(tmpl){
+  const side=Math.floor(Math.random()*4);
   let x,y;
-  if(side===0){x=80+Math.random()*(W-160);y=10;}
-  else if(side===1){x=80+Math.random()*(W-160);y=H-10;}
-  else if(side===2){x=10;y=80+Math.random()*(H-160);}
-  else{x=W-10;y=80+Math.random()*(H-160);}
-  enemies.push({...template, x, y, slowed:0, shield:template.type==='armored'?1:0});
+  if(side===0){x=60+Math.random()*(W-120);y=8;}
+  else if(side===1){x=60+Math.random()*(W-120);y=H-44;}
+  else if(side===2){x=8;y=55+Math.random()*(H-95);}
+  else{x=W-8;y=55+Math.random()*(H-95);}
+  enemies.push({...tmpl,x,y});
 }
 
-// ═══════════════════════════════════════════════════════════
-//  RUNE EFFECTS
-// ═══════════════════════════════════════════════════════════
-function fireRune(cellIdx, rune) {
-  const cell = grid[cellIdx];
-  const p = cellPos(cell.row, cell.col);
-  const mul = echoNext ? 2 : 1;
-  echoNext = false;
+function dealDmg(e,d){if(e.sh>0){e.sh--;glows.push({x:e.x,y:e.y,r:20,col:'#7888a8',t:0,mt:.3});return;}e.hp-=d;}
 
-  glows.push({x:p.x, y:p.y, r:28, col:rune.col, t:0, maxT:0.35});
-
-  switch(rune.id) {
-    case 'arrow': {
-      let nearest=null, nd=99999;
-      enemies.forEach(e=>{ const d=Math.hypot(e.x-p.x,e.y-p.y); if(d<nd){nd=d;nearest=e;}});
-      if(nearest) {
-        const angle=Math.atan2(nearest.y-p.y,nearest.x-p.x);
-        for(let m=0;m<mul;m++)
-          projectiles.push({x:p.x,y:p.y,vx:Math.cos(angle)*300,vy:Math.sin(angle)*300,dmg:3,col:rune.col,target:nearest});
-      }
-      break;
+function fireRune(ci,rune){
+  const cell=grid[ci],p=cp2(cell.row,cell.col),m=echo?2:1;echo=false;
+  glows.push({x:p.x,y:p.y,r:28,col:rune.col,t:0,mt:.35});
+  if(rune.id==='arrow'){
+    for(let i=0;i<m;i++){
+      let nn=null,nd=99999;
+      enemies.forEach(e=>{const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<nd){nd=d;nn=e;}});
+      if(nn){const a=Math.atan2(nn.y-p.y,nn.x-p.x);proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:3,col:rune.col});}
     }
-    case 'frost': {
-      for(let m=0;m<mul;m++) {
-        enemies.forEach(e=>{ e.slowed=2.5*m || 2.5; });
-        glows.push({x:corePos().x,y:corePos().y,r:120,col:rune.col,t:0,maxT:0.6});
-      }
-      break;
-    }
-    case 'blade': {
-      enemies.forEach(e=>{
-        if(Math.hypot(e.x-p.x,e.y-p.y)<100) {
-          dealDamage(e, 4*mul);
-        }
-      });
-      glows.push({x:p.x,y:p.y,r:80,col:rune.col,t:0,maxT:0.5});
-      break;
-    }
-    case 'haste': {
-      hasteMul = 1 + 0.7*mul;
-      hasteTimer = 3*mul;
-      numbers.push({x:p.x,y:p.y-20,val:'急行!',col:rune.col,t:0,maxT:1.2});
-      break;
-    }
-    case 'gold': {
-      const earned = 4*mul;
-      gold += earned;
-      numbers.push({x:p.x,y:p.y-20,val:`+${earned}💰`,col:'#f0c040',t:0,maxT:1.2});
-      break;
-    }
-    case 'shield': {
-      shieldActive = true;
-      shieldTimer = SHIELD_DURATION;
-      numbers.push({x:p.x,y:p.y-20,val:'盾!',col:rune.col,t:0,maxT:1.2});
-      break;
-    }
-    case 'bomb': {
-      // delayed explosion
-      setTimeout(()=>{
-        let cx2=0,cy2=0,cnt=0;
-        enemies.forEach(e=>{cx2+=e.x;cy2+=e.y;cnt++;});
-        if(cnt>0){cx2/=cnt;cy2/=cnt;}
-        else{cx2=p.x;cy2=p.y;}
-        explosions.push({x:cx2,y:cy2,r:0,maxR:90*mul,t:0,maxT:0.5,col:rune.col});
-        enemies.forEach(e=>{
-          if(Math.hypot(e.x-cx2,e.y-cy2)<90*mul) dealDamage(e,8*mul);
-        });
-      }, 800);
-      numbers.push({x:p.x,y:p.y-20,val:'💣',col:rune.col,t:0,maxT:1.0});
-      break;
-    }
-    case 'echo': {
-      echoNext = true;
-      numbers.push({x:p.x,y:p.y-20,val:'回响!',col:rune.col,t:0,maxT:1.0});
-      break;
-    }
+  }else if(rune.id==='frost'){
+    enemies.forEach(e=>e.slowed=2.5*m);
+    glows.push({x:corePos().x,y:corePos().y,r:140,col:rune.col,t:0,mt:.7});
+  }else if(rune.id==='blade'){
+    enemies.forEach(e=>{if(Math.hypot(e.x-p.x,e.y-p.y)<100*m)dealDmg(e,4);});
+    glows.push({x:p.x,y:p.y,r:80*m,col:rune.col,t:0,mt:.5});
+  }else if(rune.id==='haste'){
+    hasteMul=1+.7*m;hasteT=3*m;
+    nums.push({x:p.x,y:p.y-20,v:'急行!',col:rune.col,t:0,mt:1.2});
+  }else if(rune.id==='gold'){
+    const g=4*m;gold+=g;
+    nums.push({x:p.x,y:p.y-20,v:`+${g}💰`,col:'#f0c040',t:0,mt:1.2});
+  }else if(rune.id==='shield'){
+    shld=true;shldT=12;
+    nums.push({x:p.x,y:p.y-20,v:'盾!',col:rune.col,t:0,mt:1.2});
+  }else if(rune.id==='bomb'){
+    setTimeout(()=>{
+      let cx=p.x,cy=p.y,cnt=0;
+      enemies.forEach(e=>{cx+=e.x;cy+=e.y;cnt++;});
+      if(cnt){cx/=cnt+1;cy/=cnt+1;}
+      const br=90*m;
+      exps.push({x:cx,y:cy,r:0,mr:br,t:0,mt:.5,col:rune.col});
+      enemies.forEach(e=>{if(Math.hypot(e.x-cx,e.y-cy)<br)dealDmg(e,8*m);});
+    },800);
+    nums.push({x:p.x,y:p.y-20,v:'💣',col:rune.col,t:0,mt:1});
+  }else if(rune.id==='echo'){
+    echo=true;
+    nums.push({x:p.x,y:p.y-20,v:'回响!',col:rune.col,t:0,mt:1});
   }
 }
 
-function dealDamage(e, dmg) {
-  if(e.shield>0){ e.shield--; glows.push({x:e.x,y:e.y,r:20,col:'#7888a8',t:0,maxT:0.3}); return; }
-  e.hp -= dmg;
-}
+function update(dt){
+  t+=dt;
+  hasteT=Math.max(0,hasteT-dt);if(hasteT<=0)hasteMul=1;
+  if(shldT>0)shldT-=dt;if(shldT<=0)shld=false;
 
-// ═══════════════════════════════════════════════════════════
-//  UPDATE
-// ═══════════════════════════════════════════════════════════
-function update(dt) {
-  t += dt;
-  hasteTimer = Math.max(0, hasteTimer-dt);
-  if(hasteTimer<=0) hasteMul=1;
-  if(shieldTimer>0) shieldTimer-=dt;
-  if(shieldTimer<=0) shieldActive=false;
-
-  // knight movement
-  if(pathOrder.length>0) {
-    const targetCellIdx = pathOrder[knight.pathIdx % pathOrder.length];
-    const tc = grid[targetCellIdx];
-    const tp = cellPos(tc.row, tc.col);
-    const dx=tp.x-knight.x, dy=tp.y-knight.y;
-    const dist=Math.hypot(dx,dy);
-    const speed = KNIGHT_SPEED * hasteMul;
-
-    if(dist < 4) {
-      knight.x=tp.x; knight.y=tp.y;
-      // fire rune
-      const ci = targetCellIdx;
-      const cell = grid[ci];
-      if(cell.rune && t-lastFired[ci] >= cell.rune.cd) {
-        lastFired[ci] = t;
-        fireRune(ci, cell.rune);
-      }
-      knight.pathIdx++;
-    } else {
-      knight.x += (dx/dist)*speed*dt;
-      knight.y += (dy/dist)*speed*dt;
-    }
+  if(path.length>0){
+    const tci=path[knight.pi%path.length],tp=cp2(grid[tci].row,grid[tci].col);
+    const dx=tp.x-knight.x,dy=tp.y-knight.y,dist=Math.hypot(dx,dy);
+    if(dist<4){
+      knight.x=tp.x;knight.y=tp.y;
+      const cell=grid[tci];
+      if(cell.rune&&t-lf[tci]>=cell.rune.cd){lf[tci]=t;fireRune(tci,cell.rune);}
+      knight.pi++;
+    }else{const s=KSPD*hasteMul;knight.x+=(dx/dist)*s*dt;knight.y+=(dy/dist)*s*dt;}
   }
 
-  // spawn enemies
-  if(state==='wave' && spawnQueue.length>0) {
-    spawnTimer -= dt;
-    if(spawnTimer<=0) {
-      spawnEnemy(spawnQueue.pop());
-      spawnTimer = 0.5 + Math.random()*0.6;
-    }
-  }
+  if(spawnQ.length>0){spawnT-=dt;if(spawnT<=0){spawnE(spawnQ.pop());spawnT=.45+Math.random()*.65;}}
 
-  // move enemies
-  const cp = corePos();
+  const cp=corePos();
   enemies.forEach(e=>{
-    const spd = e.slowed>0 ? e.spd*0.3 : e.spd;
-    const dx=cp.x-e.x, dy=cp.y-e.y;
-    const dist=Math.hypot(dx,dy);
-    if(dist>14) { e.x+=(dx/dist)*spd*dt; e.y+=(dy/dist)*spd*dt; }
-    if(e.slowed>0) e.slowed-=dt;
+    const s=e.slowed>0?e.spd*.3:e.spd,dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
+    if(d>14){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
+    if(e.slowed>0)e.slowed-=dt;
   });
 
-  // projectiles
-  projectiles = projectiles.filter(p=>{
-    p.x+=p.vx*dt; p.y+=p.vy*dt;
-    if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20) return false;
+  proj=proj.filter(p=>{
+    p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20)return false;
     for(let i=enemies.length-1;i>=0;i--){
       const e=enemies[i];
-      if(Math.hypot(p.x-e.x,p.y-e.y)<14){
-        dealDamage(e,p.dmg);
-        glows.push({x:e.x,y:e.y,r:14,col:p.col,t:0,maxT:0.2});
-        return false;
-      }
+      if(Math.hypot(p.x-e.x,p.y-e.y)<14){dealDmg(e,p.d);glows.push({x:e.x,y:e.y,r:14,col:p.col,t:0,mt:.2});return false;}
     }
     return true;
   });
 
-  // enemy deaths + core damage
-  enemies = enemies.filter(e=>{
+  enemies=enemies.filter(e=>{
     if(e.hp<=0){
-      totalKills++;
-      const g = e.type==='boss'?8 : e.type==='armored'?3:1;
-      gold += g;
-      coins.push({x:e.x,y:e.y,vy:-60,t:0,maxT:0.9,val:g});
-      glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,maxT:0.3});
-      return false;
+      kills++;
+      const g=e.type==='b'?12:e.type==='a'?4:2;
+      gold+=g;coins.push({x:e.x,y:e.y,vy:-60,t:0,mt:.9,v:g});
+      glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,mt:.3});return false;
     }
     if(Math.hypot(e.x-cp.x,e.y-cp.y)<16){
-      if(shieldActive) {
-        shieldActive=false; shieldTimer=0;
-        numbers.push({x:cp.x,y:cp.y-30,val:'格挡!',col:'#52a870',t:0,maxT:1.2});
-        glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,maxT:0.5});
-      } else {
-        const dmg = e.type==='boss'?4:1;
-        coreHP = Math.max(0, coreHP-dmg);
-        glows.push({x:cp.x,y:cp.y,r:50,col:'#c04848',t:0,maxT:0.45});
-        numbers.push({x:cp.x,y:cp.y-30,val:`-${dmg}`,col:'#c04848',t:0,maxT:0.9});
+      if(shld){
+        shld=false;shldT=0;
+        nums.push({x:cp.x,y:cp.y-30,v:'格挡!',col:'#52a870',t:0,mt:1.2});
+        glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,mt:.5});
+      }else{
+        const d2=e.type==='b'?4:1;coreHP=Math.max(0,coreHP-d2);
+        glows.push({x:cp.x,y:cp.y,r:50,col:'#c04848',t:0,mt:.45});
+        nums.push({x:cp.x,y:cp.y-30,v:`-${d2}`,col:'#c04848',t:0,mt:.9});
       }
       return false;
     }
     return true;
   });
 
-  // check wave clear
-  if(state==='wave' && spawnQueue.length===0 && enemies.length===0 && !waveCleared) {
-    waveCleared = true;
-    setTimeout(openShop, 600);
-  }
+  if(state==='wave'&&spawnQ.length===0&&enemies.length===0&&!cleared){cleared=true;setTimeout(openShop,600);}
+  if(coreHP<=0&&state==='wave'){state='gameover';showOver();}
 
-  // check game over
-  if(coreHP<=0 && state==='wave') { state='gameover'; showGameOver(); }
-
-  // effects
-  glows=glows.filter(g=>{g.t+=dt;return g.t<g.maxT;});
-  coins=coins.filter(c=>{c.t+=dt;c.y+=c.vy*dt;c.vy+=120*dt;return c.t<c.maxT;});
-  numbers=numbers.filter(n=>{n.t+=dt;return n.t<n.maxT;});
-  explosions=explosions.filter(ex=>{ex.t+=dt;ex.r=ex.maxR*(ex.t/ex.maxT);return ex.t<ex.maxT;});
+  glows=glows.filter(g=>{g.t+=dt;return g.t<g.mt;});
+  coins=coins.filter(c=>{c.t+=dt;c.y+=c.vy*dt;c.vy+=120*dt;return c.t<c.mt;});
+  nums=nums.filter(n=>{n.t+=dt;return n.t<n.mt;});
+  exps=exps.filter(ex=>{ex.t+=dt;ex.r=ex.mr*(ex.t/ex.mt);return ex.t<ex.mt;});
 }
 
-// ═══════════════════════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════════════════════
-const C = {
-  bg:'#111620', bg2:'#0e1018', surface:'#1d2438', raised:'#26304a',
-  border:'#334060', dim:'#404e68', text:'#ddd0b0', muted:'#7888a8',
-  accent:'#c8a040', core:'#c8a040', hp:'#52a870', hpBg:'#1a2028',
-  danger:'#c04848',
-};
-
-function drawBg() {
-  // subtle grid lines in bg
-  ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(51,64,96,0.25)'; ctx.lineWidth=1;
+function drawBg(){
+  ctx.fillStyle='#111620';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(51,64,96,.18)';ctx.lineWidth=1;
   for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 }
 
-function drawGlows() {
+function drawGlows(){
   glows.forEach(g=>{
-    const a=1-g.t/g.maxT;
-    const rr=g.r*(1+g.t/g.maxT*0.5);
-    const grad=ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,rr);
-    grad.addColorStop(0,g.col+Math.round(a*150).toString(16).padStart(2,'0'));
-    grad.addColorStop(1,g.col+'00');
-    ctx.beginPath();ctx.arc(g.x,g.y,rr,0,Math.PI*2);
-    ctx.fillStyle=grad;ctx.fill();
+    const a=1-g.t/g.mt,r2=g.r*(1+g.t/g.mt*.5);
+    const gr=ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,r2);
+    gr.addColorStop(0,g.col+Math.round(a*150).toString(16).padStart(2,'0'));
+    gr.addColorStop(1,g.col+'00');
+    ctx.beginPath();ctx.arc(g.x,g.y,r2,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
   });
-  // explosions
-  explosions.forEach(ex=>{
-    const a=1-ex.t/ex.maxT;
-    const grad=ctx.createRadialGradient(ex.x,ex.y,0,ex.x,ex.y,ex.r);
-    grad.addColorStop(0,ex.col+Math.round(a*180).toString(16).padStart(2,'0'));
-    grad.addColorStop(0.5,ex.col+Math.round(a*80).toString(16).padStart(2,'0'));
-    grad.addColorStop(1,ex.col+'00');
-    ctx.beginPath();ctx.arc(ex.x,ex.y,ex.r,0,Math.PI*2);
-    ctx.fillStyle=grad;ctx.fill();
+  exps.forEach(ex=>{
+    const a=1-ex.t/ex.mt;
+    const gr=ctx.createRadialGradient(ex.x,ex.y,0,ex.x,ex.y,Math.max(1,ex.r));
+    gr.addColorStop(0,ex.col+Math.round(a*180).toString(16).padStart(2,'0'));
+    gr.addColorStop(.5,ex.col+Math.round(a*70).toString(16).padStart(2,'0'));
+    gr.addColorStop(1,ex.col+'00');
+    ctx.beginPath();ctx.arc(ex.x,ex.y,Math.max(1,ex.r),0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
   });
 }
 
-function drawGrid() {
-  // path dashes between cells
-  ctx.setLineDash([4,5]); ctx.strokeStyle=C.dim+'55'; ctx.lineWidth=1;
-  pathOrder.forEach((ci,idx)=>{
-    const ni=pathOrder[(idx+1)%pathOrder.length];
-    const a=cellPos(grid[ci].row,grid[ci].col);
-    const b=cellPos(grid[ni].row,grid[ni].col);
+function drawGrid(){
+  ctx.setLineDash([4,5]);ctx.strokeStyle='rgba(64,78,104,.35)';ctx.lineWidth=1;
+  path.forEach((ci,idx)=>{
+    const ni=path[(idx+1)%path.length];
+    const a=cp2(grid[ci].row,grid[ci].col),b=cp2(grid[ni].row,grid[ni].col);
     ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
   });
   ctx.setLineDash([]);
 
-  // cells
+  let hovIdx=-1;
+  if(state==='prep'){
+    hovIdx=grid.findIndex(cell=>{
+      const p=cp2(cell.row,cell.col);
+      return Math.abs(mouse.x-p.x)<CELL/2-4&&Math.abs(mouse.y-p.y)<CELL/2-4;
+    });
+  }
+
   grid.forEach((cell,ci)=>{
-    const p=cellPos(cell.row,cell.col);
-    const hs=CELL/2;
+    const p=cp2(cell.row,cell.col),hs=CELL/2;
+    ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(p.x-hs+3,p.y-hs+3,CELL-4,CELL-4);
+    ctx.fillStyle='#1d2438';ctx.fillRect(p.x-hs,p.y-hs,CELL,CELL);
+    if(ci===hovIdx){
+      ctx.strokeStyle=selHand>=0?'#c8a040':'#56aed0';ctx.lineWidth=2;
+      ctx.strokeRect(p.x-hs+2,p.y-hs+2,CELL-4,CELL-4);
+    }else{ctx.strokeStyle='#2e3c58';ctx.lineWidth=1;ctx.strokeRect(p.x-hs,p.y-hs,CELL,CELL);}
+    ctx.fillStyle='#26304a';ctx.fillRect(p.x-hs,p.y-hs,CELL,3);
 
-    // shadow
-    ctx.fillStyle='rgba(0,0,0,0.4)';
-    ctx.fillRect(p.x-hs+3,p.y-hs+3,CELL-4,CELL-4);
-
-    // cell bg
-    ctx.fillStyle=C.surface;
-    ctx.fillRect(p.x-hs,p.y-hs,CELL,CELL);
-    ctx.strokeStyle=C.border; ctx.lineWidth=1;
-    ctx.strokeRect(p.x-hs,p.y-hs,CELL,CELL);
-
-    // top highlight
-    ctx.fillStyle=C.raised;
-    ctx.fillRect(p.x-hs,p.y-hs,CELL,3);
-
-    if(cell.rune) {
-      const rune=cell.rune;
-      const frac=Math.min(1,(t-lastFired[ci])/rune.cd);
-      const ready=frac>=1;
-
-      // cooldown arc
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,22,-Math.PI/2,-Math.PI/2+Math.PI*2*frac);
-      ctx.strokeStyle=rune.col+(ready?'cc':'44');
-      ctx.lineWidth=3; ctx.stroke();
-
-      // rune symbol
+    if(cell.rune){
+      const rune=cell.rune,frac=Math.min(1,(t-lf[ci])/rune.cd),ready=frac>=1;
+      ctx.beginPath();ctx.arc(p.x,p.y,22,-Math.PI/2,-Math.PI/2+Math.PI*2*frac);
+      ctx.strokeStyle=rune.col+(ready?'cc':'44');ctx.lineWidth=3;ctx.stroke();
       if(ready){ctx.shadowColor=rune.col;ctx.shadowBlur=12;}
-      ctx.font=`${ready?'bold':'normal'} 20px serif`;
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle=ready?rune.col:C.dim;
-      ctx.fillText(rune.sym,p.x,p.y+1);
-      ctx.shadowBlur=0;
-
-      // rune name tiny
-      ctx.font='9px Noto Serif SC,serif';
-      ctx.fillStyle=C.muted; ctx.textBaseline='bottom';
+      ctx.font=`${ready?'bold':'normal'} 20px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=ready?rune.col:'#404e68';ctx.fillText(rune.sym,p.x,p.y+1);ctx.shadowBlur=0;
+      ctx.font='8px Noto Serif SC,serif';ctx.fillStyle='#3a4860';ctx.textBaseline='bottom';
       ctx.fillText(rune.name.replace('符文',''),p.x,p.y+hs-4);
-    } else {
-      ctx.font='11px Noto Serif SC,serif';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle=C.dim; ctx.fillText('空',p.x,p.y);
+    }else{
+      ctx.font='10px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=state==='prep'?'#2e3c58':'#1d2438';ctx.fillText('空',p.x,p.y);
     }
   });
-}
 
-function drawCore() {
-  const cp=corePos();
-  const pulse=0.7+0.3*Math.sin(t*3.5);
-  const grad=ctx.createRadialGradient(cp.x,cp.y,0,cp.x,cp.y,30*pulse);
-  grad.addColorStop(0,shieldActive?'rgba(82,168,112,.7)':'rgba(200,160,64,.65)');
-  grad.addColorStop(1,'transparent');
-  ctx.beginPath();ctx.arc(cp.x,cp.y,30*pulse,0,Math.PI*2);
-  ctx.fillStyle=grad;ctx.fill();
-
-  ctx.beginPath();ctx.arc(cp.x,cp.y,7,0,Math.PI*2);
-  ctx.fillStyle=shieldActive?'#52a870':C.core;ctx.fill();
-
-  // hp bar
-  const bw=52,bh=5,bx=cp.x-bw/2,by=cp.y+14;
-  ctx.fillStyle=C.hpBg;ctx.fillRect(bx,by,bw,bh);
-  const hpFrac=coreHP/INIT_HP;
-  ctx.fillStyle=hpFrac>0.5?C.hp:hpFrac>0.25?'#d4a843':C.danger;
-  ctx.fillRect(bx,by,bw*hpFrac,bh);
-  ctx.font='9px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='top';
-  ctx.fillStyle=C.muted;ctx.fillText(`核心 ${coreHP}/${INIT_HP}`,cp.x,by+7);
-
-  // shield indicator
-  if(shieldActive) {
-    ctx.beginPath();ctx.arc(cp.x,cp.y,20,0,Math.PI*2);
-    ctx.strokeStyle='#52a870aa';ctx.lineWidth=2;ctx.stroke();
+  if(state==='prep'&&selHand>=0&&hand[selHand]){
+    const rune=hand[selHand];
+    ctx.globalAlpha=.8;ctx.font='bold 20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=rune.col;ctx.shadowColor=rune.col;ctx.shadowBlur=10;
+    ctx.fillText(rune.sym,mouse.x,mouse.y-22);ctx.shadowBlur=0;ctx.globalAlpha=1;
   }
 }
 
-function drawKnight() {
-  const x=Math.round(knight.x), y=Math.round(knight.y);
-  const moving = Math.abs(knight.x - cellPos(grid[pathOrder[knight.pathIdx%pathOrder.length]].row, grid[pathOrder[knight.pathIdx%pathOrder.length]].col).x) > 5;
-  const legPhase = moving ? Math.sin(t*8)*4 : 0;
+function drawCore(){
+  const cp=corePos(),pulse=.7+.3*Math.sin(t*3.5);
+  const gr=ctx.createRadialGradient(cp.x,cp.y,0,cp.x,cp.y,30*pulse);
+  gr.addColorStop(0,shld?'rgba(82,168,112,.7)':'rgba(200,160,64,.65)');
+  gr.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.arc(cp.x,cp.y,30*pulse,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+  ctx.beginPath();ctx.arc(cp.x,cp.y,7,0,Math.PI*2);ctx.fillStyle=shld?'#52a870':'#c8a040';ctx.fill();
+  const bw=52,bx=cp.x-26,by=cp.y+14;
+  ctx.fillStyle='#1a2028';ctx.fillRect(bx,by,bw,5);
+  const hf=coreHP/INIT_HP;
+  ctx.fillStyle=hf>.5?'#52a870':hf>.25?'#d4a843':'#c04848';ctx.fillRect(bx,by,bw*hf,5);
+  ctx.font='9px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillStyle='#3a4860';ctx.fillText(`核心 ${coreHP}/${INIT_HP}`,cp.x,by+7);
+  if(shld){ctx.beginPath();ctx.arc(cp.x,cp.y,20,0,Math.PI*2);ctx.strokeStyle='#52a870aa';ctx.lineWidth=2;ctx.stroke();}
+}
 
-  // shadow
-  ctx.beginPath();ctx.ellipse(x,y+3,9,4,0,0,Math.PI*2);
-  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fill();
-  // legs
-  ctx.fillStyle='#6878a0';
-  ctx.fillRect(x-4+legPhase,y-8,4,9);
-  ctx.fillRect(x+0-legPhase,y-8,4,9);
-  // body
+function drawKnight(){
+  if(path.length===0)return;
+  const x=Math.round(knight.x),y=Math.round(knight.y);
+  const tci=path[knight.pi%path.length],tp=cp2(grid[tci].row,grid[tci].col);
+  const moving=Math.abs(knight.x-tp.x)>5||hasteMul>1;
+  const lp=moving?Math.sin(t*8)*4:0;
+  ctx.beginPath();ctx.ellipse(x,y+3,9,4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
+  ctx.fillStyle='#6878a0';ctx.fillRect(x-4+lp,y-8,4,9);ctx.fillRect(x-lp,y-8,4,9);
   ctx.fillStyle='#8898b8';ctx.fillRect(x-5,y-20,10,13);
   ctx.fillStyle='rgba(200,160,64,.3)';ctx.fillRect(x-3,y-19,6,11);
-  // head/helmet
-  ctx.fillStyle='#8898b8';
-  ctx.beginPath();ctx.arc(x,y-24,6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=C.bg;ctx.fillRect(x-4,y-26,8,2);
-  // haste glow
-  if(hasteMul>1){
-    ctx.beginPath();ctx.arc(x,y-15,14,0,Math.PI*2);
-    ctx.strokeStyle='#d4a84355';ctx.lineWidth=2;ctx.stroke();
-  }
+  ctx.fillStyle='#8898b8';ctx.beginPath();ctx.arc(x,y-24,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111620';ctx.fillRect(x-4,y-26,8,2);
+  if(hasteMul>1){ctx.beginPath();ctx.arc(x,y-15,14,0,Math.PI*2);ctx.strokeStyle='#d4a84344';ctx.lineWidth=2;ctx.stroke();}
 }
 
-function drawEnemies() {
+function drawEnemies(){
   enemies.forEach(e=>{
-    const slowed=e.slowed>0;
-    const isBoss=e.type==='boss';
-    const sz=isBoss?18:e.type==='armored'?11:9;
-    const col=slowed?'#1a3a50':isBoss?'#6a1a1a':e.type==='armored'?'#2a3050':'#7a2020';
-    const border=slowed?'#56aed0':isBoss?'#e06060':e.type==='armored'?'#5070b0':'#c04848';
-
-    // shadow
-    ctx.beginPath();ctx.ellipse(e.x,e.y+2,sz,sz*0.4,0,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fill();
-    // body
-    ctx.fillStyle=col;
-    ctx.fillRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
-    ctx.strokeStyle=border;ctx.lineWidth=isBoss?2:1.5;
-    ctx.strokeRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
-    // eyes
-    ctx.fillStyle=slowed?'#56aed0':'#ff5555';
-    ctx.fillRect(e.x-sz*0.5,e.y-sz*1.5,sz*0.35,sz*0.35);
-    ctx.fillRect(e.x+sz*0.15,e.y-sz*1.5,sz*0.35,sz*0.35);
-    // shield indicator
-    if(e.shield>0) {
-      ctx.strokeStyle='#7888a8';ctx.lineWidth=2;
-      ctx.strokeRect(e.x-sz-2,e.y-sz*2-2,sz*2+4,sz*2+4);
-    }
-    // hp bar
+    const sl=e.slowed>0,boss=e.type==='b';
+    const sz=boss?18:e.type==='a'?11:9;
+    const fill=sl?'#1a3a50':boss?'#6a1a1a':e.type==='a'?'#2a3050':'#7a2020';
+    const bdr=sl?'#56aed0':boss?'#e06060':e.type==='a'?'#5070b0':'#c04848';
+    ctx.beginPath();ctx.ellipse(e.x,e.y+2,sz,sz*.4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
+    ctx.fillStyle=fill;ctx.fillRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
+    ctx.strokeStyle=bdr;ctx.lineWidth=boss?2:1.5;ctx.strokeRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
+    ctx.fillStyle=sl?'#56aed0':'#ff5555';
+    ctx.fillRect(e.x-sz*.5,e.y-sz*1.5,sz*.35,sz*.35);ctx.fillRect(e.x+sz*.15,e.y-sz*1.5,sz*.35,sz*.35);
+    if(e.sh>0){ctx.strokeStyle='#7888a8aa';ctx.lineWidth=1.5;ctx.strokeRect(e.x-sz-2,e.y-sz*2-2,sz*2+4,sz*2+4);}
     const bw=sz*2+4;
-    ctx.fillStyle=C.hpBg;ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw,4);
-    ctx.fillStyle=e.type==='armored'?'#5070b0':border;
-    ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw*(e.hp/e.maxHp),4);
+    ctx.fillStyle='#1a2028';ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw,4);
+    ctx.fillStyle=bdr;ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw*(e.hp/e.maxHp),4);
   });
 }
 
-function drawProjectiles() {
-  projectiles.forEach(p=>{
-    const trail=6;
-    ctx.beginPath();
-    ctx.moveTo(p.x-p.vx/300*trail,p.y-p.vy/300*trail);
-    ctx.lineTo(p.x,p.y);
+function drawProj(){
+  proj.forEach(p=>{
+    ctx.beginPath();ctx.moveTo(p.x-p.vx/300*6,p.y-p.vy/300*6);ctx.lineTo(p.x,p.y);
     ctx.strokeStyle=p.col+'66';ctx.lineWidth=2;ctx.stroke();
-    ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
-    ctx.fillStyle=p.col;ctx.fill();
+    ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();
   });
 }
 
-function drawCoins() {
+function drawCoins(){
   coins.forEach(c=>{
-    const a=1-c.t/c.maxT;
-    ctx.globalAlpha=a;
-    ctx.beginPath();ctx.arc(c.x,c.y,5,0,Math.PI*2);
-    ctx.fillStyle='#f0c040';ctx.fill();
-    ctx.font='bold 9px serif';ctx.textAlign='center';
-    ctx.fillStyle='#fff';ctx.textBaseline='bottom';
-    ctx.fillText(`+${c.val}`,c.x,c.y-8);
-    ctx.globalAlpha=1;
+    const a=1-c.t/c.mt;ctx.globalAlpha=a;
+    ctx.beginPath();ctx.arc(c.x,c.y,5,0,Math.PI*2);ctx.fillStyle='#f0c040';ctx.fill();
+    ctx.font='bold 9px serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.textBaseline='bottom';
+    ctx.fillText(`+${c.v}`,c.x,c.y-8);ctx.globalAlpha=1;
   });
 }
 
-function drawNumbers() {
-  numbers.forEach(n=>{
-    const a=1-n.t/n.maxT;
-    ctx.globalAlpha=a;
-    ctx.font='bold 13px Noto Serif SC,serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle=n.col;
-    ctx.fillText(n.val,n.x,n.y-n.t*30);
-    ctx.globalAlpha=1;
+function drawNums(){
+  nums.forEach(n=>{
+    const a=1-n.t/n.mt;ctx.globalAlpha=a;
+    ctx.font='bold 13px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=n.col;ctx.fillText(n.v,n.x,n.y-n.t*28);ctx.globalAlpha=1;
   });
 }
 
-function drawHUD() {
-  // top bar bg
-  ctx.fillStyle='rgba(10,13,20,0.88)';ctx.fillRect(0,0,W,40);
-  ctx.fillStyle=C.border;ctx.fillRect(0,39,W,1);
-
+function drawHUD(){
+  ctx.fillStyle='rgba(8,10,18,.9)';ctx.fillRect(0,0,W,40);
+  ctx.fillStyle='#2a3850';ctx.fillRect(0,39,W,1);
   ctx.textBaseline='middle';
-  // wave
-  ctx.font='600 13px Cinzel,serif';ctx.textAlign='left';
-  ctx.fillStyle=C.accent;
-  const wl=waveIdx<WAVES.length?`第 ${waveIdx+1} 波 / ${WAVES.length}`:'全部通关';
-  ctx.fillText(wl,16,20);
-  // gold
-  ctx.textAlign='center';
-  ctx.fillStyle='#f0c040';
-  ctx.fillText(`💰 ${gold}`,W/2,20);
-  // kills
-  ctx.textAlign='right';
-  ctx.fillStyle=C.muted;ctx.font='12px Noto Serif SC,serif';
-  ctx.fillText(`击杀 ${totalKills}`,W-16,20);
-
-  // bottom bar
-  ctx.fillStyle='rgba(10,13,20,0.75)';ctx.fillRect(0,H-36,W,36);
-  ctx.fillStyle=C.border;ctx.fillRect(0,H-36,W,1);
-  ctx.font='11px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle=C.dim;
-  const tips=['小人踩到格子时触发符文','波次结束后可进行购买','怪物死亡时自动掉落金币'];
-  ctx.fillText(tips[waveIdx%tips.length],W/2,H-18);
-}
-
-// ═══════════════════════════════════════════════════════════
-//  GAME LOOP
-// ═══════════════════════════════════════════════════════════
-let lastTs=null;
-function loop(ts) {
-  if(!lastTs)lastTs=ts;
-  const dt=Math.min((ts-lastTs)/1000,0.1);lastTs=ts;
-
-  if(state==='wave'||state==='placing'){
-    update(dt);
+  ctx.font='600 13px Cinzel,serif';ctx.textAlign='left';ctx.fillStyle='#c8a040';
+  ctx.fillText(waveIdx<WAVES.length?`第 ${waveIdx+1} 波 / ${WAVES.length}`:'全部通关',16,20);
+  ctx.textAlign='center';ctx.fillStyle='#f0c040';ctx.fillText(`💰 ${gold}`,W/2,20);
+  ctx.textAlign='right';ctx.fillStyle='#3a4860';ctx.font='12px Noto Serif SC,serif';
+  ctx.fillText(`击杀 ${kills}`,W-16,20);
+  if(state==='prep'){
+    ctx.fillStyle='rgba(200,160,64,.06)';ctx.fillRect(0,40,W,H-40);
   }
-
-  ctx.clearRect(0,0,W,H);
-  drawBg();
-  drawGlows();
-  drawGrid();
-  drawCore();
-  drawEnemies();
-  drawProjectiles();
-  drawKnight();
-  drawCoins();
-  drawNumbers();
-  drawHUD();
-
-  requestAnimationFrame(loop);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SHOP
-// ═══════════════════════════════════════════════════════════
-function openShop() {
-  if(waveIdx+1 >= WAVES.length) { state='victory'; showVictory(); return; }
-  state='shop';
-  const shopEl=document.getElementById('shop');
-  document.getElementById('shop-title').textContent=`第 ${waveIdx+1} 波结束`;
-  document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
-  shopEl.classList.remove('hidden');
-  renderShopCards();
+// PREP
+function enterPrep(){
+  state='prep';selHand=-1;
+  if(path.length>0){const p=cp2(grid[path[0]].row,grid[path[0]].col);knight.x=p.x;knight.y=p.y;knight.pi=0;}
+  document.getElementById('prep-lbl').textContent=`第 ${waveIdx+1} 波 · 准备布局`;
+  renderHand();
+  document.getElementById('prep').classList.remove('hidden');
 }
 
-function renderShopCards() {
-  document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
-  const container=document.getElementById('shop-cards');
-  container.innerHTML='';
-
-  // pick 3 random runes not already placed
-  const placedIds=grid.filter(c=>c.rune).map(c=>c.rune.id);
-  const available=Object.values(RUNES).filter(r=>!placedIds.includes(r.id)||true); // allow duplicates
-  const picks=[];
-  const pool=[...available];
-  while(picks.length<3&&pool.length>0){
-    const i=Math.floor(Math.random()*pool.length);
-    picks.push(pool.splice(i,1)[0]);
-  }
-
-  // shovel option
-  const shovelCost=30;
-  const allItems=[...picks.map(r=>({type:'rune',data:r})), {type:'shovel',data:{cost:shovelCost}}];
-
-  allItems.forEach(item=>{
+function renderHand(){
+  const con=document.getElementById('hand-cards');con.innerHTML='';
+  if(hand.length===0){con.innerHTML='<span class="hand-empty">手牌为空，可直接开始</span>';return;}
+  hand.forEach((rune,i)=>{
     const card=document.createElement('div');
-    card.className='shop-card';
-    const cost=item.type==='rune'?item.data.cost:item.data.cost;
-    const canAfford=gold>=cost;
-    if(!canAfford)card.classList.add('cant-afford');
-
-    if(item.type==='rune'){
-      const r=item.data;
-      card.style.setProperty('--col',r.col);
-      card.innerHTML=`
-        <span class="sc-sym">${r.sym}</span>
-        <div class="sc-name">${r.name}</div>
-        <div class="sc-cost">💰 ${r.cost} 金币</div>
-        <div class="sc-desc">${r.desc}</div>
-        <span class="sc-badge badge-rune">符文</span>`;
-      if(canAfford) card.addEventListener('click',()=>buyRune(r));
-    } else {
-      card.style.setProperty('--col','#52a870');
-      card.innerHTML=`
-        <span class="sc-sym">⛏</span>
-        <div class="sc-name">铲子</div>
-        <div class="sc-cost">💰 ${shovelCost} 金币</div>
-        <div class="sc-desc">扩展格子地图一格，新增一个符文槽位</div>
-        <span class="sc-badge badge-shovel">扩展</span>`;
-      if(canAfford) card.addEventListener('click',()=>buyShovel());
-    }
-    container.appendChild(card);
+    card.className='hc'+(i===selHand?' sel':'');
+    card.style.setProperty('--col',rune.col);
+    card.innerHTML=`<span class="hc-sym">${rune.sym}</span><div class="hc-name">${rune.name}</div>`;
+    card.addEventListener('click',()=>{selHand=selHand===i?-1:i;renderHand();});
+    con.appendChild(card);
   });
 }
 
-function buyRune(rune) {
-  if(gold<rune.cost)return;
-  gold-=rune.cost;
-  document.getElementById('shop').classList.add('hidden');
-  // if empty slots exist, go to placing mode
-  if(emptyCells().length>0){
-    pendingRune=rune;
-    state='placing';
-    document.getElementById('place-prompt').classList.remove('hidden');
-  } else {
-    // no empty slots, ask which to replace — for demo just place in BL
-    const target=grid.find(c=>c.rune)||grid[0];
-    target.rune={...rune};
-    advanceWave();
-  }
-}
-
-function buyShovel() {
-  const cost=30;
-  if(gold<cost)return;
-  gold-=cost;
-  expandGrid();
-  document.getElementById('shop').classList.add('hidden');
-  advanceWave();
-}
-
-canvas.addEventListener('click', e=>{
-  if(state!=='placing'||!pendingRune) return;
-  const rect=canvas.getBoundingClientRect();
-  const scaleX=W/rect.width, scaleY=H/rect.height;
-  const mx=(e.clientX-rect.left)*scaleX;
-  const my=(e.clientY-rect.top)*scaleY;
-
-  // find clicked empty cell
-  const clicked=grid.find(cell=>{
-    if(cell.rune) return false;
-    const p=cellPos(cell.row,cell.col);
-    return Math.abs(mx-p.x)<CELL/2&&Math.abs(my-p.y)<CELL/2;
-  });
-  if(clicked){
-    clicked.rune={...pendingRune};
-    pendingRune=null;
-    document.getElementById('place-prompt').classList.add('hidden');
-    advanceWave();
+cv.addEventListener('click',e=>{
+  if(state!=='prep')return;
+  const r=cv.getBoundingClientRect(),mx=(e.clientX-r.left)*(W/r.width),my=(e.clientY-r.top)*(H/r.height);
+  const ci=grid.findIndex(cell=>{const p=cp2(cell.row,cell.col);return Math.abs(mx-p.x)<CELL/2-4&&Math.abs(my-p.y)<CELL/2-4;});
+  if(ci===-1)return;
+  const cell=grid[ci];
+  if(selHand>=0){
+    const toPlace=hand[selHand],displaced=cell.rune?{...cell.rune}:null;
+    cell.rune={...toPlace};lf[ci]=-99;
+    hand.splice(selHand,1);
+    if(displaced)hand.push(displaced);
+    selHand=-1;renderHand();
+  }else if(cell.rune){
+    hand.push({...cell.rune});cell.rune=null;
+    selHand=hand.length-1;renderHand();
   }
 });
 
-function advanceWave() {
-  waveIdx++;
-  waveCleared=false;
-  if(waveIdx>=WAVES.length){ state='victory'; showVictory(); return; }
-  spawnQueue=buildSpawnQueue(WAVES[waveIdx]);
-  spawnTimer=1.5;
-  state='wave';
+document.getElementById('btn-go').addEventListener('click',()=>{
+  document.getElementById('prep').classList.add('hidden');
+  state='wave';cleared=false;
+  spawnQ=mkQ(WAVES[waveIdx]);spawnT=1.5;
+});
+
+// SHOP
+function openShop(){
+  if(waveIdx+1>=WAVES.length){state='victory';showWin();return;}
+  state='shop';
+  document.getElementById('shop-hdr').textContent=`第 ${waveIdx+1} 波结束`;
+  document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
+  document.getElementById('shop').classList.remove('hidden');
+  mkShop();
+}
+
+function mkShop(){
+  document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
+  const con=document.getElementById('shop-cards');con.innerHTML='';
+  const pool=Object.values(RUNES),picks=[],used=new Set();
+  while(picks.length<3){const i=Math.floor(Math.random()*pool.length);if(!used.has(pool[i].id)){picks.push(pool[i]);used.add(pool[i].id);}}
+  [...picks.map(r=>({type:'r',data:r})),{type:'s',data:{cost:30}}].forEach(item=>{
+    const card=document.createElement('div'),cost=item.data.cost,can=gold>=cost;
+    card.className='sc'+(can?'':' dim');
+    if(item.type==='r'){
+      const r=item.data;
+      card.style.setProperty('--col',r.col);
+      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}</div><div class="sc-desc">${r.desc}</div><span class="sc-tag tag-r">符文</span>`;
+      card.addEventListener('click',()=>{
+        if(gold<r.cost){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
+        gold-=r.cost;hand.push({...r});closeShop();
+      });
+    }else{
+      card.style.setProperty('--col','#52a870');
+      card.innerHTML=`<span class="sc-sym">⛏</span><div class="sc-name">铲子</div><div class="sc-cost">💰 30</div><div class="sc-desc">扩展格子，新增符文槽位</div><span class="sc-tag tag-s">扩展</span>`;
+      card.addEventListener('click',()=>{
+        if(gold<30){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
+        gold-=30;expandGrid();closeShop();
+      });
+    }
+    con.appendChild(card);
+  });
+}
+
+function closeShop(){
+  document.getElementById('shop').classList.add('hidden');
+  waveIdx++;if(waveIdx>=WAVES.length){state='victory';showWin();return;}
+  enterPrep();
 }
 
 document.getElementById('shop-skip').addEventListener('click',()=>{
   document.getElementById('shop').classList.add('hidden');
-  advanceWave();
+  waveIdx++;if(waveIdx>=WAVES.length){state='victory';showWin();return;}
+  enterPrep();
 });
 
-// ═══════════════════════════════════════════════════════════
-//  END SCREENS
-// ═══════════════════════════════════════════════════════════
-function showGameOver() {
-  document.getElementById('go-stat').textContent=`波次 ${waveIdx+1}  · 击杀 ${totalKills}  · 金币 ${gold}`;
-  document.getElementById('ov-gameover').classList.remove('hidden');
+function showOver(){
+  document.getElementById('over-stat').textContent=`波次 ${waveIdx+1} · 击杀 ${kills} · 金币 ${gold}`;
+  document.getElementById('ov-over').classList.remove('hidden');
 }
-function showVictory() {
-  document.getElementById('vic-stat').textContent=`全部 ${WAVES.length} 波通关  · 击杀 ${totalKills}  · 剩余金币 ${gold}`;
-  document.getElementById('ov-victory').classList.remove('hidden');
+function showWin(){
+  document.getElementById('win-stat').textContent=`全部 ${WAVES.length} 波通关 · 击杀 ${kills} · 剩余金币 ${gold}`;
+  document.getElementById('ov-win').classList.remove('hidden');
 }
 
-function resetGame() {
+function reset(){
   document.querySelectorAll('.overlay').forEach(el=>el.classList.add('hidden'));
-  document.getElementById('shop').classList.add('hidden');
-  document.getElementById('place-prompt').classList.add('hidden');
-  enemies=[]; projectiles=[]; coins=[]; glows=[]; numbers=[]; explosions=[];
-  pendingRune=null; echoNext=false; hasteMul=1; hasteTimer=0;
-  shieldActive=false; shieldTimer=0;
-  waveIdx=0; gold=5; coreHP=INIT_HP; totalKills=0; t=0;
-  waveCleared=false;
-  initGrid();
-  state='wave';
-  spawnQueue=buildSpawnQueue(WAVES[0]);
-  spawnTimer=1.5;
+  ['shop','prep'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  enemies=[];proj=[];coins=[];glows=[];nums=[];exps=[];
+  selHand=-1;echo=false;hasteMul=1;hasteT=0;shld=false;shldT=0;
+  waveIdx=0;gold=20;coreHP=INIT_HP;kills=0;t=0;cleared=false;
+  hand=[{...RUNES.arrow},{...RUNES.frost}];
+  initGrid();enterPrep();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════════
-document.getElementById('btn-start').addEventListener('click',()=>{
-  document.getElementById('ov-start').classList.add('hidden');
-  resetGame();
-});
-document.getElementById('btn-restart').addEventListener('click',()=>{
-  document.getElementById('ov-gameover').classList.add('hidden');
-  resetGame();
-});
-document.getElementById('btn-again').addEventListener('click',()=>{
-  document.getElementById('ov-victory').classList.add('hidden');
-  resetGame();
-});
+document.getElementById('btn-start').addEventListener('click',()=>{document.getElementById('ov-start').classList.add('hidden');reset();});
+document.getElementById('btn-retry').addEventListener('click',()=>{document.getElementById('ov-over').classList.add('hidden');reset();});
+document.getElementById('btn-again').addEventListener('click',()=>{document.getElementById('ov-win').classList.add('hidden');reset();});
 
+let lastTs=null;
+function loop(ts){
+  if(!lastTs)lastTs=ts;
+  const dt=Math.min((ts-lastTs)/1000,.1);lastTs=ts;
+  if(state==='wave')update(dt);
+  ctx.clearRect(0,0,W,H);
+  drawBg();drawGlows();drawGrid();drawCore();
+  if(state==='wave')drawEnemies();
+  drawProj();drawKnight();drawCoins();drawNums();drawHUD();
+  requestAnimationFrame(loop);
+}
 initGrid();
 requestAnimationFrame(loop);
 </script>
