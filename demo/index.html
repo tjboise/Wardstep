@@ -8,12 +8,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&display=swap">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;height:100%;background:#0a0d14;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;}
+html,body{width:100%;height:100%;background:#0e1525;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;}
 body{padding:16px 0 40px;gap:12px;}
 h1.logo{font-family:'Cinzel',serif;font-size:1.6rem;letter-spacing:.2em;color:#c8a040;text-shadow:0 0 20px rgba(200,160,64,.4);}
 .subtitle{font-family:'Noto Serif SC',serif;font-size:.75rem;color:#404e68;letter-spacing:.1em;}
 #wrap{position:relative;width:min(800px,100vw);flex-shrink:0;}
-canvas{display:block;width:100%;background:#111620;border:1px solid #253050;}
+canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(8,10,18,.92);backdrop-filter:blur(4px);}
 .overlay.hidden{display:none;}
@@ -202,13 +202,13 @@ const ALL_RELICS=[
 // ── WAVES ──
 const WAVES=[
   {label:'小关 1', type:'small',
-   enemies:[{count:4,hp:3,spd:24,type:'n'}]},
+   enemies:[{count:5,hp:8,spd:24,type:'n'}]},
   {label:'小关 2', type:'small',
-   enemies:[{count:4,hp:3,spd:26,type:'n'},{count:1,hp:8,spd:15,type:'a'}]},
+   enemies:[{count:5,hp:8,spd:26,type:'n'},{count:2,hp:18,spd:15,type:'a'}]},
   {label:'精英关', type:'elite',
-   enemies:[{count:3,hp:4,spd:28,type:'n'},{count:1,hp:10,spd:16,type:'a'},{count:1,hp:22,spd:11,type:'e'}]},
+   enemies:[{count:4,hp:8,spd:28,type:'n'},{count:2,hp:18,spd:16,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
   {label:'Boss关', type:'boss',
-   enemies:[{count:1,hp:45,spd:9,type:'b'}]},
+   enemies:[{count:1,hp:120,spd:9,type:'b'}]},
 ];
 
 // ── CANVAS ──
@@ -216,11 +216,11 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 cv.width=W; cv.height=H;
 
 // ── STATE ──
-let state='start',waveIdx=0,gold=20,maxHP=20,coreHP=20;
+let state='start',waveIdx=0,gold=20,maxHP=100,coreHP=100;
 let shld=false,shldT=0,kills=0,t=0;
 let hand=[],selHand=-1,grid=[],path=[],lf=[],bladeCharge=[];
 let knight={x:0,y:0,pi:0};
-let enemies=[],warriors=[],proj=[],exps=[],coins=[],glows=[],nums=[],slowZones=[];
+let enemies=[],warriors=[],proj=[],eProj=[],exps=[],coins=[],glows=[],nums=[],slowZones=[];
 let spawnQ=[],spawnT=0,cleared=false;
 let mouse={x:-999,y:-999};
 
@@ -281,9 +281,13 @@ function expandGrid(){
 
 // ── ENEMIES ──
 function mkEnemy(g){
+  const ranged=g.type==='e';
+  const atk=g.type==='b'?12:g.type==='e'?7:g.type==='a'?5:3;
+  const atkCd=g.type==='b'?2.5:g.type==='e'?2.0:g.type==='a'?1.2:1.5;
   return{hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,
          slowed:0,slowFactor:.3,frozenUntil:0,
-         sh:g.type==='a'?1:g.type==='e'?2:0};
+         sh:g.type==='a'?1:g.type==='e'?2:0,
+         atk,atkCd,atkT:0,ranged,stopRange:ranged?170:22};
 }
 function mkQ(wc){
   const q=[];
@@ -543,8 +547,56 @@ function update(dt){
     const frozen=e.frozenUntil>t;
     const s=frozen?e.spd*.02:e.slowed>0?e.spd*(e.slowFactor||.3):e.spd;
     const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
-    if(d>14){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
+    if(d>e.stopRange){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
     if(e.slowed>0)e.slowed-=dt;
+  });
+
+  // enemy attacks on core
+  enemies.forEach(e=>{
+    if(e.frozenUntil>t)return;
+    const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
+    if(d>e.stopRange+12)return;
+    e.atkT-=dt;
+    if(e.atkT>0)return;
+    e.atkT=e.atkCd;
+    if(e.ranged){
+      const spd=180,ang=Math.atan2(dy,dx);
+      eProj.push({x:e.x,y:e.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,d:e.atk});
+    }else{
+      if(shld){shld=false;shldT=0;
+        nums.push({x:cp.x,y:cp.y-30,v:'格挡!',col:'#52a870',t:0,mt:1.2});
+        glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,mt:.5});
+      }else{
+        coreHP=Math.max(0,coreHP-e.atk);
+        glows.push({x:cp.x,y:cp.y,r:50,col:'#c04848',t:0,mt:.45});
+        nums.push({x:cp.x,y:cp.y-30,v:`-${e.atk}`,col:'#c04848',t:0,mt:.9});
+      }
+    }
+  });
+
+  // enemy projectiles
+  eProj=eProj.filter(p=>{
+    p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20)return false;
+    if(Math.hypot(p.x-cp.x,p.y-cp.y)<12){
+      if(shld){shld=false;shldT=0;
+        nums.push({x:cp.x,y:cp.y-30,v:'格挡!',col:'#52a870',t:0,mt:1.2});
+        glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,mt:.5});
+      }else{
+        coreHP=Math.max(0,coreHP-p.d);
+        glows.push({x:cp.x,y:cp.y,r:50,col:'#c04848',t:0,mt:.45});
+        nums.push({x:cp.x,y:cp.y-30,v:`-${p.d}`,col:'#c04848',t:0,mt:.9});
+      }
+      return false;
+    }
+    for(let i=warriors.length-1;i>=0;i--){
+      if(Math.hypot(p.x-warriors[i].x,p.y-warriors[i].y)<12){
+        warriors[i].hp-=p.d;
+        glows.push({x:warriors[i].x,y:warriors[i].y,r:10,col:'#e06060',t:0,mt:.2});
+        return false;
+      }
+    }
+    return true;
   });
 
   // slow zones
@@ -628,32 +680,17 @@ function update(dt){
     return !consumed;
   });
 
-  // enemy death / reach core
+  // enemy death
   enemies=enemies.filter(e=>{
-    if(e.hp<=0){
-      kills++;
-      const g=e.type==='b'?15:e.type==='e'?6:e.type==='a'?4:2;
-      gold+=g;coins.push({x:e.x,y:e.y,vy:-60,t:0,mt:.9,v:g});
-      glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,mt:.3});
-      return false;
-    }
-    if(Math.hypot(e.x-cp.x,e.y-cp.y)<16){
-      if(shld){
-        shld=false;shldT=0;
-        nums.push({x:cp.x,y:cp.y-30,v:'格挡!',col:'#52a870',t:0,mt:1.2});
-        glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,mt:.5});
-      }else{
-        const d2=e.type==='b'?5:e.type==='e'?3:1;
-        coreHP=Math.max(0,coreHP-d2);
-        glows.push({x:cp.x,y:cp.y,r:50,col:'#c04848',t:0,mt:.45});
-        nums.push({x:cp.x,y:cp.y-30,v:`-${d2}`,col:'#c04848',t:0,mt:.9});
-      }
-      return false;
-    }
-    return true;
+    if(e.hp>0)return true;
+    kills++;
+    const g=e.type==='b'?15:e.type==='e'?6:e.type==='a'?4:2;
+    gold+=g;coins.push({x:e.x,y:e.y,vy:-60,t:0,mt:.9,v:g});
+    glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,mt:.3});
+    return false;
   });
 
-  if(state==='wave'&&spawnQ.length===0&&enemies.length===0&&!cleared){cleared=true;warriors=[];setTimeout(onWaveEnd,700);}
+  if(state==='wave'&&spawnQ.length===0&&enemies.length===0&&!cleared){cleared=true;warriors=[];eProj=[];setTimeout(onWaveEnd,700);}
   if(coreHP<=0&&state==='wave'){state='gameover';stopBoss();showOver();}
 
   glows=glows.filter(g=>{g.t+=dt;return g.t<g.mt;});
@@ -675,8 +712,8 @@ function stopBoss(){if(bossInterval){clearInterval(bossInterval);bossInterval=nu
 
 // ── DRAW ──
 function drawBg(){
-  ctx.fillStyle='#111620';ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(51,64,96,.16)';ctx.lineWidth=1;
+  ctx.fillStyle='#182038';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(64,80,120,.28)';ctx.lineWidth=1;
   for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 }
@@ -732,13 +769,13 @@ function drawGrid(){
 
   grid.forEach((cell,ci)=>{
     const p=cp2(cell.row,cell.col),hs=CELL/2;
-    ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(p.x-hs+3,p.y-hs+3,CELL-4,CELL-4);
-    ctx.fillStyle='#1d2438';ctx.fillRect(p.x-hs,p.y-hs,CELL,CELL);
+    ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(p.x-hs+3,p.y-hs+3,CELL-4,CELL-4);
+    ctx.fillStyle='#253050';ctx.fillRect(p.x-hs,p.y-hs,CELL,CELL);
     if(ci===hovIdx){
       ctx.strokeStyle=selHand>=0?'#c8a040':'#56aed0';ctx.lineWidth=2;
       ctx.strokeRect(p.x-hs+2,p.y-hs+2,CELL-4,CELL-4);
     }else{ctx.strokeStyle='#2e3c58';ctx.lineWidth=1;ctx.strokeRect(p.x-hs,p.y-hs,CELL,CELL);}
-    ctx.fillStyle='#26304a';ctx.fillRect(p.x-hs,p.y-hs,CELL,3);
+    ctx.fillStyle='#303a5a';ctx.fillRect(p.x-hs,p.y-hs,CELL,3);
 
     if(cell.rune){
       const rune=cell.rune,lv=rune.lv||1;
@@ -776,7 +813,7 @@ function drawGrid(){
       }
     }else{
       ctx.font='10px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillStyle=state==='prep'?'#2e3c58':'#1d2438';ctx.fillText('空',p.x,p.y);
+      ctx.fillStyle=state==='prep'?'#3a4868':'#253050';ctx.fillText('空',p.x,p.y);
     }
   });
 
@@ -814,7 +851,7 @@ function drawKnight(){
   ctx.fillStyle='#8898b8';ctx.fillRect(x-5,y-20,10,13);
   ctx.fillStyle='rgba(200,160,64,.3)';ctx.fillRect(x-3,y-19,6,11);
   ctx.fillStyle='#8898b8';ctx.beginPath();ctx.arc(x,y-24,6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#111620';ctx.fillRect(x-4,y-26,8,2);
+  ctx.fillStyle='#1a2038';ctx.fillRect(x-4,y-26,8,2);
   if(kSpdMul>1){ctx.beginPath();ctx.arc(x,y-15,14,0,Math.PI*2);ctx.strokeStyle='#d4a84344';ctx.lineWidth=2;ctx.stroke();}
 }
 
@@ -869,6 +906,25 @@ function drawEnemies(){
     const bw=sz*2+4;
     ctx.fillStyle='#1a2028';ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw,4);
     ctx.fillStyle=bdr;ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw*(e.hp/e.maxHp),4);
+    // Weapon indicator (ranged=bow arc, melee=sword line)
+    if(e.ranged&&!boss){
+      ctx.strokeStyle=bdr+'bb';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(e.x+sz*.65,e.y-sz,sz*.38,-.9,.9);ctx.stroke();
+      ctx.strokeStyle=bdr+'55';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(e.x+sz*.65,e.y-sz*1.35);ctx.lineTo(e.x+sz*.65,e.y-sz*.65);ctx.stroke();
+    }else if(!boss){
+      ctx.strokeStyle=bdr+'bb';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(e.x+sz*.35,e.y-sz*1.85);ctx.lineTo(e.x+sz*.8,e.y-sz*.75);ctx.stroke();
+    }
+  });
+}
+
+function drawEProj(){
+  eProj.forEach(p=>{
+    const sp=Math.hypot(p.vx,p.vy)||1,len=8;
+    ctx.beginPath();ctx.moveTo(p.x-p.vx/sp*len,p.y-p.vy/sp*len);ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle='#e06060cc';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fillStyle='#e08080';ctx.fill();
   });
 }
 
@@ -918,7 +974,7 @@ function drawNums(){
 }
 
 function drawHUD(){
-  ctx.fillStyle='rgba(8,10,18,.9)';ctx.fillRect(0,0,W,40);
+  ctx.fillStyle='rgba(14,20,38,.9)';ctx.fillRect(0,0,W,40);
   ctx.fillStyle='#2a3850';ctx.fillRect(0,39,W,1);
   ctx.textBaseline='middle';
   const wave=WAVES[waveIdx<WAVES.length?waveIdx:WAVES.length-1];
@@ -983,7 +1039,7 @@ document.getElementById('btn-go').addEventListener('click',()=>{
       if(!boss)return;
       for(let i=0;i<3;i++){
         const a=Math.random()*Math.PI*2,r=50+Math.random()*40;
-        enemies.push({hp:3,maxHp:3,spd:26,type:'n',slowed:0,slowFactor:.3,frozenUntil:0,sh:0,x:boss.x+Math.cos(a)*r,y:boss.y+Math.sin(a)*r});
+        enemies.push({hp:8,maxHp:8,spd:26,type:'n',slowed:0,slowFactor:.3,frozenUntil:0,sh:0,x:boss.x+Math.cos(a)*r,y:boss.y+Math.sin(a)*r,atk:3,atkCd:1.5,atkT:0,ranged:false,stopRange:22});
       }
       nums.push({x:boss.x,y:boss.y-34,v:'召唤援军!',col:'#e06060',t:0,mt:1.5});
     },8000);
@@ -1016,8 +1072,8 @@ function mkShop(){
       const r=item.data;
       card.style.setProperty('--col',r.col);
       // Preview merge result in hand
-      const hasLv1=hand.some(h=>h.id===r.id&&(h.lv||1)===1);
-      const hasLv2=hand.some(h=>h.id===r.id&&(h.lv||1)===2);
+      const hasLv1=hand.some(h=>h.id===r.id&&(h.lv||1)===1)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===1);
+      const hasLv2=hand.some(h=>h.id===r.id&&(h.lv||1)===2)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===2);
       const mergeTag=hasLv1?(hasLv2?'→ Lv3合成':'→ Lv2合成'):'';
       const desc=RUNE_DESCS[r.id]?.[0]||'';
       card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div><span class="sc-tag tag-r">Lv1 符文</span>`;
@@ -1034,24 +1090,22 @@ function mkShop(){
   });
 }
 
+// Search hand then grid for a rune match; remove it and return true if found
+function findAndRemove(id,lv){
+  const hi=hand.findIndex(h=>h.id===id&&(h.lv||1)===lv);
+  if(hi>=0){hand.splice(hi,1);return true;}
+  const gi=grid.findIndex(c=>c.rune&&c.rune.id===id&&(c.rune.lv||1)===lv);
+  if(gi>=0){grid[gi].rune=null;bladeCharge[gi]=0;lf[gi]=-99;return true;}
+  return false;
+}
 function buyRune(r){
   if(gold<r.cost){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
   gold-=r.cost;
-  // Auto-merge: same id same level → upgrade
-  let newRune={...r,lv:1};
-  const merge1=hand.findIndex(h=>h.id===r.id&&(h.lv||1)===1);
-  if(merge1>=0){
-    hand.splice(merge1,1);
-    newRune.lv=2;
-    const merge2=hand.findIndex(h=>h.id===r.id&&(h.lv||1)===2);
-    if(merge2>=0){
-      hand.splice(merge2,1);
-      newRune.lv=3;
-    }
-  }
-  hand.push(newRune);
-  if(newRune.lv>1){
-    nums.push({x:W/2,y:H/2-30,v:`${r.name} → Lv${newRune.lv}!`,col:r.col,t:0,mt:2.0});
+  let newLv=1;
+  if(findAndRemove(r.id,1)){newLv=2;if(findAndRemove(r.id,2))newLv=3;}
+  hand.push({...r,lv:newLv});
+  if(newLv>1){
+    nums.push({x:W/2,y:H/2-30,v:`${r.name} → Lv${newLv}!`,col:r.col,t:0,mt:2.0});
     glows.push({x:W/2,y:H/2,r:80,col:r.col,t:0,mt:.6});
   }
   closeShop();
@@ -1110,9 +1164,9 @@ function reset(){
   document.querySelectorAll('.overlay').forEach(el=>el.classList.add('hidden'));
   ['shop','relic','prep'].forEach(id=>document.getElementById(id).classList.add('hidden'));
   stopBoss();
-  enemies=[];warriors=[];proj=[];coins=[];glows=[];nums=[];exps=[];slowZones=[];
+  enemies=[];warriors=[];proj=[];eProj=[];coins=[];glows=[];nums=[];exps=[];slowZones=[];
   selHand=-1;shld=false;shldT=0;
-  waveIdx=0;gold=20;maxHP=20;coreHP=20;kills=0;t=0;cleared=false;
+  waveIdx=0;gold=20;maxHP=100;coreHP=100;kills=0;t=0;cleared=false;
   ownedRelics=[];extraProj=0;kSpdMul=1;dmgMul=1;
   shopRefreshCost=1;
   lastFiredId=null;prevFiredId=null;lastFiredT=-99;lastArrowTarget=null;
@@ -1249,7 +1303,7 @@ function loop(ts){
   if(state==='wave')update(dt);
   ctx.clearRect(0,0,W,H);
   drawBg();drawSlowZones();drawGlows();drawGrid();drawCore();
-  if(state==='wave'){drawEnemies();drawWarriors();}
+  if(state==='wave'){drawEnemies();drawWarriors();drawEProj();}
   drawProj();drawKnight();drawCoins();drawNums();drawHUD();
   requestAnimationFrame(loop);
 }
