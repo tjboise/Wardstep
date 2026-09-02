@@ -803,7 +803,7 @@ function update(dt){
   });
 
   // enemy death
-  const cp2=corePos();
+  const coreP=corePos();
   enemies=enemies.filter(e=>{
     if(e.hp>0)return true;
     kills++;
@@ -816,8 +816,8 @@ function update(dt){
     const thresh=knight.lv===1?6:14;
     if(knight.lv<3&&knight.xp>=thresh){
       knight.lv++;knight.xp=0;
-      nums.push({x:cp2.x,y:cp2.y-55,v:`骑士 Lv${knight.lv}!`,col:'#c8a040',t:0,mt:2.2,big:true});
-      glows.push({x:cp2.x,y:cp2.y,r:70,col:'#c8a040',t:0,mt:.8});
+      nums.push({x:coreP.x,y:coreP.y-55,v:`骑士 Lv${knight.lv}!`,col:'#c8a040',t:0,mt:2.2,big:true});
+      glows.push({x:coreP.x,y:coreP.y,r:70,col:'#c8a040',t:0,mt:.8});
     }
     return false;
   });
