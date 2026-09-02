@@ -77,8 +77,8 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 .hand-empty{font-family:'Noto Serif SC',serif;font-size:.74rem;color:#3a4860;}
 
 /* RELIC BAR */
-#relic-bar{position:absolute;top:42px;left:0;right:0;display:flex;justify-content:center;gap:6px;padding:4px 12px;pointer-events:none;}
-.rb{width:24px;height:24px;background:#1d2438;border:1px solid #3a2860;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+#relic-bar{position:absolute;top:42px;left:0;right:0;display:flex;justify-content:center;gap:5px;padding:3px 12px;pointer-events:none;}
+.rb{width:26px;height:26px;background:#1e2840;border:1px solid #3a2860;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.88rem;}
 
 /* MUTE BUTTON */
 #btn-mute{position:absolute;top:5px;right:6px;z-index:30;background:rgba(8,10,18,.78);border:1px solid #2a3850;color:#56aed0;font-size:.72rem;padding:3px 8px;cursor:pointer;border-radius:2px;font-family:Cinzel,serif;letter-spacing:.04em;transition:background .15s;}
@@ -204,7 +204,7 @@ const WAVES=[
   {label:'小关 1', type:'small',
    enemies:[{count:5,hp:8,spd:24,type:'n'}]},
   {label:'小关 2', type:'small',
-   enemies:[{count:5,hp:8,spd:26,type:'n'},{count:2,hp:18,spd:15,type:'a'}]},
+   enemies:[{count:5,hp:8,spd:26,type:'n'},{count:2,hp:18,spd:15,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
   {label:'精英关', type:'elite',
    enemies:[{count:4,hp:8,spd:28,type:'n'},{count:2,hp:18,spd:16,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
   {label:'Boss关', type:'boss',
@@ -244,7 +244,7 @@ cv.addEventListener('mousemove',e=>{
 });
 
 // ── GRID ──
-function gc(){return{x:W/2,y:195};}
+function gc(){return{x:W/2,y:222};}
 function cp2(row,col){
   const g=gc(),nc=Math.max(...grid.map(c=>c.col))+1,nr=Math.max(...grid.map(c=>c.row))+1;
   return{x:g.x+col*CELL-(nc*CELL/2-CELL/2),y:g.y+row*CELL-(nr*CELL/2-CELL/2)};
@@ -252,6 +252,16 @@ function cp2(row,col){
 function corePos(){return gc();}
 
 function mkPath(){
+  // 3×3 ring (8 cells, center missing): clockwise path around the core
+  if(grid.length===8){
+    const ring=[
+      {row:0,col:0},{row:0,col:1},{row:0,col:2},
+      {row:1,col:2},{row:2,col:2},{row:2,col:1},
+      {row:2,col:0},{row:1,col:0},
+    ];
+    path=ring.map(({row,col})=>grid.findIndex(c=>c.row===row&&c.col===col));
+    return;
+  }
   const byR={};
   grid.forEach(c=>{if(!byR[c.row])byR[c.row]=[];byR[c.row].push(c);});
   const res=[];
@@ -263,20 +273,16 @@ function mkPath(){
 }
 
 function initGrid(){
-  grid=[{row:0,col:0,rune:null},{row:0,col:1,rune:null},{row:1,col:0,rune:null},{row:1,col:1,rune:null}];
+  grid=[];
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){
+    if(r===1&&c===1)continue; // center reserved for core
+    grid.push({row:r,col:c,rune:null});
+  }
   lf=grid.map(()=>-99);
   bladeCharge=grid.map(()=>0);
   mkPath();
   const p0=cp2(grid[path[0]].row,grid[path[0]].col);
   knight.x=p0.x;knight.y=p0.y;knight.pi=0;
-}
-
-function expandGrid(){
-  const mr=Math.max(...grid.map(c=>c.row)),mc=Math.max(...grid.map(c=>c.col));
-  if(mr<2){grid.push({row:mr+1,col:0,rune:null});}
-  else if(mc<2){grid.push({row:0,col:mc+1,rune:null});}
-  lf.push(-99);bladeCharge.push(0);
-  mkPath();
 }
 
 // ── ENEMIES ──
@@ -507,8 +513,17 @@ function applyRelic(rel){
 }
 
 function renderRelicBar(){
-  const bar=document.getElementById('relic-bar');
-  bar.innerHTML=ownedRelics.map(r=>`<div class="rb" style="border-color:${r.col}" title="${r.name}：${r.desc}">${r.sym}</div>`).join('');
+  const bar=document.getElementById('relic-bar'),MAX=5;bar.innerHTML='';
+  for(let i=0;i<MAX;i++){
+    const div=document.createElement('div');div.className='rb';
+    if(i<ownedRelics.length){
+      const r=ownedRelics[i];
+      div.textContent=r.sym;div.style.borderColor=r.col+'99';div.title=`${r.name}：${r.desc}`;
+    }else{
+      div.style.opacity='.22';
+    }
+    bar.appendChild(div);
+  }
 }
 
 // ── UPDATE ──
@@ -1064,8 +1079,8 @@ function mkShop(){
     const i=Math.floor(Math.random()*pool.length);
     if(!used.has(pool[i].id)){picks.push(pool[i]);used.add(pool[i].id);}
   }
-  // Rune cards + shovel
-  [...picks.map(r=>({type:'r',data:r})),{type:'s',data:{cost:28}}].forEach(item=>{
+  // Rune cards
+  picks.map(r=>({type:'r',data:r})).forEach(item=>{
     const card=document.createElement('div'),cost=item.data.cost,can=gold>=cost;
     card.className='sc'+(can?'':' dim');
     if(item.type==='r'){
@@ -1078,13 +1093,6 @@ function mkShop(){
       const desc=RUNE_DESCS[r.id]?.[0]||'';
       card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div><span class="sc-tag tag-r">Lv1 符文</span>`;
       card.addEventListener('click',()=>buyRune(r));
-    }else{
-      card.style.setProperty('--col','#52a870');
-      card.innerHTML=`<span class="sc-sym">⛏</span><div class="sc-name">铲子</div><div class="sc-cost">💰 28</div><div class="sc-desc">扩展格子，新增符文槽位</div><span class="sc-tag tag-s">扩展</span>`;
-      card.addEventListener('click',()=>{
-        if(gold<28){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
-        gold-=28;expandGrid();closeShop();
-      });
     }
     con.appendChild(card);
   });
