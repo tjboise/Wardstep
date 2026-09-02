@@ -80,6 +80,12 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 #relic-bar{position:absolute;top:42px;left:0;right:0;display:flex;justify-content:center;gap:5px;padding:3px 12px;pointer-events:none;}
 .rb{width:26px;height:26px;background:#1e2840;border:1px solid #3a2860;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.88rem;}
 
+/* SELL CARDS */
+.sell-card{display:flex;align-items:center;gap:8px;padding:5px 11px;background:#1e2840;border:1px solid #2e3850;border-radius:2px;cursor:pointer;font-family:'Noto Serif SC',serif;font-size:.72rem;color:#7888a8;transition:background .12s;}
+.sell-card:hover{background:rgba(192,72,72,.12);border-color:#c04848;}
+.sell-sep{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.1em;color:#3a4860;margin-top:4px;}
+.affix-badge{font-size:.55rem;color:#9070d0;border:1px solid #9070d066;padding:1px 5px;border-radius:2px;margin-top:3px;display:inline-block;}
+
 /* MUTE BUTTON */
 #btn-mute{position:absolute;top:5px;right:6px;z-index:30;background:rgba(8,10,18,.78);border:1px solid #2a3850;color:#56aed0;font-size:.72rem;padding:3px 8px;cursor:pointer;border-radius:2px;font-family:Cinzel,serif;letter-spacing:.04em;transition:background .15s;}
 #btn-mute:hover{background:rgba(86,174,208,.12);}
@@ -114,6 +120,8 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
     <div class="panel-hdr" id="shop-hdr">小关结束</div>
     <div class="panel-gold" id="shop-gold">💰 0</div>
     <div class="card-row" id="shop-cards"></div>
+    <div class="sell-sep" id="sell-hdr" style="display:none">── 出售手牌 ──</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center" id="shop-sell"></div>
     <div class="shop-row">
       <button class="refresh-btn" id="shop-refresh">🔄 刷新 (1💰)</button>
       <span class="skip-link" id="shop-skip">跳过 →</span>
@@ -136,6 +144,13 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
     </div>
     <div class="hand-row" id="hand-cards"></div>
     <button class="btn btn-sm" id="btn-go">开始本波 →</button>
+  </div>
+
+  <!-- ROUTE CHOICE -->
+  <div class="overlay hidden" id="ov-route">
+    <div class="ov-title">波次结束</div>
+    <div class="ov-sub">选择下一步行动</div>
+    <div class="card-row" id="route-cards"></div>
   </div>
 
   <!-- GAMEOVER -->
@@ -199,6 +214,30 @@ const ALL_RELICS=[
   {id:'dmg',       name:'力量祝福', sym:'⊕', col:'#c04848', desc:'所有伤害 +50%'},
 ];
 
+// ── RUNE AFFIXES (unlock at Lv3) ──
+const AFFIXES={
+  arrow:[
+    {id:'chill',  name:'寒矢', desc:'命中附带减速 1.5秒'},
+    {id:'spread', name:'散射', desc:'左右各多发1枚箭矢'},
+  ],
+  blade:[
+    {id:'iron',    name:'铁甲', desc:'战士受到伤害-40%'},
+    {id:'berserker',name:'狂战',desc:'战士每击杀获得移速+15%（最多3层）'},
+  ],
+  frost:[
+    {id:'permafrost',name:'永寒', desc:'减速/冻结持续时间×2'},
+    {id:'shatter',   name:'碎冰', desc:'触发时对全场敌人造成12点伤害'},
+  ],
+  bomb:[
+    {id:'chain',  name:'连锁', desc:'爆炸命中敌人后触发小型二次爆炸(6伤)'},
+    {id:'inferno',name:'地狱火',desc:'火区持续时间×2，火区伤害+50%'},
+  ],
+  moonblade:[
+    {id:'homing',   name:'锁定', desc:'追踪最低血量目标'},
+    {id:'lifesteal',name:'吸血', desc:'命中时为最近战士恢复2HP'},
+  ],
+};
+
 // ── WAVES ──
 const WAVES=[
   {label:'小关 1', type:'small',
@@ -206,9 +245,9 @@ const WAVES=[
   {label:'小关 2', type:'small',
    enemies:[{count:5,hp:8,spd:26,type:'n'},{count:2,hp:18,spd:15,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
   {label:'精英关', type:'elite',
-   enemies:[{count:4,hp:8,spd:28,type:'n'},{count:2,hp:18,spd:16,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
+   enemies:[{count:4,hp:8,spd:28,type:'n'},{count:2,hp:18,spd:16,type:'a'},{count:1,hp:30,spd:11,type:'e'},{count:1,hp:22,spd:24,type:'h'}]},
   {label:'Boss关', type:'boss',
-   enemies:[{count:1,hp:120,spd:9,type:'b'}]},
+   enemies:[{count:1,hp:120,spd:9,type:'b'},{count:2,hp:22,spd:24,type:'h'}]},
 ];
 
 // ── CANVAS ──
@@ -219,7 +258,7 @@ cv.width=W; cv.height=H;
 let state='start',waveIdx=0,gold=20,maxHP=100,coreHP=100;
 let shld=false,shldT=0,kills=0,t=0;
 let hand=[],selHand=-1,grid=[],path=[],lf=[],bladeCharge=[];
-let knight={x:0,y:0,pi:0};
+let knight={x:0,y:0,pi:0,lv:1,xp:0};
 let enemies=[],warriors=[],proj=[],eProj=[],exps=[],coins=[],glows=[],nums=[],slowZones=[];
 let spawnQ=[],spawnT=0,cleared=false;
 let mouse={x:-999,y:-999};
@@ -288,12 +327,13 @@ function initGrid(){
 // ── ENEMIES ──
 function mkEnemy(g){
   const ranged=g.type==='e';
-  const atk=g.type==='b'?12:g.type==='e'?7:g.type==='a'?5:3;
-  const atkCd=g.type==='b'?2.5:g.type==='e'?2.0:g.type==='a'?1.2:1.5;
+  const healer=g.type==='h';
+  const atk=g.type==='b'?12:g.type==='e'?7:g.type==='a'?5:g.type==='h'?5:3;
+  const atkCd=g.type==='b'?2.5:g.type==='e'?2.0:g.type==='a'?1.2:g.type==='h'?2.2:1.5;
   return{hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,
          slowed:0,slowFactor:.3,frozenUntil:0,
          sh:g.type==='a'?1:g.type==='e'?2:0,
-         atk,atkCd,atkT:0,ranged,stopRange:ranged?170:22};
+         atk,atkCd,atkT:0,ranged,healer,stopRange:healer?9999:ranged?170:22};
 }
 function mkQ(wc){
   const q=[];
@@ -321,14 +361,17 @@ function dealDmg(e,d){
 }
 
 // ── WARRIORS ──
-function spawnWarrior(x,y,lv){
+function spawnWarrior(x,y,lv,affix){
   lv=lv||1;
+  const iron=affix?.id==='iron',berserk=affix?.id==='berserker';
   const w={x,y,
     hp:lv===3?30:lv===2?40:20,
     maxHp:lv===3?30:lv===2?40:20,
     atk:lv===3?7:lv===2?8:5,
     atkCd:1.0,atkT:0,lv,
-    sh:lv===2?1:0};
+    sh:lv===2?1:0,
+    dmgReduct:iron?.4:0,
+    berserker:berserk,kills:0};
   warriors.push(w);
   glows.push({x,y,r:35,col:'#c04848',t:0,mt:.5});
   nums.push({x,y:y-24,v:lv>1?`战士 Lv${lv}!`:'战士召唤!',col:'#c04848',t:0,mt:1.2});
@@ -366,15 +409,16 @@ function fireRune(ci,rune){
       const combo=checkCombo(rune.id);
       if(combo)showCombo(combo,p);
       glows.push({x:p.x,y:p.y,r:28,col:rune.col,t:0,mt:.4});
+      const af=rune.affix||null;
       if(lv>=3){
-        spawnWarrior(p.x-14,p.y,lv);
-        spawnWarrior(p.x+14,p.y,lv);
+        spawnWarrior(p.x-14,p.y,lv,af);
+        spawnWarrior(p.x+14,p.y,lv,af);
       }else{
-        spawnWarrior(p.x,p.y,lv);
+        spawnWarrior(p.x,p.y,lv,af);
       }
       // 血印: extra warrior at arrow target
       if((combo?.name==='血印'||combo?.name==='★同归于尽')&&lastArrowTarget){
-        spawnWarrior(lastArrowTarget.x,lastArrowTarget.y,1);
+        spawnWarrior(lastArrowTarget.x,lastArrowTarget.y,1,null);
       }
       updateComboState(rune.id);
     }
@@ -415,19 +459,32 @@ function fireRune(ci,rune){
       for(let i=0;i<Math.min(shots,sorted.length);i++){
         const nn=sorted[i];
         const a=Math.atan2(nn.y-p.y,nn.x-p.x);
-        proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:dmg,col:rune.col,bounces:0,pierce,hitSet:pierce?new Set():null});
+        const chill=rune.affix?.id==='chill';
+        proj.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,d:dmg,col:rune.col,bounces:0,pierce,hitSet:pierce?new Set():null,chill});
+        // spread: ±25° extra shots
+        if(rune.affix?.id==='spread'){
+          [.44,-.44].forEach(da=>{
+            proj.push({x:p.x,y:p.y,vx:Math.cos(a+da)*300,vy:Math.sin(a+da)*300,d:dmg,col:rune.col,bounces:0,pierce:false,hitSet:null,chill});
+          });
+        }
         if(i===0)lastArrowTarget={x:nn.x,y:nn.y};
       }
     }
 
   }else if(rune.id==='frost'){
     const slowFactor=lv>=2?0.2:0.3;
-    const slowDur=lv>=2?4:2.5;
+    const durMul=rune.affix?.id==='permafrost'?2:1;
+    const slowDur=(lv>=2?4:2.5)*durMul;
     enemies.forEach(e=>{
-      e.slowed=lv>=3?4.5:slowDur;
+      e.slowed=lv>=3?4.5*durMul:slowDur;
       e.slowFactor=slowFactor;
-      if(lv>=3)e.frozenUntil=t+1.5;
+      if(lv>=3)e.frozenUntil=t+1.5*durMul;
     });
+    if(rune.affix?.id==='shatter'){
+      const shatterDmg=Math.round(12*dmgMul);
+      enemies.forEach(e=>dealDmg(e,shatterDmg));
+      glows.push({x:corePos().x,y:corePos().y,r:180,col:'#c0e8ff',t:0,mt:.5});
+    }
     glows.push({x:corePos().x,y:corePos().y,r:140,col:rune.col,t:0,mt:.7});
 
   }else if(rune.id==='bomb'){
@@ -440,13 +497,23 @@ function fireRune(ci,rune){
       enemies.forEach(e=>{sx+=e.x;sy+=e.y;cnt++;});
       return cnt>0?{x:sx/cnt,y:sy/cnt}:{x:p.x,y:p.y};
     };
+    const fireMt=rune.affix?.id==='inferno'?8:4;
+    const fireDmgScale=rune.affix?.id==='inferno'?1.5:1;
     const doExp=(tx,ty,d,dmgAmt,br)=>{
       setTimeout(()=>{
         if(state!=='wave')return;
         exps.push({x:tx,y:ty,r:0,mr:br,t:0,mt:.55,col:rune.col});
-        enemies.forEach(e=>{if(Math.hypot(e.x-tx,e.y-ty)<br)dealDmg(e,Math.round(dmgAmt*dmgMul));});
+        const hit=[];
+        enemies.forEach(e=>{if(Math.hypot(e.x-tx,e.y-ty)<br){dealDmg(e,Math.round(dmgAmt*dmgMul));hit.push(e);}});
         if(leaveSlow)slowZones.push({x:tx,y:ty,r:br*.65,t:0,mt:3,fire:false});
-        if(lv>=3)slowZones.push({x:tx,y:ty,r:60,t:0,mt:4,fire:true});
+        if(lv>=3)slowZones.push({x:tx,y:ty,r:60,t:0,mt:fireMt,fire:true,dmgScale:fireDmgScale});
+        // Chain affix: mini-explosion on each hit enemy
+        if(rune.affix?.id==='chain'&&hit.length>0){
+          hit.forEach(e=>{
+            exps.push({x:e.x,y:e.y,r:0,mr:50,t:0,mt:.35,col:rune.col});
+            enemies.forEach(ne=>{if(ne!==e&&Math.hypot(ne.x-e.x,ne.y-e.y)<50)dealDmg(ne,Math.round(6*dmgMul));});
+          });
+        }
       },d);
     };
 
@@ -480,6 +547,10 @@ function fireRune(ci,rune){
       let target=null;
       if(isTracking&&lastArrowTarget){
         target={a:Math.atan2(lastArrowTarget.y-p.y,lastArrowTarget.x-p.x)};
+      }else if(rune.affix?.id==='homing'){
+        let nn=null,lowestHp=9999;
+        enemies.forEach(e=>{if(e.hp<lowestHp){lowestHp=e.hp;nn=e;}});
+        if(nn)target={a:Math.atan2(nn.y-p.y,nn.x-p.x)};
       }else{
         let nn=null,nd=9999;
         enemies.forEach(e=>{const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<nd){nd=d;nn=e;}});
@@ -494,7 +565,9 @@ function fireRune(ci,rune){
           bounces,hitSet:hs,
           iceFrag:isIceFrag,
           dmgBonus:lv>=2?1:0,
-          pierce:false
+          pierce:false,
+          lifesteal:rune.affix?.id==='lifesteal',
+          homing:rune.affix?.id==='homing',
         });
       }
     }
@@ -538,16 +611,18 @@ function update(dt){
       knight.x=tp.x;knight.y=tp.y;
       const cell=grid[tci];
       if(cell.rune){
+        const cdF=knight.lv>=3?0.72:1;
         if(cell.rune.id==='blade'){
-          if(t-lf[tci]>=cell.rune.cd)fireRune(tci,cell.rune);
-        }else if(t-lf[tci]>=cell.rune.cd){
+          if(t-lf[tci]>=cell.rune.cd*cdF)fireRune(tci,cell.rune);
+        }else if(t-lf[tci]>=cell.rune.cd*cdF){
           lf[tci]=t;
           fireRune(tci,cell.rune);
         }
       }
       knight.pi++;
     }else{
-      const s=KSPD_BASE*kSpdMul;
+      const kLvMul=knight.lv>=3?1.4:knight.lv>=2?1.2:1;
+      const s=KSPD_BASE*kSpdMul*kLvMul;
       knight.x+=(dx/dist)*s*dt;knight.y+=(dy/dist)*s*dt;
     }
   }
@@ -561,14 +636,33 @@ function update(dt){
   enemies.forEach(e=>{
     const frozen=e.frozenUntil>t;
     const s=frozen?e.spd*.02:e.slowed>0?e.spd*(e.slowFactor||.3):e.spd;
-    const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
-    if(d>e.stopRange){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
+    if(e.healer){
+      // Healers chase most-damaged ally
+      let tgt=null,lowestRatio=1;
+      enemies.forEach(ne=>{
+        if(ne===e||ne.healer)return;
+        const ratio=ne.hp/ne.maxHp;
+        if(ratio<lowestRatio&&Math.hypot(ne.x-e.x,ne.y-e.y)<160){lowestRatio=ratio;tgt=ne;}
+      });
+      if(tgt){const dx=tgt.x-e.x,dy=tgt.y-e.y,d=Math.hypot(dx,dy);if(d>20){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}}
+      else{const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);if(d>80){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}}
+    }else{
+      const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
+      if(d>e.stopRange){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
+    }
     if(e.slowed>0)e.slowed-=dt;
   });
 
-  // enemy attacks on core
+  // enemy attacks (core or heal allies)
   enemies.forEach(e=>{
     if(e.frozenUntil>t)return;
+    if(e.healer){
+      e.atkT-=dt;if(e.atkT>0)return;e.atkT=e.atkCd;
+      let tgt=null,lowestHp=9999;
+      enemies.forEach(ne=>{if(ne===e||ne.healer||ne.hp>=ne.maxHp)return;if(Math.hypot(ne.x-e.x,ne.y-e.y)<90&&ne.hp<lowestHp){lowestHp=ne.hp;tgt=ne;}});
+      if(tgt){tgt.hp=Math.min(tgt.maxHp,tgt.hp+e.atk);glows.push({x:tgt.x,y:tgt.y,r:16,col:'#52a870',t:0,mt:.5});nums.push({x:tgt.x,y:tgt.y-16,v:`+${e.atk}`,col:'#52a870',t:0,mt:.9});}
+      return;
+    }
     const dx=cp.x-e.x,dy=cp.y-e.y,d=Math.hypot(dx,dy);
     if(d>e.stopRange+12)return;
     e.atkT-=dt;
@@ -606,7 +700,7 @@ function update(dt){
     }
     for(let i=warriors.length-1;i>=0;i--){
       if(Math.hypot(p.x-warriors[i].x,p.y-warriors[i].y)<12){
-        warriors[i].hp-=p.d;
+        warriors[i].hp-=p.d*(1-(warriors[i].dmgReduct||0));
         glows.push({x:warriors[i].x,y:warriors[i].y,r:10,col:'#e06060',t:0,mt:.2});
         return false;
       }
@@ -641,12 +735,18 @@ function update(dt){
         if(w.atkT<=0){
           w.atkT=w.atkCd;
           const dmg=Math.round(w.atk*dmgMul);
+          const wasAlive=nn.hp>0;
           dealDmg(nn,dmg);
           glows.push({x:nn.x,y:nn.y,r:12,col:'#c04848',t:0,mt:.2});
+          if(w.berserker&&wasAlive&&nn.hp<=0){
+            w.kills=(w.kills||0)+1;
+            if(w.kills<=3)glows.push({x:w.x,y:w.y,r:20,col:'#e05858',t:0,mt:.4});
+          }
         }
       }else{
+        const bMul=w.berserker?1+Math.min(w.kills||0,3)*.15:1;
         const dx=nn.x-w.x,dy=nn.y-w.y,d=Math.hypot(dx,dy);
-        w.x+=(dx/d)*55*dt;w.y+=(dy/d)*55*dt;
+        w.x+=(dx/d)*55*bMul*dt;w.y+=(dy/d)*55*bMul*dt;
       }
     }
     return true;
@@ -664,6 +764,13 @@ function update(dt){
         const dmg=p.d+(p.dmgBonus||0)*p.bounces;
         dealDmg(e,dmg);
         glows.push({x:e.x,y:e.y,r:14,col:p.col,t:0,mt:.2});
+        if(p.chill){e.slowed=Math.max(e.slowed,1.5);e.slowFactor=Math.min(e.slowFactor||.3,.3);}
+        if(p.lifesteal){let nw=null,nd=9999;warriors.forEach(w=>{const d=Math.hypot(w.x-e.x,w.y-e.y);if(d<nd){nd=d;nw=w;}});if(nw){nw.hp=Math.min(nw.maxHp,nw.hp+2);glows.push({x:nw.x,y:nw.y,r:10,col:'#52a870',t:0,mt:.3});}}
+        if(p.homing&&p.bounces>0){
+          let nn2=null,nd2=9999;
+          enemies.forEach(en=>{if(p.hitSet&&p.hitSet.has(en))return;if(en.hp<nd2){nd2=en.hp;nn2=en;}});
+          if(nn2)p._homingTarget=nn2;
+        }
         // ice frag combo
         if(p.iceFrag&&(e.frozenUntil>t||e.slowed>0)){
           exps.push({x:e.x,y:e.y,r:0,mr:55,t:0,mt:.4,col:'#56aed0'});
@@ -696,12 +803,22 @@ function update(dt){
   });
 
   // enemy death
+  const cp2=corePos();
   enemies=enemies.filter(e=>{
     if(e.hp>0)return true;
     kills++;
-    const g=e.type==='b'?15:e.type==='e'?6:e.type==='a'?4:2;
+    const g=e.type==='b'?15:e.type==='e'?6:e.type==='h'?3:e.type==='a'?4:2;
     gold+=g;coins.push({x:e.x,y:e.y,vy:-60,t:0,mt:.9,v:g});
     glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,mt:.3});
+    // Knight XP
+    const xp=e.type==='b'?6:e.type==='e'?3:e.type==='a'?2:1;
+    knight.xp+=xp;
+    const thresh=knight.lv===1?6:14;
+    if(knight.lv<3&&knight.xp>=thresh){
+      knight.lv++;knight.xp=0;
+      nums.push({x:cp2.x,y:cp2.y-55,v:`骑士 Lv${knight.lv}!`,col:'#c8a040',t:0,mt:2.2,big:true});
+      glows.push({x:cp2.x,y:cp2.y,r:70,col:'#c8a040',t:0,mt:.8});
+    }
     return false;
   });
 
@@ -719,8 +836,37 @@ function onWaveEnd(){
   stopBoss();
   const wave=WAVES[waveIdx];
   if(wave.type==='boss'){state='victory';showWin();}
-  else if(wave.type==='elite'){openRelicChoice();}
-  else{openShop();}
+  else if(wave.type==='elite'){openRoute('elite');}
+  else{openRoute('small');}
+}
+
+function openRoute(waveType){
+  state='route';
+  const cards=document.getElementById('route-cards');cards.innerHTML='';
+  const healAmt=Math.round(maxHP*.2);
+  const opts=waveType==='elite'
+    ?[{id:'relic',label:'遗物',desc:'选择一件遗物',col:'#9070d0'},
+      {id:'shop', label:'商店',desc:'购买或出售符文',col:'#c8a040'},
+      {id:'rest', label:'休息',desc:`恢复 ${healAmt} 点核心血量`,col:'#52a870'}]
+    :[{id:'shop',label:'商店',desc:'购买或出售符文',col:'#c8a040'},
+      {id:'rest',label:'休息',desc:`恢复 ${healAmt} 点核心血量`,col:'#52a870'}];
+  opts.forEach(opt=>{
+    const div=document.createElement('div');div.className='sc';
+    div.style.setProperty('--col',opt.col);div.style.cursor='pointer';
+    div.innerHTML=`<div class="sc-name" style="font-size:1.1rem;margin-top:4px">${opt.label}</div><div class="sc-desc" style="margin-top:8px">${opt.desc}</div>`;
+    div.addEventListener('click',()=>{
+      document.getElementById('ov-route').classList.add('hidden');
+      if(opt.id==='rest'){
+        coreHP=Math.min(maxHP,coreHP+healAmt);
+        nums.push({x:W/2,y:H/2-20,v:`核心 +${healAmt} HP`,col:'#52a870',t:0,mt:1.8,big:true});
+        glows.push({x:W/2,y:H/2,r:80,col:'#52a870',t:0,mt:.8});
+        waveIdx++;enterPrep();
+      }else if(opt.id==='shop'){openShop();}
+      else{openRelicChoice();}
+    });
+    cards.appendChild(div);
+  });
+  document.getElementById('ov-route').classList.remove('hidden');
 }
 
 function stopBoss(){if(bossInterval){clearInterval(bossInterval);bossInterval=null;}}
@@ -868,6 +1014,17 @@ function drawKnight(){
   ctx.fillStyle='#8898b8';ctx.beginPath();ctx.arc(x,y-24,6,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#1a2038';ctx.fillRect(x-4,y-26,8,2);
   if(kSpdMul>1){ctx.beginPath();ctx.arc(x,y-15,14,0,Math.PI*2);ctx.strokeStyle='#d4a84344';ctx.lineWidth=2;ctx.stroke();}
+  // XP arc progress ring
+  if(knight.lv<3){
+    const xpMax=knight.lv===1?6:14;
+    const xpFrac=Math.min(1,knight.xp/xpMax);
+    ctx.beginPath();ctx.arc(x,y-24,9,-Math.PI/2,-Math.PI/2+xpFrac*Math.PI*2);
+    ctx.strokeStyle='#c8a040';ctx.lineWidth=2;ctx.stroke();
+  }
+  if(knight.lv>1){
+    ctx.font='bold 7px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillStyle=knight.lv>=3?'#f0d060':'#c8a040';ctx.fillText(`L${knight.lv}`,x,y-33);
+  }
 }
 
 function drawWarriors(){
@@ -896,11 +1053,11 @@ function drawWarriors(){
 
 function drawEnemies(){
   enemies.forEach(e=>{
-    const sl=e.slowed>0,frozen=e.frozenUntil>t,boss=e.type==='b',elite=e.type==='e';
+    const sl=e.slowed>0,frozen=e.frozenUntil>t,boss=e.type==='b',elite=e.type==='e',healer=e.type==='h';
     const sz=boss?20:elite?14:e.type==='a'?11:9;
-    const fill=frozen?'#1a2848':sl?(boss?'#1a2a40':elite?'#2a1a40':'#1a3a50')
-               :boss?'#6a1a1a':elite?'#3a1a5a':e.type==='a'?'#2a3050':'#7a2020';
-    const bdr=frozen?'#8cd4f0':sl?'#56aed0':boss?'#e06060':elite?'#9060d0':e.type==='a'?'#5070b0':'#c04848';
+    const fill=frozen?'#1a2848':sl?(boss?'#1a2a40':elite?'#2a1a40':healer?'#1a3828':'#1a3a50')
+               :boss?'#6a1a1a':elite?'#3a1a5a':healer?'#1a4030':e.type==='a'?'#2a3050':'#7a2020';
+    const bdr=frozen?'#8cd4f0':sl?'#56aed0':boss?'#e06060':elite?'#9060d0':healer?'#52c870':e.type==='a'?'#5070b0':'#c04848';
     ctx.beginPath();ctx.ellipse(e.x,e.y+2,sz,sz*.4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
     ctx.fillStyle=fill;ctx.fillRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
     ctx.strokeStyle=bdr;ctx.lineWidth=boss?2.5:elite?2:1.5;ctx.strokeRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
@@ -921,8 +1078,12 @@ function drawEnemies(){
     const bw=sz*2+4;
     ctx.fillStyle='#1a2028';ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw,4);
     ctx.fillStyle=bdr;ctx.fillRect(e.x-bw/2,e.y-sz*2-8,bw*(e.hp/e.maxHp),4);
-    // Weapon indicator (ranged=bow arc, melee=sword line)
-    if(e.ranged&&!boss){
+    // Weapon indicator
+    if(healer){
+      ctx.strokeStyle=bdr+'cc';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(e.x,e.y-sz*1.85);ctx.lineTo(e.x,e.y-sz*.85);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(e.x-sz*.45,e.y-sz*1.35);ctx.lineTo(e.x+sz*.45,e.y-sz*1.35);ctx.stroke();
+    }else if(e.ranged&&!boss){
       ctx.strokeStyle=bdr+'bb';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.arc(e.x+sz*.65,e.y-sz,sz*.38,-.9,.9);ctx.stroke();
       ctx.strokeStyle=bdr+'55';ctx.lineWidth=1;
@@ -1090,12 +1251,27 @@ function mkShop(){
       const hasLv1=hand.some(h=>h.id===r.id&&(h.lv||1)===1)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===1);
       const hasLv2=hand.some(h=>h.id===r.id&&(h.lv||1)===2)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===2);
       const mergeTag=hasLv1?(hasLv2?'→ Lv3合成':'→ Lv2合成'):'';
+      const affixHint=hasLv1&&hasLv2?'<div class="affix-badge">★ 词缀解锁</div>':'';
       const desc=RUNE_DESCS[r.id]?.[0]||'';
-      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div><span class="sc-tag tag-r">Lv1 符文</span>`;
+      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div>${affixHint}<span class="sc-tag tag-r">Lv1 符文</span>`;
       card.addEventListener('click',()=>buyRune(r));
     }
     con.appendChild(card);
   });
+  // Sell section
+  const sellHdr=document.getElementById('sell-hdr'),sellCon=document.getElementById('shop-sell');
+  sellCon.innerHTML='';
+  if(hand.length>0){
+    sellHdr.style.display='block';
+    hand.forEach((rune,i)=>{
+      const lv=rune.lv||1;
+      const price=Math.floor(rune.cost*(lv===3?1:lv===2?.65:.4));
+      const card=document.createElement('div');card.className='sell-card';
+      card.innerHTML=`<span style="color:${rune.col}">${rune.sym}</span><span>${rune.name}${lv>1?` Lv${lv}`:''}${rune.affix?` [${rune.affix.name}]`:''}</span><span style="color:#f0c040;margin-left:auto">卖 ${price}💰</span>`;
+      card.addEventListener('click',()=>{gold+=price;hand.splice(i,1);mkShop();});
+      sellCon.appendChild(card);
+    });
+  }else{sellHdr.style.display='none';}
 }
 
 // Search hand then grid for a rune match; remove it and return true if found
@@ -1111,10 +1287,16 @@ function buyRune(r){
   gold-=r.cost;
   let newLv=1;
   if(findAndRemove(r.id,1)){newLv=2;if(findAndRemove(r.id,2))newLv=3;}
-  hand.push({...r,lv:newLv});
+  const newRune={...r,lv:newLv};
+  if(newLv===3){
+    const pool=AFFIXES[r.id]||[];
+    if(pool.length)newRune.affix=pool[Math.floor(Math.random()*pool.length)];
+  }
+  hand.push(newRune);
   if(newLv>1){
-    nums.push({x:W/2,y:H/2-30,v:`${r.name} → Lv${newLv}!`,col:r.col,t:0,mt:2.0});
-    glows.push({x:W/2,y:H/2,r:80,col:r.col,t:0,mt:.6});
+    const msg=newLv===3&&newRune.affix?`${r.name} Lv3 · 词缀:${newRune.affix.name}!`:`${r.name} → Lv${newLv}!`;
+    nums.push({x:W/2,y:H/2-30,v:msg,col:r.col,t:0,mt:2.2,big:newLv===3});
+    glows.push({x:W/2,y:H/2,r:newLv===3?110:80,col:r.col,t:0,mt:.7});
   }
   closeShop();
 }
@@ -1176,6 +1358,7 @@ function reset(){
   selHand=-1;shld=false;shldT=0;
   waveIdx=0;gold=20;maxHP=100;coreHP=100;kills=0;t=0;cleared=false;
   ownedRelics=[];extraProj=0;kSpdMul=1;dmgMul=1;
+  knight.lv=1;knight.xp=0;
   shopRefreshCost=1;
   lastFiredId=null;prevFiredId=null;lastFiredT=-99;lastArrowTarget=null;
   renderRelicBar();
