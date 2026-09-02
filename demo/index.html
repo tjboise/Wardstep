@@ -89,6 +89,8 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 /* MUTE BUTTON */
 #btn-mute{position:absolute;top:5px;right:6px;z-index:30;background:rgba(8,10,18,.78);border:1px solid #2a3850;color:#56aed0;font-size:.72rem;padding:3px 8px;cursor:pointer;border-radius:2px;font-family:Cinzel,serif;letter-spacing:.04em;transition:background .15s;}
 #btn-mute:hover{background:rgba(86,174,208,.12);}
+#btn-track{position:absolute;top:5px;right:58px;z-index:30;background:rgba(8,10,18,.78);border:1px solid #2a3850;color:#c8a040;font-size:.72rem;padding:3px 8px;cursor:pointer;border-radius:2px;font-family:Cinzel,serif;letter-spacing:.04em;transition:background .15s;}
+#btn-track:hover{background:rgba(200,160,64,.12);}
 </style>
 </head>
 <body>
@@ -101,6 +103,7 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
   <canvas id="c"></canvas>
   <div id="relic-bar"></div>
   <button id="btn-mute" title="音乐开关">🔈</button>
+  <button id="btn-track" title="切换音轨">♪</button>
 
   <!-- START -->
   <div class="overlay" id="ov-start">
@@ -1370,121 +1373,10 @@ document.getElementById('btn-start').addEventListener('click',()=>{document.getE
 document.getElementById('btn-retry').addEventListener('click',()=>{document.getElementById('ov-over').classList.add('hidden');reset();});
 document.getElementById('btn-again').addEventListener('click',()=>{document.getElementById('ov-win').classList.add('hidden');reset();});
 
-// ── AUDIO ──
-let _AC=null,_MG=null,_muted=false;
+// ── AUDIO: see music.js ──
 
-function audioInit(){
-  if(_AC)return;
-  try{
-    _AC=new(window.AudioContext||window.webkitAudioContext)();
-    if(_AC.state==='suspended')_AC.resume();
-    _MG=_AC.createGain();_MG.gain.value=.55;_MG.connect(_AC.destination);
-    _buildMusic();
-  }catch(e){}
-}
-
-function toggleMute(){
-  if(!_AC)return;
-  _muted=!_muted;
-  _MG.gain.linearRampToValueAtTime(_muted?0:.55,_AC.currentTime+.5);
-  document.getElementById('btn-mute').textContent=_muted?'🔇':'🔈';
-}
-
-function _buildMusic(){
-  const ac=_AC,mg=_MG;
-  const BPM=90,BEAT=60/BPM,STEP=BEAT/2; // 8th-note duration
-
-  // ─ Drone: two slightly-detuned saws + a fifth ─
-  [[55,0,'sawtooth',.07,230],[55,-9,'sawtooth',.05,185],[82.4,0,'sine',.038,310]].forEach(([f,dt,tp,v,fc])=>{
-    const o=ac.createOscillator(),g=ac.createGain(),fl=ac.createBiquadFilter();
-    o.type=tp;o.frequency.value=f;o.detune.value=dt;
-    fl.type='lowpass';fl.frequency.value=fc;fl.Q.value=1.4;
-    g.gain.value=v;o.connect(fl);fl.connect(g);g.connect(mg);o.start();
-    const lfo=ac.createOscillator(),lg=ac.createGain();
-    lfo.frequency.value=.09+Math.random()*.05;lg.gain.value=fc*.28;
-    lfo.connect(lg);lg.connect(fl.frequency);lfo.start();
-  });
-
-  // ─ Chord progression (4 bars): Am → Dm → Em → Am ─
-  const CHORDS=[[110,164.8,220],[146.8,220,293.7],[164.8,246.9,329.6],[110,164.8,220]];
-
-  // ─ Arpeggio: 8 8th-notes per bar × 4 bars = 32 notes ─
-  const ARP=[
-    220,261.6,329.6,440,392,329.6,261.6,220,   // Am ↑↓
-    293.7,349.2,440,587.3,523.3,440,349.2,293.7,// Dm ↑↓
-    329.6,392,493.9,659.3,587.3,493.9,392,329.6,// Em ↑↓
-    440,523.3,659.3,784,659.3,523.3,440,392,    // Am high ↑↓
-  ];
-
-  // ─ Melody: quarter-note slots (16 total = 4 bars), null=rest ─
-  const MEL=[
-    440,null,659.3,523.3,   // A4 - E5 C5
-    587.3,null,440,349.2,   // D5 - A4 F4
-    493.9,440,392,349.2,    // B4 A4 G4 F4
-    329.6,null,null,null,   // E4 - - -
-  ];
-
-  // ─ Percussion (32 8th-note slots): 1=kick, 2=accent-hat, 3=soft-hat, 0=off ─
-  const PERC=[
-    1,3,2,3,1,3,2,3, 1,3,2,3,1,3,2,3,
-    1,3,2,3,1,3,2,3, 1,3,2,3,1,3,2,3,
-  ];
-
-  // Pre-create noise buffer for hi-hat
-  const hatBuf=ac.createBuffer(1,Math.floor(ac.sampleRate*.065),ac.sampleRate);
-  {const d=hatBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
-
-  const note=(f,when,dur,tp,vol)=>{
-    const o=ac.createOscillator(),g=ac.createGain(),fl=ac.createBiquadFilter();
-    o.type=tp;o.frequency.value=f;fl.type='lowpass';fl.frequency.value=f*5;fl.Q.value=1;
-    g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(vol,when+.014);
-    g.gain.exponentialRampToValueAtTime(.001,when+dur);
-    o.connect(fl);fl.connect(g);g.connect(mg);o.start(when);o.stop(when+dur+.04);
-  };
-
-  const kick=(when)=>{
-    const o=ac.createOscillator(),g=ac.createGain();
-    o.type='sine';o.frequency.setValueAtTime(100,when);o.frequency.exponentialRampToValueAtTime(28,when+.13);
-    g.gain.setValueAtTime(.22,when);g.gain.exponentialRampToValueAtTime(.001,when+.2);
-    o.connect(g);g.connect(mg);o.start(when);o.stop(when+.26);
-  };
-
-  const hat=(when,vol)=>{
-    const s=ac.createBufferSource(),fl=ac.createBiquadFilter(),g=ac.createGain();
-    s.buffer=hatBuf;fl.type='highpass';fl.frequency.value=6500;
-    g.gain.setValueAtTime(vol,when);g.gain.exponentialRampToValueAtTime(.001,when+.055);
-    s.connect(fl);fl.connect(g);g.connect(mg);s.start(when);
-  };
-
-  const pad=(bar,when,dur)=>{
-    CHORDS[bar%4].forEach(f=>{
-      const o=ac.createOscillator(),g=ac.createGain(),fl=ac.createBiquadFilter();
-      o.type='sine';o.frequency.value=f;fl.type='lowpass';fl.frequency.value=f*5;
-      g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(.028,when+.55);
-      g.gain.setValueAtTime(.028,when+dur-.45);g.gain.linearRampToValueAtTime(0,when+dur);
-      o.connect(fl);fl.connect(g);g.connect(mg);o.start(when);o.stop(when+dur+.05);
-    });
-  };
-
-  let step=0,nxt=ac.currentTime+.05;
-  const sched=()=>{
-    while(nxt<ac.currentTime+.3){
-      const si=step%32,bar=Math.floor(si/8);
-      note(ARP[si],nxt,STEP*.8,'triangle',.04);
-      if(si%2===0){const m=MEL[si>>1];if(m)note(m,nxt,BEAT*.88,'sine',.022);}
-      if(si%8===0)pad(bar,nxt,BEAT*4);
-      const p=PERC[si];
-      if(p===1)kick(nxt);
-      else if(p===2)hat(nxt,.08);
-      else if(p===3)hat(nxt,.026);
-      nxt+=STEP;step++;
-    }
-  };
-  sched();
-  setInterval(sched,50);
-}
-
-document.getElementById('btn-mute').addEventListener('click',toggleMute);
+document.getElementById('btn-mute').addEventListener('click',()=>toggleMute());
+document.getElementById('btn-track').addEventListener('click',()=>nextTrack());
 
 // ── GAME LOOP ──
 let lastTs=null;
@@ -1501,5 +1393,6 @@ function loop(ts){
 initGrid();
 requestAnimationFrame(loop);
 </script>
+<script src="music.js"></script>
 </body>
 </html>
