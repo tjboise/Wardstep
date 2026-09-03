@@ -24,6 +24,7 @@
 | **[遗物图鉴](https://tjboise.github.io/Wardstep/design/relics/)** | [design/relics/](design/relics/) | 16件遗物·分五类·稀有度 |
 | **[怪物图鉴](https://tjboise.github.io/Wardstep/design/monsters/)** | [design/monsters/](design/monsters/) | 5种普通怪·16位Boss（8关各2位） |
 | **[关卡图鉴](https://tjboise.github.io/Wardstep/design/stages/)** | [design/stages/](design/stages/) | 8大关地形设计·敌人配置·攻略提示 |
+| **[局外成长](https://tjboise.github.io/Wardstep/design/meta/)** | [design/meta/](design/meta/) | 解锁进程·挑战诅咒·组合记忆 |
 | **[音乐图鉴](https://tjboise.github.io/Wardstep/design/music/)** | [design/music/](design/music/) | 4首程序性音轨设计（调性/BPM/音色层） |
 | 源代码 | [src/](src/) | 引擎待定 |
 
