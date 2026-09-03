@@ -1,8 +1,8 @@
 # Wardstep
 
-一款 Roguelite 卡牌构筑策略防御游戏，目标平台 Steam。
+一款 Roguelite 空间策略防御游戏，目标平台 Steam。
 
-在一张不断扩展的格子地图上放置符文，守卫中心核心。小人自动巡逻踩格触发符文效果，怪物从四面涌来。买铲子扩格子，买符文堆构筑，赢 Boss 拿稀有牌，撑过 8 大关。
+玩家**自由摆放**最多 9 个格子，拼出任意形状的巡逻路线（L形、十字、环形……）。骑士自动沿路径踩格，触发格子上的武器攻击敌人；每个格子可独立附魔强化效果。选择不同角色职业，与武器类型产生天然协同。8大关，地形各异，步步为营，守卫城堡。
 
 ---
 
@@ -12,15 +12,15 @@
 
 ## 设计文档
 
-- **[互动设计文档](https://tjboise.github.io/Wardstep/docs/design.html)** — 含格子演示、卡牌、关卡结构（网页版）
+- **[互动设计文档](https://tjboise.github.io/Wardstep/docs/design.html)** — 含格子演示、武器、关卡结构（网页版）
 - [游戏设计文档 GDD](docs/GDD.md) — 完整设计规格
-- [符文系统 & 连携设计](docs/rune-system.md) — 符文等级、7种二连携、3种三连携、策略构筑举例
 
 ## 设计资源
 
 | 类别 | 页面 | 说明 |
 |------|------|------|
-| **[符文图鉴](https://tjboise.github.io/Wardstep/design/runes/)** | [design/runes/](design/runes/) | 所有符文的完整设计，可搜索筛选 |
+| **[武器图鉴](https://tjboise.github.io/Wardstep/design/weapons/)** | [design/weapons/](design/weapons/) | 所有武器的完整设计，含标签筛选与附魔说明 |
+| **[人物图鉴](https://tjboise.github.io/Wardstep/design/characters/)** | [design/characters/](design/characters/) | 可选职业、专属被动、武器倾向 |
 | **[音乐图鉴](https://tjboise.github.io/Wardstep/design/music/)** | [design/music/](design/music/) | 4首程序性音轨设计（调性/BPM/音色层/和弦） |
 | 遗物图鉴 | [design/relics/](design/relics/) | 即将上线 |
 | 怪物图鉴 | [design/monsters/](design/monsters/) | 即将上线 |
@@ -34,7 +34,8 @@
 | 2026-08-31 | 项目启动，核心玩法确定 |
 | 2026-08-31 | 格子系统、铲子机制、8大关结构确定 |
 | 2026-08-31 | 可玩 Demo：第一大关完整通关体验（遗物系统、精英关、Boss） |
-| 2026-09-01 | 符文升级系统（Lv1/2/3 自动合成）、7种二连携 + 3种三连携、商店刷新递增费用 |
+| 2026-09-01 | 升级系统、连携机制、商店刷新递增费用 |
+| 2026-09-02 | 玩法转型：玩家自由摆格·武器系统·附魔·职业差异化 |
 
 ## 灵感来源
 
