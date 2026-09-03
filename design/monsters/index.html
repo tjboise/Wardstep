@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap">
 
 <style>
-:root {
+:root{
   --bg:#111620;--surface:#1d2438;--raised:#26304a;
   --border:#334060;--border2:#253050;
   --text:#ddd0b0;--muted:#7888a8;--dim:#404e68;
@@ -42,49 +42,72 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
 .stat-val{font-family:'Cinzel',serif;font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;}
 .stat-lbl{font-size:.68rem;letter-spacing:.1em;color:var(--muted);}
 
-/* section titles */
-.section-title{font-family:'Cinzel',serif;font-size:1.05rem;letter-spacing:.12em;color:var(--accent);margin:40px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border2);}
-
 /* normal enemies */
-.enemy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px;}
+.section-title{font-family:'Cinzel',serif;font-size:1.05rem;letter-spacing:.12em;color:var(--accent);margin:40px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border2);}
+.enemy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px;margin-bottom:16px;}
 .enemy-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;position:relative;}
 .enemy-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--e-col,var(--muted));}
 .enemy-name{font-weight:600;font-size:.9rem;color:var(--text);margin-bottom:2px;}
 .enemy-sym{font-size:1.4rem;float:right;margin-top:-2px;}
-.enemy-stat{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;font-size:.72rem;font-variant-numeric:tabular-nums;color:var(--muted);}
-.enemy-stat span{display:flex;flex-direction:column;gap:1px;}
-.stat-k{font-size:.6rem;letter-spacing:.08em;color:var(--dim);}
+.enemy-stat{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0;font-size:.72rem;font-variant-numeric:tabular-nums;}
+.es{display:flex;flex-direction:column;gap:1px;}
+.sk{font-size:.58rem;letter-spacing:.08em;color:var(--dim);}
+.sv{color:var(--muted);}
 .enemy-trait{font-size:.78rem;color:var(--muted);line-height:1.5;}
 
-/* boss section */
-.act-block{margin-bottom:40px;}
-.act-header{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
-.act-num{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.2em;padding:4px 10px;border:1px solid var(--act-col,var(--accent));color:var(--act-col,var(--accent));border-radius:2px;}
-.act-name{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.08em;color:var(--text);}
+/* act divider */
+.act-header{display:flex;align-items:center;gap:14px;margin:44px 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border2);}
+.act-badge{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.2em;padding:4px 10px;border:1px solid var(--act-col);color:var(--act-col);border-radius:2px;flex-shrink:0;}
+.act-name{font-family:'Cinzel',serif;font-size:1.05rem;letter-spacing:.06em;color:var(--text);}
 .act-terrain{font-size:.75rem;color:var(--muted);margin-left:auto;}
 
-.boss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;}
-.boss-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
-.boss-card:hover{border-color:var(--act-col,var(--accent));}
-.boss-top{padding:16px 16px 12px;position:relative;}
-.boss-top::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--act-col,var(--accent));}
-.boss-head{display:flex;gap:12px;align-items:center;margin-bottom:10px;}
-.boss-sym{font-size:2rem;width:46px;text-align:center;}
-.boss-info{}
-.boss-name{font-weight:600;font-size:.98rem;color:var(--text);margin-bottom:2px;}
-.boss-sub{font-size:.7rem;color:var(--muted);}
-.boss-stats{display:flex;gap:16px;margin-bottom:10px;font-size:.72rem;font-variant-numeric:tabular-nums;color:var(--muted);}
-.boss-stat-item{display:flex;flex-direction:column;gap:1px;}
-.boss-type{position:absolute;top:12px;right:12px;font-size:.58rem;letter-spacing:.1em;padding:3px 7px;border-radius:2px;}
+.boss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:16px;}
+
+/* boss card */
+.boss-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.boss-card:hover{border-color:var(--act-col);}
+.boss-banner{height:4px;background:linear-gradient(90deg,var(--act-col),transparent);}
+
+.boss-header{padding:16px 18px 12px;position:relative;border-bottom:1px solid var(--border2);}
+.boss-identity{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;}
+.boss-sym{font-size:2.2rem;width:50px;text-align:center;flex-shrink:0;line-height:1.1;}
+.boss-title-block{}
+.boss-name{font-family:'Cinzel',serif;font-weight:700;font-size:1.05rem;letter-spacing:.04em;color:var(--text);margin-bottom:2px;}
+.boss-sub{font-size:.72rem;color:var(--muted);}
+.boss-type{position:absolute;top:14px;right:14px;font-size:.58rem;letter-spacing:.1em;padding:3px 7px;border-radius:2px;}
 .t-elite{background:rgba(86,174,208,.1);border:1px solid rgba(86,174,208,.3);color:var(--frost);}
 .t-boss{background:rgba(192,72,72,.12);border:1px solid rgba(192,72,72,.3);color:var(--danger);}
 
-.ability-box{background:var(--raised);border-left:3px solid var(--act-col,var(--accent));padding:10px 12px;border-radius:0 3px 3px 0;}
-.ability-name{font-size:.68rem;letter-spacing:.1em;color:var(--act-col,var(--accent));margin-bottom:4px;}
-.ability-desc{font-size:.85rem;color:var(--text);line-height:1.6;}
-.ability-note{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.5;}
+/* stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.sg-cell{background:var(--raised);border-radius:3px;padding:6px 8px;text-align:center;}
+.sg-val{font-family:'Cinzel',serif;font-size:.95rem;color:var(--act-col);font-variant-numeric:tabular-nums;line-height:1;margin-bottom:2px;}
+.sg-key{font-size:.58rem;letter-spacing:.1em;color:var(--dim);}
+.move-row{margin-top:8px;font-size:.78rem;color:var(--muted);padding:6px 10px;background:var(--raised);border-radius:3px;border-left:2px solid var(--act-col);}
+.move-label{font-size:.6rem;letter-spacing:.1em;color:var(--act-col);margin-right:6px;}
 
-@media(max-width:600px){.boss-grid,.enemy-grid{grid-template-columns:1fr;}.header-row{flex-direction:column;align-items:flex-start;}}
+/* abilities */
+.boss-abilities{padding:12px 18px 14px;}
+.ability{margin-bottom:10px;}
+.ability:last-child{margin-bottom:0;}
+.ability-head{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+.ability-tag{font-size:.58rem;letter-spacing:.1em;padding:2px 6px;border-radius:2px;flex-shrink:0;}
+.at-passive{background:rgba(120,136,168,.2);border:1px solid var(--border2);color:var(--muted);}
+.at-active{background:color-mix(in srgb,var(--act-col) 12%,transparent);border:1px solid color-mix(in srgb,var(--act-col) 35%,transparent);color:var(--act-col);}
+.at-phase{background:rgba(192,72,72,.12);border:1px solid rgba(192,72,72,.3);color:var(--danger);}
+.ability-name{font-size:.78rem;font-weight:600;color:var(--text);}
+.ability-trigger{font-size:.65rem;color:var(--dim);margin-left:auto;}
+.ability-desc{font-size:.82rem;color:var(--muted);line-height:1.6;padding-left:2px;}
+
+/* resist/weak */
+.boss-footer{padding:10px 18px 14px;border-top:1px solid var(--border2);display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;}
+.rw-block{display:flex;flex-direction:column;gap:4px;}
+.rw-label{font-size:.6rem;letter-spacing:.12em;color:var(--dim);}
+.rw-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.weak-tag{font-size:.65rem;padding:2px 8px;border-radius:2px;background:rgba(82,168,112,.12);border:1px solid rgba(82,168,112,.3);color:var(--emerald);}
+.resist-tag{font-size:.65rem;padding:2px 8px;border-radius:2px;background:rgba(192,72,72,.1);border:1px solid rgba(192,72,72,.25);color:var(--danger);}
+
+@media(max-width:600px){.boss-grid{grid-template-columns:1fr;}.stat-grid{grid-template-columns:repeat(3,1fr);}.header-row{flex-direction:column;align-items:flex-start;}.enemy-grid{grid-template-columns:1fr 1fr;}}
 </style>
 
 <div class="page">
@@ -103,64 +126,67 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
     <div class="stat"><div class="stat-val">8</div><div class="stat-lbl">大关数量</div></div>
   </div>
 
-  <!-- 普通敌人 -->
   <div class="section-title">普通敌人</div>
   <div class="enemy-grid">
     <div class="enemy-card" style="--e-col:#7888a8">
       <span class="enemy-sym">🗡</span>
       <div class="enemy-name">普通兵</div>
       <div class="enemy-stat">
-        <span><div class="stat-k">HP</div>8</span>
-        <span><div class="stat-k">速度</div>22</span>
-        <span><div class="stat-k">护盾</div>—</span>
+        <span class="es"><span class="sk">HP</span><span class="sv">8</span></span>
+        <span class="es"><span class="sk">移速</span><span class="sv">22</span></span>
+        <span class="es"><span class="sk">护盾</span><span class="sv">—</span></span>
+        <span class="es"><span class="sk">攻击</span><span class="sv">4/2s</span></span>
       </div>
-      <div class="enemy-trait">直线冲向城堡，无特殊能力。成群出现时依靠数量形成压力。</div>
+      <div class="enemy-trait">直线冲向城堡，无特殊能力。成群时依靠数量形成压力。</div>
     </div>
     <div class="enemy-card" style="--e-col:#5080c8">
       <span class="enemy-sym">🛡</span>
       <div class="enemy-name">重甲兵</div>
       <div class="enemy-stat">
-        <span><div class="stat-k">HP</div>28</span>
-        <span><div class="stat-k">速度</div>14</span>
-        <span><div class="stat-k">护盾</div>12</span>
+        <span class="es"><span class="sk">HP</span><span class="sv">28</span></span>
+        <span class="es"><span class="sk">移速</span><span class="sv">14</span></span>
+        <span class="es"><span class="sk">护盾</span><span class="sv">12</span></span>
+        <span class="es"><span class="sk">攻击</span><span class="sv">7/3s</span></span>
       </div>
-      <div class="enemy-trait">移速缓慢但护盾需先击破，破盾后才能正常造成伤害。</div>
+      <div class="enemy-trait">护盾需先击破才能正常造成伤害。移速慢但抗打击。</div>
     </div>
     <div class="enemy-card" style="--e-col:#52a870">
       <span class="enemy-sym">🏹</span>
       <div class="enemy-name">精英远程</div>
       <div class="enemy-stat">
-        <span><div class="stat-k">HP</div>18</span>
-        <span><div class="stat-k">速度</div>10</span>
-        <span><div class="stat-k">攻击</div>远程3</span>
+        <span class="es"><span class="sk">HP</span><span class="sv">18</span></span>
+        <span class="es"><span class="sk">移速</span><span class="sv">10</span></span>
+        <span class="es"><span class="sk">护盾</span><span class="sv">12</span></span>
+        <span class="es"><span class="sk">攻击</span><span class="sv">远程3/2.5s</span></span>
       </div>
-      <div class="enemy-trait">保持远距离，对城堡射箭造成直接伤害；有护盾值12。优先击杀目标。</div>
+      <div class="enemy-trait">保持距离对城堡射击，优先清除目标。</div>
     </div>
     <div class="enemy-card" style="--e-col:#52a870">
       <span class="enemy-sym">✚</span>
       <div class="enemy-name">治愈者</div>
       <div class="enemy-stat">
-        <span><div class="stat-k">HP</div>14</span>
-        <span><div class="stat-k">速度</div>16</span>
-        <span><div class="stat-k">治疗</div>3/s</span>
+        <span class="es"><span class="sk">HP</span><span class="sv">14</span></span>
+        <span class="es"><span class="sk">移速</span><span class="sv">16</span></span>
+        <span class="es"><span class="sk">护盾</span><span class="sv">—</span></span>
+        <span class="es"><span class="sk">治疗</span><span class="sv">3/s</span></span>
       </div>
-      <div class="enemy-trait">不直接攻击城堡，追踪受伤盟友并持续回血。需优先清除。</div>
+      <div class="enemy-trait">不攻击城堡，追踪受伤盟友持续回血，需优先清除。</div>
     </div>
     <div class="enemy-card" style="--e-col:#9070d0">
       <span class="enemy-sym">💀</span>
       <div class="enemy-name">爆炸兵</div>
       <div class="enemy-stat">
-        <span><div class="stat-k">HP</div>6</span>
-        <span><div class="stat-k">速度</div>28</span>
-        <span><div class="stat-k">爆炸</div>8</span>
+        <span class="es"><span class="sk">HP</span><span class="sv">6</span></span>
+        <span class="es"><span class="sk">移速</span><span class="sv">28</span></span>
+        <span class="es"><span class="sk">护盾</span><span class="sv">—</span></span>
+        <span class="es"><span class="sk">自爆</span><span class="sv">范围8</span></span>
       </div>
-      <div class="enemy-trait">高速冲锋，抵达城堡时自爆造成范围伤害；击杀时也小爆炸（伤害减半）。</div>
+      <div class="enemy-trait">高速冲锋，抵达城堡时自爆。被击杀时也触发小爆炸（伤害减半）。</div>
     </div>
   </div>
 
-  <!-- Boss 区域 -->
   <div class="section-title">Boss · 每关两位</div>
-  <p style="font-size:.85rem;color:var(--muted);margin-bottom:28px;line-height:1.7;">每大关含一位精英Boss（出现在精英关节点）和一位终章Boss（关卡结尾）。精英Boss HP和强度适中，是获取遗物的关键战；终章Boss体型庞大、机制复杂，需要针对性构筑应对。</p>
+  <p style="font-size:.85rem;color:var(--muted);margin-bottom:28px;line-height:1.7;">每大关含一位<span style="color:var(--frost);">精英Boss</span>（精英关节点）和一位<span style="color:var(--danger);">终章Boss</span>（关卡结尾）。技能标签：<span style="color:var(--muted);font-size:.75rem;">常驻被动</span> / <span style="color:var(--accent);font-size:.75rem;">主动技能</span> / <span style="color:var(--danger);font-size:.75rem;">阶段变化</span></p>
 
   <div id="boss-container"></div>
 </div>
@@ -168,193 +194,352 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
 <script>
 const ACTS = [
   {
-    act:1, name:"古城外墙", terrain:"石砖平地", color:"#c8a040",
+    n:1, name:"古城外墙", terrain:"石砖平地", color:"#c8a040",
     bosses:[
       {
-        sym:"👴",name:"守关老兵",type:"elite",
-        hp:80, spd:12, shield:20,
-        ability:"护盾轮转",
-        desc:"每隔8秒，在骑士当前所在格子前方随机2格放置临时力场，被力场覆盖的格子武器本圈无法触发。力场持续4秒后消失。",
-        note:"强迫玩家调整格子布局，或借助穿透武器绕过力场。"
+        sym:"👴", name:"守关老兵", sub:"边关守将 · 人类", type:"elite",
+        stats:{hp:80, spd:12, shield:20, armor:"10%", atk:"近战5 / 2.5s"},
+        move:"直线冲向城堡；护盾被击破后转为迂回路线，绕行至侧翼通道",
+        abilities:[
+          {tag:"active", name:"护盾轮转", trigger:"每8秒",
+           desc:"在骑士当前格子前方随机2个格子放置力场屏障，覆盖格子上的武器本圈无法触发，持续4秒。力场破坏时发出轻微光效提示。"},
+          {tag:"phase", name:"背水一战", trigger:"HP < 30%",
+           desc:"激活：移速提升至18，攻击频率缩短至1.5s，护盾不再恢复——最后的冲刺。"}
+        ],
+        weak:["刺击 +25%", "火焰附魔 +20%"],
+        resist:["防御类武器 -10%（盾反不触发）"]
       },
       {
-        sym:"⚔",name:"铁甲将领",type:"boss",
-        hp:160, spd:8, shield:40,
-        ability:"战场号令",
-        desc:"每30秒吹响号角：立即召唤4名近战普通兵，同时提升场上所有存活敌人移速15%（持续10秒）。自身受到伤害低于30%时，触发一次额外号令。",
-        note:"号令时机往往卡在玩家格子CD最长的时刻，需要合理规划冷却节奏。"
+        sym:"⚔", name:"铁甲将领", sub:"帝国精锐统帅 · 人类", type:"boss",
+        stats:{hp:160, spd:8, shield:40, armor:"20%", atk:"近战8 / 3s"},
+        move:"缓慢稳定推进；护盾被击破时原地停顿2秒并召唤援军，而后继续前进",
+        abilities:[
+          {tag:"active", name:"战场号令", trigger:"每30秒",
+           desc:"吹响号角，立即召唤4名近战普通兵；同时场上所有存活敌人移速+15%，持续10秒。号令时机刻意卡在玩家武器CD最长的窗口。"},
+          {tag:"phase", name:"铁壁强化", trigger:"HP < 50% 触发一次",
+           desc:"护甲额外+20%（共40%减伤），进入「投石」模式：每15秒对城堡造成6点远程伤害（可被骑士盾格挡）。"},
+          {tag:"passive", name:"统帅威压", trigger:"常驻",
+           desc:"将领存活时，场上所有普通兵和重甲兵的HP上限+20%，移速+8%。击杀将领后，场上剩余援军全体移速-20%。"}
+        ],
+        weak:["法系范围 +30%", "毒素附魔（绕过护甲%伤害）"],
+        resist:["近战 -15%（重甲减伤）", "冰霜（护甲50%减免减速持续时间）"]
       }
     ]
   },
   {
-    act:2, name:"幽暗森林", terrain:"树木遮蔽地形", color:"#52a870",
+    n:2, name:"幽暗森林", terrain:"树木遮蔽地形", color:"#52a870",
     bosses:[
       {
-        sym:"🧙",name:"林中女巫",type:"elite",
-        hp:90, spd:9, shield:0,
-        ability:"诅咒格子",
-        desc:"每15秒随机选择1~2个有武器的格子施加诅咒，被诅咒格子的武器CD延长200%，持续12秒。诅咒格子会发出紫色光晕提示。",
-        note:"瞬间削弱主力输出格子，迫使玩家在此期间依赖其他格子维持输出。"
+        sym:"🧙", name:"林中女巫", sub:"黑魔导师 · 精灵", type:"elite",
+        stats:{hp:90, spd:9, shield:0, armor:"5%", atk:"法术4 / 3s · 附减速40%"},
+        move:"保持距离，总是在武器射程外边缘游走；被近战命中后立即后退3格",
+        abilities:[
+          {tag:"active", name:"诅咒格子", trigger:"每15秒",
+           desc:"随机选1~2个有武器的格子施加诅咒（发出紫光），被诅咒格子武器CD×3，持续12秒。诅咒无法被提前解除。"},
+          {tag:"active", name:"魔法屏障", trigger:"HP < 40% 触发一次",
+           desc:"瞬间激活5秒完全免疫护盾（无法被任何伤害穿透），同时治疗自身10点HP。护盾结束后进入真正的弱势阶段。"},
+          {tag:"passive", name:"遮蔽共鸣", trigger:"常驻",
+           desc:"站在树木格子旁时，诅咒持续时间延长至18秒；同时己方治愈者治疗效率+50%。"}
+        ],
+        weak:["近战 +35%（逼近时无法后退）", "火焰附魔 +40%（树木环境）"],
+        resist:["法系 -20%（魔法同源）", "弓类 -10%（预判规避）"]
       },
       {
-        sym:"🌳",name:"古树精王",type:"boss",
-        hp:200, spd:5, shield:0,
-        ability:"根系束缚",
-        desc:"每20秒从地面伸出根系，缠绕骑士1.8秒使其停止巡逻；同时在最近的2条出兵通道外侧放置树根屏障，使该通道本波所有敌人移速+30%。",
-        note:"骑士被缠绕期间武器全部暂停，是本关最危险的控制机制，需要提前规划远程/法系覆盖。"
+        sym:"🌳", name:"古树精王", sub:"千年古树精灵 · 自然", type:"boss",
+        stats:{hp:200, spd:5, shield:0, armor:"15%", atk:"根系近战10 / 4s · 射程3格"},
+        move:"几乎原地移动，但触手/根系攻击范围覆盖3格；从不主动追击骑士",
+        abilities:[
+          {tag:"active", name:"根系束缚", trigger:"每20秒",
+           desc:"从地面伸出根系，缠绕骑士1.8秒（巡逻停止，武器全部暂停）；同时最近的2条出兵通道侧外放置根系屏障，使该通道本波所有敌人移速+30%。"},
+          {tag:"active", name:"林木再生", trigger:"每45秒",
+           desc:"自身回复15点HP并恢复护甲效果重置；若场上被占用的树木格被清除，立即在该处重新生长树木（恢复阻挡，格子重新不可用）。"},
+          {tag:"phase", name:"枯叶风暴", trigger:"HP < 35%",
+           desc:"每10秒向城堡方向喷出扇形枯叶（对城堡直接造成4点伤害，可被骑士盾格挡）；同时树精进入暴走状态，根系束缚CD缩短至12秒。"},
+          {tag:"passive", name:"自然之盾", trigger:"常驻",
+           desc:"每次受到火焰附魔伤害时获得1层燃烧标记；累积3层后树精进入灼烧状态——护甲降至0%但持续受到每秒8点真实伤害（绕过护甲的机制窗口）。"}
+        ],
+        weak:["火焰附魔 +50%（且触发燃烧标记）", "法系范围 +20%"],
+        resist:["冰霜 -30%（耐寒）", "近战 -10%（触手保护）"]
       }
     ]
   },
   {
-    act:3, name:"冰封雪原", terrain:"冰面·积雪地形", color:"#56aed0",
+    n:3, name:"冰封雪原", terrain:"冰面·积雪地形", color:"#56aed0",
     bosses:[
       {
-        sym:"❄",name:"冰霜魔法师",type:"elite",
-        hp:85, spd:7, shield:0,
-        ability:"冰封格阵",
-        desc:"开场时随机冻结1个格子，此后每12秒额外冻结1格（最多同时冻结3格）。被冻结的格子武器完全无法触发。玩家击杀该Boss可解冻所有格子。",
-        note:"逐渐压缩输出空间，早期清除可避免格子被全面冻结。"
+        sym:"❄", name:"冰霜魔法师", sub:"雪域法术师 · 人类", type:"elite",
+        stats:{hp:85, spd:7, shield:0, armor:"0%", atk:"冰法术5 / 3.5s · 附减速40%"},
+        move:"保持中远距离；每次被近战命中后急速后退3格；自身行动时会留下冰迹（骑士经过减速15%）",
+        abilities:[
+          {tag:"active", name:"冰封格阵", trigger:"开场即激活，每12秒+1格",
+           desc:"开场冻结1个随机武器格（武器完全失效），此后每隔12秒额外冻结1格，上限同时3格冰封。击杀魔法师解冻全部。"},
+          {tag:"active", name:"冰镜反射", trigger:"HP < 50% 触发一次",
+           desc:"激活5秒冰晶护盾：免疫所有远程和法系伤害，将被吸收的伤害以50%反弹至城堡（近战武器正常伤害）。"},
+          {tag:"passive", name:"严寒领域", trigger:"常驻",
+           desc:"战场持续低温：所有附魔的冰霜效果持续时间+30%；但敌方减速效果在本关被雪地抵消15%（净减速效率降低）。"}
+        ],
+        weak:["近战 +40%（无法保持距离）", "火焰附魔 +60%（融冰破防）"],
+        resist:["冰霜附魔（完全免疫）", "弓类 -15%（主动规避）"]
       },
       {
-        sym:"🐉",name:"霜龙",type:"boss",
-        hp:240, spd:6, shield:50,
-        ability:"龙息横扫",
-        desc:"每25秒低飞喷出宽幅冰霜龙息：覆盖全场所有格子（武器本次触发效果降低60%），同时对所有在场敌人施加减速40%（持续5秒）。之后在最薄弱的防线方向再召唤一波援军。",
-        note:"龙息期间大幅削弱输出，援军往往精准地趁此空档抵达城堡。"
+        sym:"🐉", name:"霜龙", sub:"古代冰龙 · 龙族", type:"boss",
+        stats:{hp:240, spd:6, shield:50, armor:"25%", atk:"爪击12 / 3s · 近战范围2格"},
+        move:"空中飞行，近战武器命中率-20%；每次被攻击后会向侧面偏移，避免连续正面受击",
+        abilities:[
+          {tag:"active", name:"龙息横扫", trigger:"每25秒",
+           desc:"低飞喷出宽幅冰霜龙息，覆盖全场：所有格子武器效果降低60%（本次触发），同时场上所有敌人附加减速40%持续5秒。龙息结束后立即在最薄弱防线方向召唤一波援军。"},
+          {tag:"phase", name:"冰晶甲壳", trigger:"HP < 60% 触发一次",
+           desc:"护盾恢复至满值（50），护甲提升至35%；同时自身免疫冰霜附魔减速效果（但仍受冰霜附魔其他效果影响）。"},
+          {tag:"phase", name:"冰冻结界", trigger:"HP < 30%",
+           desc:"将3个随机武器格永久冰封（仅击杀霜龙可解冻）；自身进入狂暴状态：移速+30%，攻击频率缩短至2s，每次攻击附带小范围冰霜AOE。"},
+          {tag:"passive", name:"飞行特性", trigger:"常驻",
+           desc:"近战武器命中率-20%。铁剑、钢矛等近战武器若想命中，需要骑士在格子上触发时龙正好飞过该格子上方（属于概率性命中，而非完全无效）。"}
+        ],
+        weak:["火焰附魔 +80%（龙族克制）", "法系范围 +20%"],
+        resist:["冰霜附魔（完全免疫）", "近战 -20%（飞行状态）"]
       }
     ]
   },
   {
-    act:4, name:"炙热熔岩", terrain:"熔岩裂缝地形", color:"#c04848",
+    n:4, name:"炙热熔岩", terrain:"熔岩裂缝地形", color:"#c04848",
     bosses:[
       {
-        sym:"🌋",name:"熔岩巨人",type:"elite",
-        hp:110, spd:6, shield:0,
-        ability:"地裂重组",
-        desc:"每20秒制造地震：所有格子随机位移1格（强制打乱当前布局），格子上的武器不会丢失，但路径顺序完全改变。地震前0.5秒会有震动预警。",
-        note:"最考验即时反应的精英机制——需要在新路径中快速评估输出顺序。"
+        sym:"🌋", name:"熔岩巨人", sub:"熔岩元素 · 无机", type:"elite",
+        stats:{hp:110, spd:6, shield:0, armor:"20%", atk:"熔岩拳12 / 4s · 命中留火区3s"},
+        move:"直线推进；刻意踩过熔岩裂缝格（在熔岩格上行动时每秒回复5HP）",
+        abilities:[
+          {tag:"active", name:"地裂重组", trigger:"每20秒",
+           desc:"制造地震：场上所有格子随机位移1格（路径顺序改变），格子上武器不丢失但位置被打乱。地震前0.5秒有地面震动预警。"},
+          {tag:"passive", name:"熔岩护体", trigger:"被冰霜附魔命中时",
+           desc:"冰霜不能减缓熔岩巨人，反而激活熔岩护体5秒：在护体期间被近战武器命中时对攻击方格子反弹3点伤害（传递给城堡）。冰霜附魔仍正常叠加脆弱标记。"},
+          {tag:"phase", name:"岩浆爆发", trigger:"HP < 35%",
+           desc:"激活：每8秒在随机1个格子上喷出岩浆（该格武器失效4秒），同时自身护甲降至0%（岩浆状态下防御减弱，是最佳集火窗口）。"}
+        ],
+        weak:["冰霜附魔（无减速但触发脆弱+30%）", "穿透武器 +20%", "毒素附魔（百分比伤害绕过护甲）"],
+        resist:["火焰附魔（完全免疫）", "近战 -15%（熔岩护体期间）"]
       },
       {
-        sym:"😈",name:"火焰恶魔",type:"boss",
-        hp:220, spd:14, shield:0,
-        ability:"灼焰冲锋",
-        desc:"以极高速度直线冲向城堡，冲锋路线上的格子被灼焰点燃（武器失效5秒，冷却重置）。每次冲锋结束后停顿8秒再次蓄力，一场战斗最多冲锋5次。",
-        note:"冲锋路线随机，需要提前在格子布局上留出冗余，避免所有主力格子同时失效。"
+        sym:"😈", name:"火焰恶魔", sub:"地狱火焰精灵 · 恶魔", type:"boss",
+        stats:{hp:220, spd:14, shield:0, armor:"10%", atk:"爪击15 / 2.5s"},
+        move:"常规移速14，冲锋时移速飙升至30；冲锋前0.5秒出现红色轨迹预警线",
+        abilities:[
+          {tag:"active", name:"灼焰冲锋", trigger:"每18秒 · 最多5次/场",
+           desc:"沿预定路线高速冲向城堡：冲锋路线上所有格子武器被点燃失效5秒、CD重置；冲锋本身对城堡造成6点伤害。第5次冲锋伤害翻倍（12点）。"},
+          {tag:"active", name:"地狱烈焰", trigger:"每35秒",
+           desc:"在城堡前方半径3格区域放置持续燃烧地带，持续12秒：敌人经过不受影响，但骑士巡逻经过时其他格子武器CD额外+30%（高温干扰触发节奏）。"},
+          {tag:"phase", name:"烈焰重生", trigger:"HP首次归0时",
+           desc:"以30%HP复活（仅触发一次）：移速+20%，护甲+15%（共25%），冲锋CD缩短至12秒；复活时立即发动一次冲锋。"},
+          {tag:"passive", name:"炎热领域", trigger:"常驻",
+           desc:"本场战斗中，火焰附魔对己方造成的灼烧效果完全无效（火焰免疫）。但冰霜附魔命中恶魔时持续时间×2（极寒与高温的剧烈反应）。"}
+        ],
+        weak:["冰霜附魔 +50%（减速时间加倍）", "穿透武器 +25%（冲锋路线可预判）"],
+        resist:["火焰附魔（完全免疫）", "第5次冲锋后无更多冲锋（存活即胜）"]
       }
     ]
   },
   {
-    act:5, name:"沙漠废墟", terrain:"流沙·废墟遗迹", color:"#c8a040",
+    n:5, name:"沙漠废墟", terrain:"流沙·废墟遗迹", color:"#c8a040",
     bosses:[
       {
-        sym:"💀",name:"沙漠死灵",type:"elite",
-        hp:95, spd:8, shield:0,
-        ability:"亡灵复苏",
-        desc:"场上每有1名普通敌人被击杀，立即在原地复活为骷髅兵（HP减半，护盾为0，忽略减速效果）。骷髅兵被击杀后不再复活。死灵本体存活时持续触发此效果。",
-        note:"理论上将本波敌人数量翻倍，范围武器（法杖）在此关价值最高。"
+        sym:"💀", name:"沙漠死灵", sub:"流沙术士 · 不死", type:"elite",
+        stats:{hp:95, spd:8, shield:0, armor:"5%", atk:"骨刺6 / 2s · 远程"},
+        move:"始终藏在己方大军后方3格；主动保持距离，不会率先进入武器射程",
+        abilities:[
+          {tag:"passive", name:"亡灵复苏", trigger:"常驻",
+           desc:"场上每有1名普通兵被击杀，立即在原地复活为骷髅兵（HP减半，移速相同，忽略减速/冻结效果）。骷髅兵被击杀后不再复活。死灵存活时持续触发。"},
+          {tag:"active", name:"亡者壁垒", trigger:"每25秒",
+           desc:"在城堡前方3格处召唤3具骷髅盾兵（HP15，无攻击力），仅为吸收远程武器命中（每具骷髅吸收1次远程攻击后消散）。法系范围和近战不受阻挡。"},
+          {tag:"phase", name:"绝命诅咒", trigger:"HP < 25%",
+           desc:"死灵发出绝命诅咒：此后所有被击杀的骷髅兵爆炸（小范围3点伤害传递给城堡），同时自身护甲降至0%（孤注一掷）。"}
+        ],
+        weak:["法系范围 +30%（清场+清骷髅一并处理）", "陷阱（骷髅兵无视减速但会触发陷阱伤害）"],
+        resist:["单体远程 -20%（壁垒吸收）", "冰霜（骷髅兵免疫冻结）"]
       },
       {
-        sym:"🪱",name:"沙漠巨虫",type:"boss",
-        hp:280, spd:0, shield:0,
-        ability:"地下穿越",
-        desc:"本体在地下移动，不受任何格子武器影响。每18秒从格子路径正下方钻出，直接对城堡造成12点伤害，随后潜入沙中。仅在地面时（4秒窗口）可被攻击。",
-        note:"完全无视防线设计，需要在其浮出时集中爆发输出，附魔的持续效果在其潜入后依然有效。"
+        sym:"🪱", name:"沙漠巨虫", sub:"远古沙漠掠食者 · 虫族", type:"boss",
+        stats:{hp:280, spd:"0（地下）/ 20（地面）", shield:0, armor:"30%", atk:"钻出时直接对城堡造成12伤"},
+        move:"地下移动不可见也不可攻击；每次浮出地面停留4秒，此窗口内所有武器正常命中",
+        abilities:[
+          {tag:"active", name:"地下穿越", trigger:"每18秒",
+           desc:"从骑士路径正下方钻出地面，直接对城堡造成12点伤害（无视格子武器），随后潜回地下。浮出前0.8秒地面颤动预警。"},
+          {tag:"active", name:"沙尘暴", trigger:"每40秒（地下移动时）",
+           desc:"制造沙尘暴：所有格子武器CD延长20%，骑士移速降低15%，持续8秒。沙尘暴与浮出攻击通常配合，在沙暴结束时钻出给玩家措手不及。"},
+          {tag:"phase", name:"狂暴化", trigger:"HP < 40%",
+           desc:"浮出频率从18秒缩短至10秒，每次浮出伤害从12提升至18；同时每次浮出后留下沙坑（持续5秒），骑士路径经过时额外减速30%。"},
+          {tag:"passive", name:"地甲", trigger:"常驻",
+           desc:"地下状态完全免疫所有武器伤害。浮出地面4秒为唯一攻击窗口——每秒集中输出约为标准战斗的4.5倍密度，要求构筑具备爆发能力。"}
+        ],
+        weak:["毒素附魔（浮出时叠加的毒素在地下仍持续造成伤害）", "陷阱（路径上预埋触发）"],
+        resist:["近战/弓类（地下状态完全免疫）", "护甲30%减免地面窗口期伤害"]
       }
     ]
   },
   {
-    act:6, name:"雷暴高地", terrain:"暴风雷电高原", color:"#9070d0",
+    n:6, name:"雷暴高地", terrain:"暴风雷电高原", color:"#9070d0",
     bosses:[
       {
-        sym:"⚡",name:"雷霆武士",type:"elite",
-        hp:100, spd:11, shield:30,
-        ability:"避雷护体",
-        desc:"对自身施加避雷场：主动吸引所有弓类和法系武器的攻击（近战武器不受影响）。吸收的攻击伤害减少50%，但积累的能量每8秒以闪电形式反弹，对城堡造成积累伤害的30%。",
-        note:"强制玩家倚重近战武器，弓手职业在此关需要调整策略。"
+        sym:"⚡", name:"雷霆武士", sub:"雷法武装战士 · 人类", type:"elite",
+        stats:{hp:100, spd:11, shield:30, armor:"15%", atk:"电击冲击8 / 2s · 附带0.8s麻痹"},
+        move:"主动靠近城堡；被近战武器命中后，会绕路至该武器格，对格子（及骑士）发起攻击",
+        abilities:[
+          {tag:"passive", name:"避雷护体", trigger:"常驻",
+           desc:"主动吸引所有弓类和法系武器的攻击（近战不受影响）。被吸收的远程/法系伤害减少50%，积累的能量每8秒以闪电形式回击城堡（积累伤害的30%）。"},
+          {tag:"active", name:"过载反击", trigger:"护盾被击破时",
+           desc:"护盾破碎瞬间在骑士所在格子放出过载闪电：该格武器短暂失效2秒，并对附近1格内的敌人（若有）也造成电击（4点伤害）。"},
+          {tag:"phase", name:"雷霆爆发", trigger:"HP < 30%",
+           desc:"激活雷霆爆发：移速提升至16，每次普通攻击附带麻痹延长至1.5秒，并解除护体（主动放弃避雷，不再吸收远程攻击），专注高速冲锋。"}
+        ],
+        weak:["近战 +40%（不被避雷吸收）", "毒素附魔（直接穿透避雷护体造成DOT）"],
+        resist:["弓类/法系 -50%（被避雷吸收）", "雷电附魔（完全免疫）"]
       },
       {
-        sym:"🦅",name:"风暴鹰王",type:"boss",
-        hp:190, spd:0, shield:0,
-        ability:"掠夺横扫",
-        desc:"在战场上空盘旋，不可被近战武器攻击（仅远程/法系有效）。每20秒俯冲掠夺：随机抓走1个格子上的武器（该格变为空格），玩家下一波须重新购置。同时制造气流，令骑士下一圈速度降低30%。",
-        note:"持续削减战力，强调弓手/法师职业的重要性。被抓走的武器可在商店重新购回。"
+        sym:"🦅", name:"风暴鹰王", sub:"雷云之主 · 神兽", type:"boss",
+        stats:{hp:190, spd:"盘旋:0 / 俯冲:22", shield:0, armor:"5%", atk:"俯冲爪击12 / 每次俯冲"},
+        move:"空中盘旋时不可被近战攻击；每20秒俯冲一次，俯冲时短暂落地，此时所有武器正常命中",
+        abilities:[
+          {tag:"active", name:"掠夺横扫", trigger:"每20秒（俯冲时）",
+           desc:"俯冲过程中随机抓走1个格子上的武器（该格变为空格，武器下波须重新购置）；同时俯冲气流使骑士下一整圈移速降低30%。"},
+          {tag:"passive", name:"气流屏障", trigger:"盘旋时常驻",
+           desc:"弓类武器命中概率-40%（强风偏转），法系武器爆炸范围-20%（气流压缩）；近战武器在盘旋时完全无效（够不着）。"},
+          {tag:"active", name:"雷羽风暴", trigger:"HP < 50%，每15秒",
+           desc:"从空中向2个随机武器格抛落带电羽毛，命中格子武器失效3秒；同时对骑士当前位置造成5点伤害（传递给城堡）。"},
+          {tag:"phase", name:"狂风领域", trigger:"HP < 25%",
+           desc:"召唤持续狂风：所有远程和法系武器的命中率再额外-20%（盘旋时弓类合计-60%命中率）；但鹰王俯冲频率加快至每12秒一次。"}
+        ],
+        weak:["远程（俯冲时气流消失，命中率恢复正常）", "毒素附魔（飞行中毒素持续生效）"],
+        resist:["近战（盘旋时完全免疫）", "弓类 -40%命中率（盘旋）", "雷电附魔 -30%（羽毛导电抵消部分）"]
       }
     ]
   },
   {
-    act:7, name:"深海遗迹", terrain:"水下遗迹·潮汐涌动", color:"#56aed0",
+    n:7, name:"深海遗迹", terrain:"水下遗迹·潮汐涌动", color:"#56aed0",
     bosses:[
       {
-        sym:"🧿",name:"深海祭司",type:"elite",
-        hp:105, spd:7, shield:20,
-        ability:"潮汐反转",
-        desc:"每18秒施放潮汐之力：骑士巡逻方向反转（逆时针），持续10秒。方向反转期间格子触发顺序完全改变，玩家布置的路径逻辑倒置。",
-        note:"需要格子布局在顺逆两种方向下都保持合理的输出覆盖，不能只针对单一方向设计。"
+        sym:"🧿", name:"深海祭司", sub:"海渊法术祭司 · 水族", type:"elite",
+        stats:{hp:105, spd:7, shield:20, armor:"10%", atk:"水系法术7 / 3s · 减速30%·1s"},
+        move:"螺旋形逼近城堡，每3秒改变行进角度；被命中后短暂改变方向（使穿透武器难以连续命中）",
+        abilities:[
+          {tag:"active", name:"潮汐反转", trigger:"每18秒",
+           desc:"施放潮汐之力：骑士巡逻方向反转（顺变逆或逆变顺），持续10秒。方向反转期间格子触发顺序完全颠倒，依赖单向路径的构筑会出现输出空窗。"},
+          {tag:"active", name:"净化波动", trigger:"每30秒",
+           desc:"清除场上所有敌方单位的负面状态（减速/冻结/灼烧/中毒），并为所有存活盟友回复5点HP。净化无法被阻断，会在波动瞬间生效。"},
+          {tag:"passive", name:"深海感知", trigger:"常驻",
+           desc:"祭司可以感知骑士当前位置；当骑士踩到含弓类武器的格子时，祭司会短暂加速（移速+25%，持续2秒），趁骑士发射箭矢的间隙加速接近。"}
+        ],
+        weak:["雷电附魔 +50%（水体导电）", "弓类穿透 +20%"],
+        resist:["冰霜 -30%（深海生物耐寒）", "毒素 -25%（海洋环境稀释）"]
       },
       {
-        sym:"🐙",name:"深海巨兽",type:"boss",
-        hp:320, spd:4, shield:60,
-        ability:"巨浪清扫",
-        desc:"每30秒召唤巨浪横扫战场：随机清除1排（横向或纵向）格子上的所有武器（格子保留，武器消失）。同时将该排所有格子的连接顺序打乱，骑士路径暂时中断0.8秒。",
-        note:"强制玩家备用替换武器或采用分散布局，单排集中所有主力武器的策略在此被大幅削弱。"
+        sym:"🐙", name:"深海巨兽", sub:"远古深渊怪物 · 海兽", type:"boss",
+        stats:{hp:320, spd:4, shield:60, armor:"30%", atk:"触手横扫18 / 5s · 范围4格"},
+        move:"极慢但体型巨大，触手攻击覆盖周围4格范围；护盾被击破后停顿3秒（喘息窗口），而后护盾自动以每秒8点的速度缓慢恢复",
+        abilities:[
+          {tag:"active", name:"巨浪清扫", trigger:"每30秒",
+           desc:"召唤巨浪横扫战场随机1排（横向或纵向）：该排所有格子武器消失（格子保留），路径连接暂时中断0.8秒。玩家须在下一波商店补充被清除的武器。"},
+          {tag:"active", name:"深海再生", trigger:"每20秒",
+           desc:"自身回复25点HP，护盾值补充15点；若护盾已满，则将多余的再生量（15点）转化为额外护甲层（临时护甲+5%，持续12秒，不可叠加）。"},
+          {tag:"phase", name:"墨汁笼罩", trigger:"HP < 50%",
+           desc:"激活：喷出墨汁笼罩整个战场，所有格子武器射程/范围缩小30%，持续整个后半场。同时潮汐淹没格子频率从30秒缩短为18秒。"},
+          {tag:"passive", name:"巨兽体魄", trigger:"常驻",
+           desc:"单次受到的伤害超过35时，该次伤害被护甲额外减免10%（共40%）——超大型目标的厚皮特性，惩罚依赖单次高爆发的构筑。"}
+        ],
+        weak:["雷电附魔 +70%（水体导电最大化）", "法系范围 +25%（大型目标全命中）"],
+        resist:["近战 -20%（体型巨大难精准）", "冰霜 -20%", "高爆发单次 -10%（巨兽体魄）"]
       }
     ]
   },
   {
-    act:8, name:"天空要塞", terrain:"浮空平台·疾风地形", color:"#c04848",
+    n:8, name:"天空要塞", terrain:"浮空平台·疾风地形", color:"#c04848",
     bosses:[
       {
-        sym:"👁",name:"天空执政官",type:"elite",
-        hp:120, spd:10, shield:35,
-        ability:"规则扭曲",
-        desc:"开场随机宣布一种武器类型被「禁制」，该类型武器伤害降至0，持续整场精英关（重进无效）。每场精英关被禁武器随机不同，强迫构筑具备多元性。",
-        note:"对单一武器类型依赖过深的构筑在此直接崩盘。建议保持至少两种武器类型。"
+        sym:"👁", name:"天空执政官", sub:"天空要塞统治者 · 人类/机械", type:"elite",
+        stats:{hp:120, spd:10, shield:35, armor:"20%", atk:"能量炮12 / 4s · 穿透格子直打城堡"},
+        move:"悬浮移动，每3秒随机瞬移至附近另一位置（约2~4格距离），使连续命中极难",
+        abilities:[
+          {tag:"passive", name:"规则扭曲", trigger:"战斗开始",
+           desc:"开场随机宣布一种武器类型被禁制（铁剑/猎弓/火焰法杖/骑士盾/钢矛/陷阱之一），该类型武器伤害降至0，效果持续全场。每场精英关禁制内容随机，构筑不能过度依赖单一武器。"},
+          {tag:"active", name:"相位跃迁", trigger:"每12秒",
+           desc:"瞬移同时激活0.5秒无敌帧（所有伤害免疫），是连续高频攻击时的集火空窗。陷阱格子和毒素的持续效果在无敌帧期间依然继续计算。"},
+          {tag:"phase", name:"裁决炮击", trigger:"HP < 40%",
+           desc:"能量炮攻击频率从4秒缩短至2.5秒，并获得护盾穿透属性（直接对城堡HP造成伤害，骑士盾无法格挡）；同时瞬移频率提升至每1.5秒一次。"}
+        ],
+        weak:["陷阱（瞬移不规避陷阱格，固定位置必中）", "毒素附魔（持续伤害穿透无敌帧）"],
+        resist:["弓类 -20%（瞬移规避）", "法系 -20%（瞬移避开爆炸中心）"]
       },
       {
-        sym:"⚔",name:"永恒守护者",type:"boss",
-        hp:480, spd:5, shield:80,
-        ability:"镜像反制",
-        desc:"持续扫描玩家格子，复制当前伤害最高的单件武器数值，每12秒以该数值对城堡造成1次等量伤害（无视格子武器效果）。同时，每当守护者受到的单次伤害超过40时，激活护甲：下次受到伤害降低50%（持续8秒）。",
-        note:"最终Boss：强烈惩罚单一爆发构筑，鼓励分散输出。同时其护甲机制反制法杖Lv3等高爆发武器，考验构筑全面性。"
+        sym:"⚔", name:"永恒守护者", sub:"天空要塞最终卫士 · 神明", type:"boss",
+        stats:{hp:480, spd:5, shield:80, armor:"30%", atk:"圣剑劈击20 / 4s · 范围3格"},
+        move:"稳定缓慢推进；每次己方单位被击杀时短暂停步0.5秒（感知战场），不追击任何目标",
+        abilities:[
+          {tag:"passive", name:"镜像反制", trigger:"每12秒扫描",
+           desc:"持续监测玩家所有格子，每12秒找出当前伤害最高的单件武器，以该武器数值对城堡造成等量伤害（真实伤害，无视骑士盾和护甲）。强迫构筑分散输出，不能单件武器一家独大。"},
+          {tag:"passive", name:"护甲重叠", trigger:"单次受伤 > 40 时",
+           desc:"护甲临时提升50%（共80%减伤），持续8秒。是对爆发性高伤武器（法杖Lv3、钢矛Lv3等）的直接反制：爆发越高，反制越强。最优策略为所有武器伤害均等化，避免触发此效果。"},
+          {tag:"active", name:"神圣号令", trigger:"每40秒",
+           desc:"召唤前七关所有精英Boss的弱化版援军（HP各50，无特殊技能，但携带原始属性）：守关老兵、林中女巫、冰霜魔法师、熔岩巨人、沙漠死灵、雷霆武士、深海祭司同时登场。"},
+          {tag:"phase", name:"终末审判", trigger:"HP < 20%",
+           desc:"狂暴化：移速+30%，攻击力+50%（30伤/次），护盾立即恢复至满值（80）；但护甲清零（0%）——最后的疯狂状态，高伤害高速但防御全开，是集中爆发击杀的最佳也是唯一窗口。"}
+        ],
+        weak:["分散均等输出构筑（每件武器不超过15伤避免护甲重叠）", "毒素附魔（百分比伤害绕过护甲）", "终末审判阶段（护甲0%，集中爆发）"],
+        resist:["高爆发单体（护甲重叠反制）", "骑士盾（镜像反制穿透真实伤害）", "单一武器类型构筑（镜像+禁制双重压制）"]
       }
     ]
-  },
+  }
 ];
 
-const container=document.getElementById('boss-container');
-ACTS.forEach(act=>{
-  const bossHtml=act.bosses.map(b=>`
-    <div class="boss-card" style="--act-col:${act.color}">
-      <div class="boss-top">
-        <span class="boss-type ${b.type==='elite'?'t-elite':'t-boss'}">${b.type==='elite'?'精英':'终章Boss'}</span>
-        <div class="boss-head">
+const con = document.getElementById('boss-container');
+ACTS.forEach(act => {
+  const bossHtml = act.bosses.map(b => {
+    const abilHtml = b.abilities.map(a => {
+      const tagClass = {active:'at-active', passive:'at-passive', phase:'at-phase'}[a.tag] || 'at-passive';
+      const tagLabel = {active:'主动', passive:'被动', phase:'阶段'}[a.tag] || a.tag;
+      return `<div class="ability">
+        <div class="ability-head">
+          <span class="ability-tag ${tagClass}">${tagLabel}</span>
+          <span class="ability-name">${a.name}</span>
+          <span class="ability-trigger">${a.trigger}</span>
+        </div>
+        <div class="ability-desc">${a.desc}</div>
+      </div>`;
+    }).join('');
+
+    const weakHtml = b.weak.map(w => `<span class="weak-tag">▲ ${w}</span>`).join('');
+    const resistHtml = b.resist.map(r => `<span class="resist-tag">▼ ${r}</span>`).join('');
+
+    return `<div class="boss-card" style="--act-col:${act.color}">
+      <div class="boss-banner"></div>
+      <div class="boss-header">
+        <span class="boss-type ${b.type === 'elite' ? 't-elite' : 't-boss'}">${b.type === 'elite' ? '精英' : '终章Boss'}</span>
+        <div class="boss-identity">
           <div class="boss-sym">${b.sym}</div>
-          <div class="boss-info">
+          <div class="boss-title-block">
             <div class="boss-name">${b.name}</div>
-            <div class="boss-sub">${act.name} · ${act.terrain}</div>
+            <div class="boss-sub">${b.sub}</div>
           </div>
         </div>
-        <div class="boss-stats">
-          <div class="boss-stat-item"><div class="stat-k">HP</div>${b.hp}</div>
-          <div class="boss-stat-item"><div class="stat-k">移速</div>${b.spd}</div>
-          <div class="boss-stat-item"><div class="stat-k">护盾</div>${b.shield||'—'}</div>
+        <div class="stat-grid">
+          <div class="sg-cell"><div class="sg-val">${b.stats.hp}</div><div class="sg-key">HP</div></div>
+          <div class="sg-cell"><div class="sg-val">${b.stats.spd}</div><div class="sg-key">移速</div></div>
+          <div class="sg-cell"><div class="sg-val">${b.stats.shield}</div><div class="sg-key">护盾</div></div>
+          <div class="sg-cell"><div class="sg-val">${b.stats.armor}</div><div class="sg-key">护甲</div></div>
+          <div class="sg-cell"><div class="sg-val" style="font-size:.65rem;font-family:inherit;">${b.stats.atk}</div><div class="sg-key">攻击</div></div>
         </div>
-        <div class="ability-box">
-          <div class="ability-name">专属技能 · ${b.ability}</div>
-          <div class="ability-desc">${b.desc}</div>
-          ${b.note?`<div class="ability-note">🔸 ${b.note}</div>`:''}
-        </div>
+        <div class="move-row"><span class="move-label">移动方式</span>${b.move}</div>
       </div>
-    </div>`).join('');
+      <div class="boss-abilities">${abilHtml}</div>
+      <div class="boss-footer">
+        <div class="rw-block"><div class="rw-label">弱点</div><div class="rw-tags">${weakHtml}</div></div>
+        <div class="rw-block"><div class="rw-label">抗性</div><div class="rw-tags">${resistHtml}</div></div>
+      </div>
+    </div>`;
+  }).join('');
 
-  container.innerHTML+=`
-  <div class="act-block" style="--act-col:${act.color}">
-    <div class="act-header">
-      <span class="act-num">ACT ${act.act}</span>
-      <span class="act-name">${act.name}</span>
-      <span class="act-terrain">🗺 ${act.terrain}</span>
-    </div>
-    <div class="boss-grid">${bossHtml}</div>
-  </div>`;
+  con.innerHTML += `
+  <div class="act-header" style="--act-col:${act.color}">
+    <span class="act-badge">ACT ${act.n}</span>
+    <span class="act-name">${act.name}</span>
+    <span class="act-terrain">🗺 ${act.terrain}</span>
+  </div>
+  <div class="boss-grid">${bossHtml}</div>`;
 });
 </script>
