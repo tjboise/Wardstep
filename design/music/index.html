@@ -1,0 +1,300 @@
+<title>Wardstep · 音乐图鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap">
+
+<style>
+:root {
+  --bg:#111620; --surface:#1d2438; --raised:#26304a;
+  --border:#334060; --border2:#253050;
+  --text:#ddd0b0; --muted:#7888a8; --dim:#404e68;
+  --accent:#c8a040; --accent-lo:rgba(200,160,64,.12);
+  --frost:#56aed0; --emerald:#52a870;
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f0e4cc; --surface:#e0cca8; --raised:#d4be94;
+  --border:#b89e70; --border2:#c8ae80;
+  --text:#1c140a; --muted:#7a6040; --dim:#a89068;
+  --accent:#8a5c10; --accent-lo:rgba(138,92,16,.10);
+  --frost:#1e72a0; --emerald:#2a7848;
+}}
+:root[data-theme="light"]{
+  --bg:#f0e4cc; --surface:#e0cca8; --raised:#d4be94;
+  --border:#b89e70; --border2:#c8ae80;
+  --text:#1c140a; --muted:#7a6040; --dim:#a89068;
+  --accent:#8a5c10; --accent-lo:rgba(138,92,16,.10);
+  --frost:#1e72a0; --emerald:#2a7848;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun',serif;font-size:15px;line-height:1.7;min-height:100vh;}
+
+.page{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+
+.site-header{padding:40px 0 32px;border-bottom:1px solid var(--border2);margin-bottom:32px;}
+.breadcrumb{font-size:.7rem;letter-spacing:.16em;color:var(--dim);margin-bottom:12px;}
+.breadcrumb a{color:var(--dim);text-decoration:none;}
+.breadcrumb a:hover{color:var(--accent);}
+.header-row{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+.page-title{font-family:'Cinzel',serif;font-weight:700;font-size:2rem;letter-spacing:.1em;color:var(--accent);}
+.page-sub{color:var(--muted);font-size:.9rem;margin-left:auto;}
+
+.stats-bar{display:flex;gap:32px;flex-wrap:wrap;margin-bottom:28px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:4px;}
+.stat{display:flex;flex-direction:column;gap:2px;}
+.stat-val{font-family:'Cinzel',serif;font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;}
+.stat-lbl{font-size:.68rem;letter-spacing:.1em;color:var(--muted);}
+
+.track-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+
+.track-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:transform .15s,border-color .2s;cursor:default;}
+.track-card:hover{transform:translateY(-3px);border-color:var(--card-col,var(--accent));}
+.card-top{padding:18px 18px 14px;position:relative;}
+.card-top::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-col,var(--accent));}
+
+.card-sym-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.card-sym{font-size:2rem;line-height:1;width:44px;text-align:center;opacity:.9;}
+.card-title-block{flex:1;}
+.card-name{font-weight:600;font-size:1.05rem;color:var(--text);margin-bottom:3px;line-height:1.2;}
+.card-meta{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums;}
+.card-key{font-family:'Cinzel',serif;letter-spacing:.05em;}
+
+.bpm-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.bpm-label{font-size:.65rem;letter-spacing:.1em;color:var(--dim);}
+.bpm-val{font-family:'Cinzel',serif;font-size:.9rem;color:var(--card-col,var(--accent));font-variant-numeric:tabular-nums;}
+.bpm-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.bpm-fill{height:100%;background:var(--card-col,var(--accent));opacity:.55;border-radius:2px;}
+
+.card-mood{font-size:.88rem;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;}
+.tag{font-size:.62rem;letter-spacing:.08em;padding:3px 8px;border-radius:2px;border:1px solid var(--border2);color:var(--dim);}
+
+.card-bottom{padding:12px 18px;border-top:1px solid var(--border2);background:var(--raised);}
+.section-label{font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.chord-prog{font-family:'Cinzel',serif;font-size:.82rem;color:var(--muted);letter-spacing:.04em;margin-bottom:10px;}
+.chord-prog span{color:var(--card-col,var(--accent));}
+.chord-arrow{color:var(--dim);margin:0 4px;font-size:.7rem;}
+
+.layer-list{display:flex;flex-direction:column;gap:4px;}
+.layer-row{display:flex;align-items:baseline;gap:8px;}
+.layer-name{font-size:.68rem;letter-spacing:.08em;color:var(--dim);width:52px;flex-shrink:0;}
+.layer-desc{font-size:.78rem;color:var(--muted);line-height:1.4;}
+
+.status{position:absolute;top:12px;right:12px;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:2px;}
+.s-implemented{background:rgba(82,168,112,.15);border:1px solid rgba(82,168,112,.3);color:var(--emerald);}
+
+.play-hint{margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:.72rem;color:var(--dim);}
+.play-hint a{color:var(--frost);text-decoration:none;}
+.play-hint a:hover{color:var(--accent);}
+
+@media(max-width:600px){.track-grid{grid-template-columns:1fr;}.header-row{flex-direction:column;align-items:flex-start;}}
+</style>
+
+<div class="page">
+
+  <header class="site-header">
+    <div class="breadcrumb"><a href="../../README.md">Wardstep</a> / design / music</div>
+    <div class="header-row">
+      <div class="page-title">音乐图鉴</div>
+      <div class="page-sub">程序性生成音轨 · Web Audio API · 可运行时切换</div>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">音轨</div></div>
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">已实现</div></div>
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">调性</div></div>
+    <div class="stat"><div class="stat-val">68–112</div><div class="stat-lbl">BPM 范围</div></div>
+  </div>
+
+  <div class="track-grid">
+
+    <!-- 古堡守望 -->
+    <div class="track-card" style="--card-col:#c8a040">
+      <div class="card-top">
+        <span class="status s-implemented">已实现</span>
+        <div class="card-sym-row">
+          <div class="card-sym">♩</div>
+          <div class="card-title-block">
+            <div class="card-name">古堡守望</div>
+            <div class="card-meta">
+              <span class="card-key">Am</span>
+              <span>·</span>
+              <span>大气 · 哥特</span>
+            </div>
+          </div>
+        </div>
+        <div class="bpm-row">
+          <span class="bpm-label">BPM</span>
+          <span class="bpm-val">90</span>
+          <div class="bpm-bar"><div class="bpm-fill" style="width:50%"></div></div>
+        </div>
+        <div class="card-mood">游戏默认曲目。低沉的双锯齿波 drone 营造哥特城堡氛围，三角波琶音轻柔扫弦，正弦波旋律游荡其上。</div>
+        <div class="card-tags">
+          <span class="tag">默认轨道</span>
+          <span class="tag">小调</span>
+          <span class="tag">慢板</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="section-label">和弦进行</div>
+        <div class="chord-prog">
+          <span>Am</span><span class="chord-arrow">→</span><span>Dm</span><span class="chord-arrow">→</span><span>Em</span><span class="chord-arrow">→</span><span>Am</span>
+        </div>
+        <div class="section-label">音色层</div>
+        <div class="layer-list">
+          <div class="layer-row"><span class="layer-name">DRONE</span><span class="layer-desc">55 Hz 锯齿波 ×2（微失谐）+ 82 Hz 正弦波</span></div>
+          <div class="layer-row"><span class="layer-name">ARP</span><span class="layer-desc">三角波，8分音符，4小节32音</span></div>
+          <div class="layer-row"><span class="layer-name">MEL</span><span class="layer-desc">正弦波，4分音符旋律，含停顿</span></div>
+          <div class="layer-row"><span class="layer-name">PAD</span><span class="layer-desc">正弦波和弦衬底，每小节淡入淡出</span></div>
+          <div class="layer-row"><span class="layer-name">PERC</span><span class="layer-desc">底鼓 + 重音踩镲 + 软踩镲</span></div>
+        </div>
+        <div class="play-hint">在 <a href="https://tjboise.github.io/Wardstep/demo/" target="_blank">Demo</a> 中游玩时默认播放</div>
+      </div>
+    </div>
+
+    <!-- 征途 -->
+    <div class="track-card" style="--card-col:#5080c8">
+      <div class="card-top">
+        <span class="status s-implemented">已实现</span>
+        <div class="card-sym-row">
+          <div class="card-sym">♪</div>
+          <div class="card-title-block">
+            <div class="card-name">征途</div>
+            <div class="card-meta">
+              <span class="card-key">Dm</span>
+              <span>·</span>
+              <span>英雄 · 进行曲</span>
+            </div>
+          </div>
+        </div>
+        <div class="bpm-row">
+          <span class="bpm-label">BPM</span>
+          <span class="bpm-val">112</span>
+          <div class="bpm-bar"><div class="bpm-fill" style="width:85%"></div></div>
+        </div>
+        <div class="card-mood">最快节奏的曲目。军鼓（snare）替代踩镲，配合进行曲式锯齿波旋律，烘托出大军出征的气势。</div>
+        <div class="card-tags">
+          <span class="tag">进行曲</span>
+          <span class="tag">小调</span>
+          <span class="tag">快板</span>
+          <span class="tag">军鼓</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="section-label">和弦进行</div>
+        <div class="chord-prog">
+          <span>Dm</span><span class="chord-arrow">→</span><span>Bb</span><span class="chord-arrow">→</span><span>F</span><span class="chord-arrow">→</span><span>C</span>
+        </div>
+        <div class="section-label">音色层</div>
+        <div class="layer-list">
+          <div class="layer-row"><span class="layer-name">DRONE</span><span class="layer-desc">73 Hz 三角波 + 锯齿波（微失谐）+ 110 Hz 正弦</span></div>
+          <div class="layer-row"><span class="layer-name">ARP</span><span class="layer-desc">三角波，上行进行曲式音型</span></div>
+          <div class="layer-row"><span class="layer-name">MEL</span><span class="layer-desc">锯齿波旋律，颗粒感更强</span></div>
+          <div class="layer-row"><span class="layer-name">PAD</span><span class="layer-desc">正弦波和弦衬底</span></div>
+          <div class="layer-row"><span class="layer-name">PERC</span><span class="layer-desc">底鼓（1拍3拍）+ 军鼓（2拍4拍）+ 踩镲</span></div>
+        </div>
+        <div class="play-hint">点击 ♪ 按钮切换至此轨</div>
+      </div>
+    </div>
+
+    <!-- 夜袭 -->
+    <div class="track-card" style="--card-col:#8050b0">
+      <div class="card-top">
+        <span class="status s-implemented">已实现</span>
+        <div class="card-sym-row">
+          <div class="card-sym">♫</div>
+          <div class="card-title-block">
+            <div class="card-name">夜袭</div>
+            <div class="card-meta">
+              <span class="card-key">Cm</span>
+              <span>·</span>
+              <span>黑暗 · 紧张</span>
+            </div>
+          </div>
+        </div>
+        <div class="bpm-row">
+          <span class="bpm-label">BPM</span>
+          <span class="bpm-val">76</span>
+          <div class="bpm-bar"><div class="bpm-fill" style="width:38%"></div></div>
+        </div>
+        <div class="card-mood">最压抑的曲目。低沉 Cm 调，稀疏节拍，减七和弦色彩烘托深夜奇袭的窒息感。</div>
+        <div class="card-tags">
+          <span class="tag">紧张</span>
+          <span class="tag">小调</span>
+          <span class="tag">中板</span>
+          <span class="tag">稀疏节拍</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="section-label">和弦进行</div>
+        <div class="chord-prog">
+          <span>Cm</span><span class="chord-arrow">→</span><span>Ab</span><span class="chord-arrow">→</span><span>Fm</span><span class="chord-arrow">→</span><span>G</span>
+        </div>
+        <div class="section-label">音色层</div>
+        <div class="layer-list">
+          <div class="layer-row"><span class="layer-name">DRONE</span><span class="layer-desc">65 Hz 锯齿波 ×2（失谐−11）+ 98 Hz 正弦</span></div>
+          <div class="layer-row"><span class="layer-name">ARP</span><span class="layer-desc">三角波，半音色彩，节奏密集</span></div>
+          <div class="layer-row"><span class="layer-name">MEL</span><span class="layer-desc">正弦波，极低音量，幽灵般飘荡</span></div>
+          <div class="layer-row"><span class="layer-name">PAD</span><span class="layer-desc">正弦波和弦衬底，低频偏重</span></div>
+          <div class="layer-row"><span class="layer-name">PERC</span><span class="layer-desc">沉重底鼓，稀疏踩镲，大量空拍</span></div>
+        </div>
+        <div class="play-hint">点击 ♪ 按钮切换至此轨</div>
+      </div>
+    </div>
+
+    <!-- 霜晨 -->
+    <div class="track-card" style="--card-col:#48b8a0">
+      <div class="card-top">
+        <span class="status s-implemented">已实现</span>
+        <div class="card-sym-row">
+          <div class="card-sym">♬</div>
+          <div class="card-title-block">
+            <div class="card-name">霜晨</div>
+            <div class="card-meta">
+              <span class="card-key">Em</span>
+              <span>·</span>
+              <span>空灵 · 平静</span>
+            </div>
+          </div>
+        </div>
+        <div class="bpm-row">
+          <span class="bpm-label">BPM</span>
+          <span class="bpm-val">68</span>
+          <div class="bpm-bar"><div class="bpm-fill" style="width:22%"></div></div>
+        </div>
+        <div class="card-mood">最舒缓的曲目。全程正弦波，钟声般琶音，节拍极度稀疏，如同寒冬清晨第一缕光的感觉。</div>
+        <div class="card-tags">
+          <span class="tag">空灵</span>
+          <span class="tag">小调</span>
+          <span class="tag">慢板</span>
+          <span class="tag">纯正弦</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="section-label">和弦进行</div>
+        <div class="chord-prog">
+          <span>Em</span><span class="chord-arrow">→</span><span>Am</span><span class="chord-arrow">→</span><span>C</span><span class="chord-arrow">→</span><span>D</span>
+        </div>
+        <div class="section-label">音色层</div>
+        <div class="layer-list">
+          <div class="layer-row"><span class="layer-name">DRONE</span><span class="layer-desc">82 Hz 正弦 + 124 Hz 正弦（+3音分）+ 165 Hz 三角</span></div>
+          <div class="layer-row"><span class="layer-name">ARP</span><span class="layer-desc">纯正弦波，钟铃质感，缓慢展开</span></div>
+          <div class="layer-row"><span class="layer-name">MEL</span><span class="layer-desc">正弦波，极轻，若有若无</span></div>
+          <div class="layer-row"><span class="layer-name">PAD</span><span class="layer-desc">正弦波和弦，极长淡入淡出</span></div>
+          <div class="layer-row"><span class="layer-name">PERC</span><span class="layer-desc">偶发底鼓，极稀疏踩镲，大量留白</span></div>
+        </div>
+        <div class="play-hint">点击 ♪ 按钮切换至此轨</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:48px;padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:4px;">
+    <div style="font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.14em;color:var(--dim);margin-bottom:10px;">技术说明</div>
+    <div style="font-size:.85rem;color:var(--muted);line-height:1.8;">
+      所有音乐由 <strong style="color:var(--text)">Web Audio API</strong> 实时合成，无需音频文件。采用「看前调度器」（look-ahead scheduler）：<code style="font-size:.8rem;background:var(--raised);padding:1px 5px;border-radius:2px;">setInterval(50ms)</code>，每次提前 0.3 秒排队音符，避免界面卡顿导致的断音。
+      drone 振荡器持续运行，切换时调用 <code style="font-size:.8rem;background:var(--raised);padding:1px 5px;border-radius:2px;">.stop()</code> 并重建；已排队的短音符自然消亡。源码见 <a href="../../demo/music.js" style="color:var(--frost);text-decoration:none;">demo/music.js</a>。
+    </div>
+  </div>
+
+</div>

@@ -21,6 +21,7 @@
 | 类别 | 页面 | 说明 |
 |------|------|------|
 | **[符文图鉴](https://tjboise.github.io/Wardstep/design/runes/)** | [design/runes/](design/runes/) | 所有符文的完整设计，可搜索筛选 |
+| **[音乐图鉴](https://tjboise.github.io/Wardstep/design/music/)** | [design/music/](design/music/) | 4首程序性音轨设计（调性/BPM/音色层/和弦） |
 | 遗物图鉴 | [design/relics/](design/relics/) | 即将上线 |
 | 怪物图鉴 | [design/monsters/](design/monsters/) | 即将上线 |
 | 关卡设计 | [design/stages/](design/stages/) | 即将上线 |
