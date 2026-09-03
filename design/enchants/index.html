@@ -1,0 +1,229 @@
+<title>Wardstep · 附魔图鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap">
+
+<style>
+:root {
+  --bg:#111620;--surface:#1d2438;--raised:#26304a;
+  --border:#334060;--border2:#253050;
+  --text:#ddd0b0;--muted:#7888a8;--dim:#404e68;
+  --accent:#c8a040;--accent-lo:rgba(200,160,64,.12);
+  --frost:#56aed0;--emerald:#52a870;--danger:#c04848;--violet:#9070d0;
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f0e4cc;--surface:#e0cca8;--raised:#d4be94;
+  --border:#b89e70;--border2:#c8ae80;
+  --text:#1c140a;--muted:#7a6040;--dim:#a89068;
+  --accent:#8a5c10;--accent-lo:rgba(138,92,16,.10);
+  --frost:#1e72a0;--emerald:#2a7848;--danger:#a02020;--violet:#6040a0;
+}}
+:root[data-theme="light"]{
+  --bg:#f0e4cc;--surface:#e0cca8;--raised:#d4be94;
+  --border:#b89e70;--border2:#c8ae80;
+  --text:#1c140a;--muted:#7a6040;--dim:#a89068;
+  --accent:#8a5c10;--accent-lo:rgba(138,92,16,.10);
+  --frost:#1e72a0;--emerald:#2a7848;--danger:#a02020;--violet:#6040a0;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun',serif;font-size:15px;line-height:1.7;min-height:100vh;}
+.page{max-width:1000px;margin:0 auto;padding:0 24px 80px;}
+
+.site-header{padding:40px 0 32px;border-bottom:1px solid var(--border2);margin-bottom:36px;}
+.breadcrumb{font-size:.7rem;letter-spacing:.16em;color:var(--dim);margin-bottom:12px;}
+.breadcrumb a{color:var(--dim);text-decoration:none;}
+.breadcrumb a:hover{color:var(--accent);}
+.header-row{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+.page-title{font-family:'Cinzel',serif;font-weight:700;font-size:2rem;letter-spacing:.1em;color:var(--accent);}
+.page-sub{color:var(--muted);font-size:.9rem;margin-left:auto;}
+
+.stats-bar{display:flex;gap:32px;flex-wrap:wrap;margin-bottom:36px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:4px;}
+.stat{display:flex;flex-direction:column;gap:2px;}
+.stat-val{font-family:'Cinzel',serif;font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;}
+.stat-lbl{font-size:.68rem;letter-spacing:.1em;color:var(--muted);}
+
+.rule-box{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:32px;font-size:.88rem;color:var(--muted);line-height:1.7;}
+.rule-box strong{color:var(--text);}
+
+.enchant-list{display:flex;flex-direction:column;gap:24px;}
+
+.enchant-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.enchant-card:hover{border-color:var(--e-col,var(--accent));}
+.enchant-banner{height:4px;background:var(--e-col,var(--accent));}
+
+.enchant-body{padding:20px 22px;}
+.enchant-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;}
+.enchant-sym{font-size:2.4rem;width:52px;text-align:center;flex-shrink:0;}
+.enchant-meta{flex:1;}
+.enchant-name{font-family:'Cinzel',serif;font-size:1.15rem;letter-spacing:.06em;color:var(--text);margin-bottom:3px;}
+.enchant-tagline{font-size:.78rem;color:var(--muted);}
+.enchant-cost{font-size:.68rem;letter-spacing:.1em;padding:3px 9px;border:1px solid var(--e-col,var(--accent));color:var(--e-col,var(--accent));border-radius:2px;margin-left:auto;align-self:flex-start;flex-shrink:0;font-variant-numeric:tabular-nums;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.block-label{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
+
+.effect-main{background:var(--raised);border-left:3px solid var(--e-col,var(--accent));padding:12px 14px;border-radius:0 4px 4px 0;font-size:.88rem;color:var(--text);line-height:1.7;}
+
+.lv-table{width:100%;border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums;}
+.lv-table th{font-size:.6rem;letter-spacing:.1em;color:var(--dim);text-align:left;padding:0 6px 5px;border-bottom:1px solid var(--border2);font-weight:400;}
+.lv-table td{padding:5px 6px;border-bottom:1px solid var(--border2);color:var(--muted);vertical-align:top;}
+.lv-table tr:last-child td{border-bottom:none;}
+.lv-badge{display:inline-block;font-size:.6rem;letter-spacing:.06em;padding:1px 6px;border-radius:2px;border:1px solid var(--e-col,var(--accent));color:var(--e-col,var(--accent));font-variant-numeric:normal;}
+.lv-val{color:var(--text);font-weight:600;}
+
+.synergy-list{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+.synergy-item{font-size:.8rem;color:var(--muted);padding:6px 10px;background:var(--raised);border-radius:3px;border:1px solid var(--border2);line-height:1.5;}
+.syn-weapon{font-size:.65rem;letter-spacing:.08em;color:var(--e-col,var(--accent));display:block;margin-bottom:2px;}
+
+@media(max-width:620px){.two-col{grid-template-columns:1fr;}.header-row{flex-direction:column;align-items:flex-start;}}
+</style>
+
+<div class="page">
+  <header class="site-header">
+    <div class="breadcrumb"><a href="../../README.md">Wardstep</a> / design / enchants</div>
+    <div class="header-row">
+      <div class="page-title">附魔图鉴</div>
+      <div class="page-sub">格子附魔 · 三级效果 · 武器协同</div>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">附魔种类</div></div>
+    <div class="stat"><div class="stat-val">3</div><div class="stat-lbl">升级等级</div></div>
+    <div class="stat"><div class="stat-val">1</div><div class="stat-lbl">每格最多附魔数</div></div>
+    <div class="stat"><div class="stat-val">9</div><div class="stat-lbl">最多附魔格子</div></div>
+  </div>
+
+  <div class="rule-box">
+    <strong>附魔规则：</strong>每个格子可独立选择一种附魔，叠加在该格武器效果上。同一格只能有一种附魔，但不同格子可以使用不同附魔。附魔本身也有等级（Lv1→Lv3），通过商店升级或遗物强化。附魔效果与职业无关，可与任意武器自由搭配。
+  </div>
+
+  <div class="enchant-list" id="enchant-list"></div>
+</div>
+
+<script>
+const ENCHANTS = [
+  {
+    sym:"🔥", name:"火焰附魔", color:"#c04848",
+    tagline:"点燃 · 持续灼烧 · 蔓延",
+    cost:"15金",
+    effect:"命中后点燃目标，在燃烧持续期间每秒受到灼烧伤害。燃烧可被冰霜附魔打断。",
+    levels:[
+      {lv:"Lv1", val:"灼烧 2/s · 持续 2s",  note:"基础点燃"},
+      {lv:"Lv2", val:"灼烧 3/s · 持续 3s",  note:"火势蔓延：燃烧目标周围1格范围内的敌人也被小幅点燃（灼烧1/s·1s）"},
+      {lv:"Lv3", val:"灼烧 5/s · 持续 4s",  note:"爆燃：燃烧时间结束时目标周围产生一次小爆炸（造成6点范围伤害）"},
+    ],
+    synergies:[
+      {weapon:"钢矛",desc:"直线穿透命中多个敌人，全部点燃，Lv2蔓延可造成火势扩散。"},
+      {weapon:"猎弓 Lv3",desc:"三箭穿透，每箭点燃各自目标，形成密集灼烧。"},
+      {weapon:"骑士盾 Lv3",desc:"激活盾时脉冲击退，击退后敌人仍在燃烧——拉开距离延长灼烧时间。"},
+    ]
+  },
+  {
+    sym:"❄", name:"冰霜附魔", color:"#56aed0",
+    tagline:"减速 · 冻结 · 脆弱",
+    cost:"15金",
+    effect:"命中后使目标移速降低，叠加3次减速后触发冻结（目标完全静止一段时间）。冻结状态下目标受到伤害+20%（脆弱）。",
+    levels:[
+      {lv:"Lv1", val:"减速30% · 持续1.5s",   note:"叠加3次触发冻结0.8s，冻结期间脆弱+20%"},
+      {lv:"Lv2", val:"减速45% · 持续2s",      note:"冻结1.5s；冻结结束时目标碎裂：受到一次额外6点伤害"},
+      {lv:"Lv3", val:"减速60% · 持续2.5s",    note:"冻结2.5s；冻结期间脆弱+35%；碎裂伤害提升为12点"},
+    ],
+    synergies:[
+      {weapon:"铁剑",desc:"近战攻击频率高，快速叠3次减速触发冻结，配合脆弱让后续攻击大幅增伤。"},
+      {weapon:"火焰法杖",desc:"冻结+燃烧组合：先冻结使其静止，法杖范围爆炸趁机造成最大伤害。"},
+      {weapon:"猎弓 Lv2",desc:"双发各自计算减速层数，对两个目标同时快速叠加冻结触发。"},
+    ]
+  },
+  {
+    sym:"⚡", name:"雷电附魔", color:"#9070d0",
+    tagline:"弹跳 · 链式 · 麻痹",
+    cost:"18金",
+    effect:"命中后有概率触发雷电弹跳，跳向附近敌人造成递减伤害，被弹跳命中的敌人短暂麻痹（停止移动）。",
+    levels:[
+      {lv:"Lv1", val:"弹跳概率30% · 最多跳2次",  note:"每跳伤害-35%，麻痹0.5s"},
+      {lv:"Lv2", val:"弹跳概率45% · 最多跳3次",  note:"每跳伤害-25%，麻痹0.8s；同一目标本圈最多被跳到1次"},
+      {lv:"Lv3", val:"弹跳概率60% · 最多跳4次",  note:"每跳伤害-20%，麻痹1s；链式弹跳时沿途留下雷痕（被下次弹跳经过时额外触发3点）"},
+    ],
+    synergies:[
+      {weapon:"火焰法杖 Lv2",desc:"范围爆炸命中多个敌人，每个命中都有弹跳概率，可同时触发数条弹跳链。"},
+      {weapon:"骑士盾 Lv2",desc:"反击时触发雷电弹跳，破盾后立即电晕附近敌人争取恢复时间。"},
+      {weapon:"猎弓",desc:"弹跳+穿透双重广度输出，最大化对密集敌群的覆盖。"},
+    ]
+  },
+  {
+    sym:"☠", name:"毒素附魔", color:"#52a870",
+    tagline:"中毒 · 叠加 · 持续DOT",
+    cost:"12金",
+    effect:"命中后使目标中毒，持续造成基于目标最大HP的百分比伤害。毒素层数可叠加，上限3层，每层独立计时。",
+    levels:[
+      {lv:"Lv1", val:"毒伤1.5% maxHP/s · 持续3s",  note:"可叠加至3层（共4.5%/s），叠满时对高HP目标有极强的持续伤害"},
+      {lv:"Lv2", val:"毒伤2.0% maxHP/s · 持续4s",  note:"毒满时额外效果：目标移速-15%（毒素减缓）"},
+      {lv:"Lv3", val:"毒伤2.8% maxHP/s · 持续5s",  note:"死亡扩散：中毒目标死亡时向周围溅射毒雾，使附近敌人叠加1层毒素"},
+    ],
+    synergies:[
+      {weapon:"陷阱 Lv2",desc:"陷阱可触发3次，三次全部叠加毒素，敌人踩入即满层中毒。"},
+      {weapon:"钢矛",desc:"直线穿透同时给多个目标叠毒，配合死亡扩散形成蔓延中毒。"},
+      {weapon:"铁剑 Lv3",desc:"双击各叠一层毒，快速达到3层上限，配合冰霜附魔的脆弱则输出爆炸。"},
+    ]
+  },
+  {
+    sym:"✦", name:"强化附魔", color:"#c8a040",
+    tagline:"纯伤 · 稳定 · 无附加效果",
+    cost:"10金",
+    effect:"直接强化格子武器的基础伤害，没有任何条件触发，最稳定可靠的附魔选择。",
+    levels:[
+      {lv:"Lv1", val:"武器伤害 +25%",  note:"基础强化，适合任何武器"},
+      {lv:"Lv2", val:"武器伤害 +40%",  note:"如果该格武器在本圈是触发的第一件，额外+10%（首击加成）"},
+      {lv:"Lv3", val:"武器伤害 +60%",  note:"首击加成提升为+20%；同时武器CD -8%（强化穿透优化）"},
+    ],
+    synergies:[
+      {weapon:"骑士盾 Lv3",desc:"护盾值按武器伤害计算——强化附魔让护盾更厚，Lv3可生成35+护盾。"},
+      {weapon:"火焰法杖 Lv3",desc:"双爆×强化附魔，两次爆炸都获得增伤，单波输出最高。"},
+      {weapon:"铁剑 Lv3",desc:"双击均获得强化加成，Lv3首击加成对第一刀生效，稳定高伤近战首选。"},
+    ]
+  },
+];
+
+const list=document.getElementById('enchant-list');
+ENCHANTS.forEach(e=>{
+  const lvRows=e.levels.map(l=>`
+    <tr>
+      <td><span class="lv-badge">${l.lv}</span></td>
+      <td class="lv-val">${l.val}</td>
+      <td>${l.note}</td>
+    </tr>`).join('');
+  const synItems=e.synergies.map(s=>`
+    <div class="synergy-item">
+      <span class="syn-weapon">⚔ ${s.weapon}</span>${s.desc}
+    </div>`).join('');
+  list.innerHTML+=`
+  <div class="enchant-card" style="--e-col:${e.color}">
+    <div class="enchant-banner"></div>
+    <div class="enchant-body">
+      <div class="enchant-head">
+        <div class="enchant-sym">${e.sym}</div>
+        <div class="enchant-meta">
+          <div class="enchant-name">${e.name}</div>
+          <div class="enchant-tagline">${e.tagline}</div>
+        </div>
+        <span class="enchant-cost">${e.cost}</span>
+      </div>
+      <div class="effect-main" style="margin-bottom:16px;">${e.effect}</div>
+      <div class="two-col">
+        <div>
+          <div class="block-label">升级数据</div>
+          <table class="lv-table">
+            <thead><tr><th>等级</th><th>数值</th><th>升级效果</th></tr></thead>
+            <tbody>${lvRows}</tbody>
+          </table>
+        </div>
+        <div>
+          <div class="block-label">武器协同</div>
+          <div class="synergy-list">${synItems}</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+});
+</script>

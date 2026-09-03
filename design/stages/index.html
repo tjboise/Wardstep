@@ -1,0 +1,336 @@
+<title>Wardstep · 关卡设计</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap">
+
+<style>
+:root {
+  --bg:#111620;--surface:#1d2438;--raised:#26304a;
+  --border:#334060;--border2:#253050;
+  --text:#ddd0b0;--muted:#7888a8;--dim:#404e68;
+  --accent:#c8a040;--accent-lo:rgba(200,160,64,.12);
+  --frost:#56aed0;--emerald:#52a870;--danger:#c04848;--violet:#9070d0;
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f0e4cc;--surface:#e0cca8;--raised:#d4be94;
+  --border:#b89e70;--border2:#c8ae80;
+  --text:#1c140a;--muted:#7a6040;--dim:#a89068;
+  --accent:#8a5c10;--accent-lo:rgba(138,92,16,.10);
+  --frost:#1e72a0;--emerald:#2a7848;--danger:#a02020;--violet:#6040a0;
+}}
+:root[data-theme="light"]{
+  --bg:#f0e4cc;--surface:#e0cca8;--raised:#d4be94;
+  --border:#b89e70;--border2:#c8ae80;
+  --text:#1c140a;--muted:#7a6040;--dim:#a89068;
+  --accent:#8a5c10;--accent-lo:rgba(138,92,16,.10);
+  --frost:#1e72a0;--emerald:#2a7848;--danger:#a02020;--violet:#6040a0;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun',serif;font-size:15px;line-height:1.7;min-height:100vh;}
+.page{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+
+.site-header{padding:40px 0 32px;border-bottom:1px solid var(--border2);margin-bottom:36px;}
+.breadcrumb{font-size:.7rem;letter-spacing:.16em;color:var(--dim);margin-bottom:12px;}
+.breadcrumb a{color:var(--dim);text-decoration:none;}
+.breadcrumb a:hover{color:var(--accent);}
+.header-row{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+.page-title{font-family:'Cinzel',serif;font-weight:700;font-size:2rem;letter-spacing:.1em;color:var(--accent);}
+.page-sub{color:var(--muted);font-size:.9rem;margin-left:auto;}
+
+/* act progress strip */
+.act-nav{display:flex;gap:0;margin-bottom:36px;overflow-x:auto;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.act-pip{flex:1;min-width:80px;padding:10px 8px;text-align:center;cursor:pointer;border-right:1px solid var(--border);background:var(--surface);transition:background .15s;}
+.act-pip:last-child{border-right:none;}
+.act-pip:hover,.act-pip.active{background:var(--accent-lo);}
+.act-pip.active .pip-num{color:var(--accent);}
+.pip-num{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.1em;color:var(--dim);display:block;transition:color .15s;}
+.pip-emoji{font-size:1.1rem;display:block;margin-bottom:2px;}
+.pip-name{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* act card */
+.act-card{display:none;}
+.act-card.active{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+.act-left,.act-right{display:flex;flex-direction:column;gap:14px;}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.panel-head{padding:12px 16px;border-bottom:1px solid var(--border2);background:var(--raised);display:flex;align-items:center;gap:10px;}
+.panel-icon{font-size:1.1rem;}
+.panel-label{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+.panel-body{padding:14px 16px;}
+
+.act-hero{border-top:4px solid var(--act-col,var(--accent));background:var(--surface);}
+.act-hero .panel-head{background:color-mix(in srgb,var(--act-col,var(--accent)) 8%,var(--surface));}
+.act-num-big{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.2em;padding:3px 9px;border:1px solid var(--act-col,var(--accent));color:var(--act-col,var(--accent));border-radius:2px;}
+.act-name-big{font-family:'Cinzel',serif;font-size:1.1rem;letter-spacing:.06em;color:var(--text);}
+.act-terrain-label{font-size:.78rem;color:var(--muted);}
+
+/* terrain grid preview */
+.terrain-preview{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:12px;background:var(--raised);border-radius:3px;aspect-ratio:5/3;}
+.t-cell{border-radius:2px;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:.75rem;}
+.t-normal{background:rgba(120,136,168,.15);}
+.t-blocked{background:rgba(64,78,104,.35);color:var(--dim);}
+.t-special{background:color-mix(in srgb,var(--act-col,var(--accent)) 18%,transparent);border-color:color-mix(in srgb,var(--act-col,var(--accent)) 30%,transparent);}
+.t-castle{background:rgba(200,160,64,.2);border-color:rgba(200,160,64,.4);color:var(--accent);font-size:.65rem;}
+.t-enemy{background:rgba(192,72,72,.15);border-color:rgba(192,72,72,.25);color:var(--danger);}
+.grid-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.62rem;color:var(--dim);}
+.legend-dot{width:10px;height:10px;border-radius:1px;border:1px solid rgba(255,255,255,.08);}
+
+/* waves */
+.wave-list{display:flex;flex-direction:column;gap:8px;}
+.wave-row{display:flex;align-items:flex-start;gap:10px;font-size:.82rem;}
+.wave-badge{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.1em;padding:3px 7px;border-radius:2px;flex-shrink:0;margin-top:2px;}
+.w-small{background:rgba(120,136,168,.15);border:1px solid var(--border);color:var(--muted);}
+.w-elite{background:rgba(86,174,208,.1);border:1px solid rgba(86,174,208,.3);color:var(--frost);}
+.w-boss{background:rgba(192,72,72,.12);border:1px solid rgba(192,72,72,.3);color:var(--danger);}
+.wave-desc{color:var(--muted);line-height:1.55;}
+
+/* terrain effect */
+.effect-box{background:var(--raised);border-left:3px solid var(--act-col,var(--accent));padding:10px 12px;border-radius:0 3px 3px 0;font-size:.85rem;color:var(--text);line-height:1.6;}
+.effect-name{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--act-col,var(--accent));margin-bottom:4px;}
+
+.tip-box{font-size:.8rem;color:var(--muted);line-height:1.6;padding:10px 14px;background:var(--raised);border-radius:3px;border:1px solid var(--border2);}
+.tip-label{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+
+@media(max-width:720px){.act-card.active{grid-template-columns:1fr;}.act-nav{gap:0;}}
+</style>
+
+<div class="page">
+  <header class="site-header">
+    <div class="breadcrumb"><a href="../../README.md">Wardstep</a> / design / stages</div>
+    <div class="header-row">
+      <div class="page-title">关卡设计</div>
+      <div class="page-sub">8大关 · 地形差异 · 敌人配置</div>
+    </div>
+  </header>
+
+  <div class="act-nav" id="act-nav"></div>
+  <div id="act-container"></div>
+</div>
+
+<script>
+const ACTS = [
+  {
+    n:1, emoji:"🏰", name:"古城外墙", terrain:"石砖平地",
+    color:"#c8a040",
+    terrainEffect:{
+      name:"坚实地基",
+      desc:"无特殊地形效果，格子可自由放置在任意9个标准位置。新手友好的起始环境。"
+    },
+    gridDesc:"标准5×3区域，中央城堡固定，玩家可使用全部9个格子槽位。无障碍无特效。",
+    cells:"N N N N N / N N N N N / N N C N N",
+    cellTypes:["n","n","n","n","n","n","n","n","n","n","n","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"3名普通兵 (HP8, 速度22) — 教学波次，熟悉巡逻机制。"},
+      {type:"small",label:"小关2",desc:"4名普通兵 + 1名重甲兵 + 1名精英远程 — 引入护盾机制和远程威胁。"},
+      {type:"elite",label:"精英关",desc:"4普通 + 2重甲 + 1精英远程 + 1治愈者 · Boss：守关老兵（护盾轮转）"},
+      {type:"boss",label:"Boss关",desc:"持续冲锋波次 + 治愈者2名 · Boss：铁甲将领（战场号令）"}
+    ],
+    tip:"入门关卡，重点是建立主力格子布局和熟悉骑士巡逻节奏。近战+弓类的基础搭配足以通关。"
+  },
+  {
+    n:2, emoji:"🌲", name:"幽暗森林", terrain:"树木遮蔽地形",
+    color:"#52a870",
+    terrainEffect:{
+      name:"林木遮蔽",
+      desc:"部分格子被大树占据，无法放置武器。树木格子不参与骑士路径，但可作为拐角分界点。"
+    },
+    gridDesc:"2个格子位置被树木永久占据（右列上/下），有效槽位减少到7个。",
+    cellTypes:["n","n","n","n","b","n","n","n","n","n","b","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"5普通兵 + 1爆炸兵 — 爆炸兵初登场，引入自爆机制。"},
+      {type:"small",label:"小关2",desc:"4普通 + 2重甲 + 1治愈者 — 治愈者出现在有遮蔽的通道后方，难以优先清除。"},
+      {type:"elite",label:"精英关",desc:"6普通 + 2重甲 + 1精英远程 + 2爆炸兵 · Boss：林中女巫（诅咒格子）"},
+      {type:"boss",label:"Boss关",desc:"密集波次 + 2治愈者 · Boss：古树精王（根系束缚）"}
+    ],
+    tip:"有效格子减少，路径选择需要绕开被占据的角落。优先构建L形或Z形路径充分利用7个槽位。"
+  },
+  {
+    n:3, emoji:"❄", name:"冰封雪原", terrain:"冰面·积雪地形",
+    color:"#56aed0",
+    terrainEffect:{
+      name:"冰滑地面",
+      desc:"骑士在冰面格子上移速+30%（踩格更快）但每次踩格后会短暂滑行至下一格（CD计时在滑行期间不停），实际触发间隔变短但骑士短暂难以控制。"
+    },
+    gridDesc:"中排3格为冰面（特效）。敌人从上下两侧同时出兵。",
+    cellTypes:["n","n","n","n","n","s","s","s","n","n","n","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"4普通 + 2重甲 — 双侧出兵首次出现，需要路径覆盖两个方向。"},
+      {type:"small",label:"小关2",desc:"5普通 + 2精英远程 + 1治愈者 — 远程从积雪掩护位射击，难以迅速消灭。"},
+      {type:"elite",label:"精英关",desc:"6普通 + 3重甲 + 2精英远程 · Boss：冰霜魔法师（冰封格阵）"},
+      {type:"boss",label:"Boss关",desc:"全面压制波次 · Boss：霜龙（龙息横扫）"}
+    ],
+    tip:"冰面加速可以提升巡逻频率，考虑把主力武器格子放在冰面上充分利用滑行加速。双侧出兵要求格子路径具备防御覆盖性。"
+  },
+  {
+    n:4, emoji:"🌋", name:"炙热熔岩", terrain:"熔岩裂缝地形",
+    color:"#c04848",
+    terrainEffect:{
+      name:"熔岩灼烧",
+      desc:"熔岩格子不可放置武器，骑士若踩入熔岩格受到2点持续灼烧伤害（传递给城堡）；绕行熔岩会使路径更长，但可以避免伤害。"
+    },
+    gridDesc:"左下和右下2格为熔岩区，不可使用。有效槽位7个，且地形分隔自然形成上下两区。",
+    cellTypes:["n","n","n","n","n","n","n","n","n","n","d","n","n","c","d"],
+    waves:[
+      {type:"small",label:"小关1",desc:"5普通 + 1爆炸兵 — 爆炸兵会绕开熔岩，通过侧道抵达城堡。"},
+      {type:"small",label:"小关2",desc:"4普通 + 2重甲 + 2爆炸兵 — 需要覆盖上方和侧翼两条出兵线。"},
+      {type:"elite",label:"精英关",desc:"6普通 + 2重甲 + 2爆炸兵 · Boss：熔岩巨人（地裂重组）"},
+      {type:"boss",label:"Boss关",desc:"高速突袭波次 · Boss：火焰恶魔（灼焰冲锋）"}
+    ],
+    tip:"地裂重组是本关最大威胁，需要设计在被强制重组后仍能保持输出的备用格子逻辑。冰霜附魔在此关可以减缓地裂后混乱期的敌人推进。"
+  },
+  {
+    n:5, emoji:"🏜", name:"沙漠废墟", terrain:"流沙·废墟遗迹",
+    color:"#c8a040",
+    terrainEffect:{
+      name:"流沙减速",
+      desc:"废墟中央有流沙区：放置在流沙格子上的武器CD+25%（武器更慢），但骑士踩过时速度减慢15%，给武器更长的触发时间窗口（实际伤害不变）。"
+    },
+    gridDesc:"中央2格为流沙（武器CD加重但触发窗口延长）。敌人三路出兵（左/右/正面），首次出现三路压制。",
+    cellTypes:["n","n","n","n","e","n","s","s","n","e","n","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"4普通 + 1精英远程 + 1治愈者 — 三路出兵首次出现，治愈者在第三路保护其他敌人。"},
+      {type:"small",label:"小关2",desc:"6普通 + 2重甲 + 1精英远程 + 2爆炸兵 — 混合多类型三路推进。"},
+      {type:"elite",label:"精英关",desc:"复合波次 · Boss：沙漠死灵（亡灵复苏）"},
+      {type:"boss",label:"Boss关",desc:"地下+地面双线进攻 · Boss：沙漠巨虫（地下穿越）"}
+    ],
+    tip:"三路出兵需要路径尽量覆盖宽度（十字形或环形），流沙格子的触发窗口延长可以弥补CD加重的缺陷，法杖在此关价值极高。"
+  },
+  {
+    n:6, emoji:"⚡", name:"雷暴高地", terrain:"暴风雷电高原",
+    color:"#9070d0",
+    terrainEffect:{
+      name:"随机落雷",
+      desc:"每20秒，随机一个有武器的格子遭到落雷：武器临时失效3秒，但触发一次雷电伤害（对格子周围所有敌人造成8点伤害，附带1秒麻痹）。落雷是随机事件，可能帮助也可能阻碍。"
+    },
+    gridDesc:"标准可放置区域，但左右两侧各有一格为雷击高发区（落雷概率×3）。",
+    cellTypes:["h","n","n","n","h","n","n","n","n","n","n","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"5普通 + 2精英远程 — 精英远程躲在落雷高发区边缘使用射程优势。"},
+      {type:"small",label:"小关2",desc:"4普通 + 2重甲 + 1治愈者 + 1精英远程 — 治愈者首次配合重甲+精英协同作战。"},
+      {type:"elite",label:"精英关",desc:"高压波次 · Boss：雷霆武士（避雷护体）"},
+      {type:"boss",label:"Boss关",desc:"空中+地面混合 · Boss：风暴鹰王（掠夺横扫）"}
+    ],
+    tip:"落雷是双刃剑——把雷击高发区空出来（不放武器）可以让落雷专门打击敌人而非中断自己武器。近战武器在雷霆武士关至关重要。"
+  },
+  {
+    n:7, emoji:"🌊", name:"深海遗迹", terrain:"水下遗迹·潮汐涌动",
+    color:"#56aed0",
+    terrainEffect:{
+      name:"潮汐涌动",
+      desc:"每30秒涌来一波潮汐：骑士路径中随机2个格子被水流短暂淹没（1.5秒），骑士经过时武器不触发（相当于空格）。潮汐前会有1秒水声预警。"
+    },
+    gridDesc:"标准区域，但上方一行格子位于水流主道，潮汐时被淹没概率更高。",
+    cellTypes:["w","w","w","w","w","n","n","n","n","n","n","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"6普通 + 1重甲 + 1爆炸兵 — 潮汐规律会被大量敌人利用，在淹没瞬间加速涌入。"},
+      {type:"small",label:"小关2",desc:"5普通 + 2精英远程 + 2治愈者 — 治愈者组队护送，双治愈者需优先清除。"},
+      {type:"elite",label:"精英关",desc:"深海复合波次 · Boss：深海祭司（潮汐反转）"},
+      {type:"boss",label:"Boss关",desc:"巨浪预兆波次 · Boss：深海巨兽（巨浪清扫）"}
+    ],
+    tip:"避免把所有主力格子放在上方水流主道——潮汐会集中淹没那一排。将主力格子分布在中下方，上方留作辅助或备用格。"
+  },
+  {
+    n:8, emoji:"☁", name:"天空要塞", terrain:"浮空平台·疾风地形",
+    color:"#c04848",
+    terrainEffect:{
+      name:"疾风气流",
+      desc:"战场受强风影响：远程武器和法系武器有20%概率被风偏转而偏移目标（命中同排旁侧敌人而非预定目标）。近战武器不受影响。同时骑士移速因顺风/逆风随机±15%波动。"
+    },
+    gridDesc:"战场平台为浮空悬台，左侧2格为悬崖边缘（高风险区，疾风概率×2）。敌人四路涌来（最终关）。",
+    cellTypes:["v","n","n","n","v","n","n","n","n","n","n","n","n","c","n"],
+    waves:[
+      {type:"small",label:"小关1",desc:"8普通 + 2重甲 + 1精英远程 — 四路并发出兵，格子覆盖面最广。"},
+      {type:"small",label:"小关2",desc:"6普通 + 3重甲 + 2精英远程 + 1爆炸兵 + 1治愈者 — 最强配置，考验全面构筑。"},
+      {type:"elite",label:"精英关",desc:"终极压制波次 · Boss：天空执政官（规则扭曲）"},
+      {type:"boss",label:"Boss关",desc:"最终决战 · Boss：永恒守护者（镜像反制）"}
+    ],
+    tip:"疾风偏转惩罚单一依赖远程/法系的构筑——最终关要求武器多元化。永恒守护者的镜像反制使得任何单一高伤武器都会被反弹回来，需要均衡分布输出来打破其护甲。"
+  },
+];
+
+const CELL_COLORS = {
+  n:"t-normal",b:"t-blocked",s:"t-special",d:"t-blocked",
+  e:"t-enemy",h:"t-special",w:"t-special",v:"t-special",c:"t-castle"
+};
+const CELL_EMOJI = {b:"🌲",d:"🌋",e:"⚔",h:"⚡",w:"🌊",v:"💨",c:"🏰"};
+
+function buildNav(){
+  const nav=document.getElementById('act-nav');
+  ACTS.forEach((a,i)=>{
+    const d=document.createElement('div');
+    d.className='act-pip'+(i===0?' active':'');
+    d.innerHTML=`<span class="pip-emoji">${a.emoji}</span><span class="pip-num">ACT ${a.n}</span><span class="pip-name">${a.name}</span>`;
+    d.addEventListener('click',()=>{
+      document.querySelectorAll('.act-pip').forEach(x=>x.classList.remove('active'));
+      d.classList.add('active');
+      document.querySelectorAll('.act-card').forEach(x=>x.classList.remove('active'));
+      document.getElementById('act-'+a.n).classList.add('active');
+    });
+    nav.appendChild(d);
+  });
+}
+
+function buildActs(){
+  const con=document.getElementById('act-container');
+  ACTS.forEach((a,i)=>{
+    const waveRows=a.waves.map(w=>`
+      <div class="wave-row">
+        <span class="wave-badge w-${w.type}">${w.label}</span>
+        <span class="wave-desc">${w.desc}</span>
+      </div>`).join('');
+
+    const cellsHtml=a.cellTypes.map(c=>{
+      const cls=CELL_COLORS[c]||'t-normal';
+      const em=CELL_EMOJI[c]||'';
+      return `<div class="t-cell ${cls}">${em}</div>`;
+    }).join('');
+
+    const legendItems={};
+    a.cellTypes.forEach(c=>{if(c!=='n')legendItems[c]=1;});
+    const legendMap={b:'树木（不可用）',s:'特殊地形',d:'熔岩（不可用）',e:'敌兵出口',h:'雷击高发区',w:'水流主道',v:'悬崖边缘（高风险）',c:'城堡'};
+    const legendHtml=Object.keys(legendItems).map(c=>`
+      <div class="legend-item"><div class="legend-dot ${CELL_COLORS[c]}"></div>${legendMap[c]||c}</div>`).join('')+
+      `<div class="legend-item"><div class="legend-dot t-normal"></div>普通格子槽位</div>`;
+
+    con.innerHTML+=`
+    <div class="act-card ${i===0?'active':''}" id="act-${a.n}" style="--act-col:${a.color}">
+      <div class="act-left">
+        <div class="panel act-hero">
+          <div class="panel-head">
+            <span class="act-num-big">ACT ${a.n}</span>
+            <span class="act-name-big">${a.emoji} ${a.name}</span>
+          </div>
+          <div class="panel-body">
+            <div class="act-terrain-label" style="margin-bottom:10px;">🗺 ${a.terrain}</div>
+            <div class="terrain-preview">${cellsHtml}</div>
+            <div class="grid-legend">${legendHtml}</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-icon">🌿</span><span class="panel-label">地形特效</span></div>
+          <div class="panel-body">
+            <div class="effect-box">
+              <div class="effect-name">${a.terrainEffect.name}</div>
+              ${a.terrainEffect.desc}
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-icon">💡</span><span class="panel-label">攻略提示</span></div>
+          <div class="panel-body"><div class="tip-box">${a.tip}</div></div>
+        </div>
+      </div>
+      <div class="act-right">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-icon">⚔</span><span class="panel-label">波次设计</span></div>
+          <div class="panel-body"><div class="wave-list">${waveRows}</div></div>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+buildNav();buildActs();
+</script>
