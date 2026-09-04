@@ -179,7 +179,7 @@ const W=800,H=520,CELL=86,KSPD_BASE=82;
 const RUNES={
   arrow:    {id:'arrow',    name:'猎弓', sym:'🏹', col:'#c8a040', cd:1.5, cost:12},
   blade:    {id:'blade',    name:'铁剑', sym:'⚔', col:'#c04848', cd:0.9, cost:15},
-  frost:    {id:'frost',   name:'冰霜法杖', sym:'❄', col:'#56aed0', cd:2.5, cost:18},
+  shield:   {id:'shield',  name:'骑士盾', sym:'🛡', col:'#52a870', cd:2.0, cost:18},
   bomb:     {id:'bomb',    name:'火焰法杖', sym:'🪄', col:'#e06030', cd:5.0, cost:20},
   moonblade:{id:'moonblade',name:'钢矛', sym:'🗡', col:'#9070d0', cd:2.0, cost:16},
 };
@@ -188,7 +188,7 @@ const RUNES={
 const RUNE_DESCS={
   arrow:    ['1枚箭 3伤','2枚箭 4伤','3枚穿透箭 6伤'],
   blade:    ['召唤战士 HP20 ATK5','召唤精英 HP40 ATK8','召唤双战士 HP30 ATK7'],
-  frost:    ['减速70% 2.5秒','减速80% 4秒','冻结1.5秒+减速3秒'],
+  shield:   ['护盾·格挡1次','护盾·脉冲击退周围敌人','护盾×2·大范围击退'],
   bomb:     ['范围爆炸12伤','双重爆炸12伤','超级爆22伤+灼烧区'],
   moonblade:['穿透弹射2次','弹射4次+逐跳增伤','双矛各穿透3次'],
 };
@@ -235,9 +235,9 @@ const AFFIXES={
     {id:'iron',    name:'铁甲', desc:'战士受到伤害-40%'},
     {id:'berserker',name:'狂战',desc:'战士每击杀获得移速+15%（最多3层）'},
   ],
-  frost:[
-    {id:'permafrost',name:'永寒', desc:'减速/冻结持续时间×2'},
-    {id:'shatter',   name:'碎冰', desc:'触发时对全场敌人造成12点伤害'},
+  shield:[
+    {id:'reflect', name:'反弹', desc:'格挡时对攻击者造成10点反伤'},
+    {id:'fortress',name:'堡垒', desc:'护盾期间界碑受到的伤害-50%'},
   ],
   bomb:[
     {id:'chain',  name:'连锁', desc:'爆炸命中敌人后触发小型二次爆炸(6伤)'},
@@ -486,21 +486,20 @@ function fireRune(ci,rune){
       }
     }
 
-  }else if(rune.id==='frost'){
-    const slowFactor=lv>=2?0.2:0.3;
-    const durMul=rune.affix?.id==='permafrost'?2:1;
-    const slowDur=(lv>=2?4:2.5)*durMul;
-    enemies.forEach(e=>{
-      e.slowed=lv>=3?4.5*durMul:slowDur;
-      e.slowFactor=slowFactor;
-      if(lv>=3)e.frozenUntil=t+1.5*durMul;
-    });
-    if(rune.affix?.id==='shatter'){
-      const shatterDmg=Math.round(12*dmgMul);
-      enemies.forEach(e=>dealDmg(e,shatterDmg));
-      glows.push({x:corePos().x,y:corePos().y,r:180,col:'#c0e8ff',t:0,mt:.5});
+  }else if(rune.id==='shield'){
+    const cp2=corePos();
+    shld=lv>=3?2:1;shldT=t+(lv===3?5:lv===2?3.5:2.5);
+    // Pulse knockback (Lv2+)
+    if(lv>=2){
+      const kbr=lv===3?140:100;
+      enemies.forEach(e=>{
+        const dx=e.x-cp2.x,dy=e.y-cp2.y,d=Math.hypot(dx,dy);
+        if(d<kbr&&d>1){e.x+=dx/d*(lv===3?50:30);e.y+=dy/d*(lv===3?50:30);}
+      });
+      glows.push({x:cp2.x,y:cp2.y,r:kbr,col:rune.col,t:0,mt:.5});
     }
-    glows.push({x:corePos().x,y:corePos().y,r:140,col:rune.col,t:0,mt:.7});
+    nums.push({x:cp2.x,y:cp2.y-28,v:lv>=3?'🛡🛡护盾!':'🛡护盾!',col:rune.col,t:0,mt:1.3});
+    glows.push({x:cp2.x,y:cp2.y,r:55,col:rune.col,t:0,mt:.7});
 
   }else if(rune.id==='bomb'){
     const leaveSlow=combo?.name==='寒爆'||combo?.name==='★永冻域';
@@ -682,6 +681,9 @@ function update(dt){
     }
   }
 
+  // shield expiry
+  if(shld&&t>shldT){shld=0;shldT=0;}
+
   // spawn queue
   if(spawnQ.length>0){spawnT-=dt;if(spawnT<=0){spawnE(spawnQ.pop());spawnT=.55+Math.random()*.7;}}
 
@@ -731,8 +733,11 @@ function update(dt){
       const spd=180,ang=Math.atan2(dy,dx);
       eProj.push({x:e.x,y:e.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,d:e.atk});
     }else{
-      if(shld){shld=false;shldT=0;
-        nums.push({x:cp.x,y:cp.y-30,v:'格挡!',col:'#52a870',t:0,mt:1.2});
+      if(shld){
+        const rem=Math.max(0,shld-1);shld=rem;if(!shld)shldT=0;
+        const reflCell=grid.find(c=>c.rune?.id==='shield'&&c.rune?.affix?.id==='reflect');
+        if(reflCell){dealDmg(e,Math.round(10*dmgMul));glows.push({x:e.x,y:e.y,r:14,col:'#52a870',t:0,mt:.3});}
+        nums.push({x:cp.x,y:cp.y-30,v:rem?`🛡格挡!(×${rem})`:'🛡格挡!',col:'#52a870',t:0,mt:1.2});
         glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,mt:.5});
       }else{
         coreHP=Math.max(0,coreHP-e.atk);
@@ -747,8 +752,8 @@ function update(dt){
     p.x+=p.vx*dt;p.y+=p.vy*dt;
     if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20)return false;
     if(Math.hypot(p.x-cp.x,p.y-cp.y)<12){
-      if(shld){shld=false;shldT=0;
-        nums.push({x:cp.x,y:cp.y-30,v:'格挡!',col:'#52a870',t:0,mt:1.2});
+      if(shld){const rem=Math.max(0,shld-1);shld=rem;if(!shld)shldT=0;
+        nums.push({x:cp.x,y:cp.y-30,v:rem?`🛡格挡!(×${rem})`:'🛡格挡!',col:'#52a870',t:0,mt:1.2});
         glows.push({x:cp.x,y:cp.y,r:40,col:'#52a870',t:0,mt:.5});
       }else{
         coreHP=Math.max(0,coreHP-p.d);
@@ -1461,14 +1466,14 @@ function reset(){
   ['shop','relic','prep'].forEach(id=>document.getElementById(id).classList.add('hidden'));
   stopBoss();
   enemies=[];warriors=[];proj=[];eProj=[];coins=[];glows=[];nums=[];exps=[];slowZones=[];
-  selHand=-1;shld=false;shldT=0;
+  selHand=-1;shld=0;shldT=0;
   waveIdx=0;gold=20;maxHP=100;coreHP=100;kills=0;t=0;cleared=false;
   ownedRelics=[];extraProj=0;kSpdMul=1;dmgMul=1;
   knight.lv=1;knight.xp=0;
   shopRefreshCost=1;
   lastFiredId=null;prevFiredId=null;lastFiredT=-99;lastArrowTarget=null;
   renderRelicBar();
-  hand=[{...RUNES.arrow,lv:1,kind:'weapon'},{...RUNES.frost,lv:1,kind:'weapon'}];
+  hand=[{...RUNES.arrow,lv:1,kind:'weapon'},{...RUNES.shield,lv:1,kind:'weapon'}];
   initGrid();enterPrep();
 }
 
