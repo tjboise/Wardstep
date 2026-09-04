@@ -96,7 +96,7 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 <body>
 <div style="text-align:center">
   <h1 class="logo">WARDSTEP</h1>
-  <div class="subtitle">第一关 · 幽暗森林边境</div>
+  <div class="subtitle">第一关 · 古城外墙 · Act 1</div>
 </div>
 
 <div id="wrap">
@@ -107,12 +107,11 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 
   <!-- START -->
   <div class="overlay" id="ov-start">
-    <div class="ov-title">守卫核心</div>
-    <div class="ov-sub">怪物从四面涌来，守住格子中心的核心。小人自动巡逻踩格触发符文。</div>
+    <div class="ov-title">守卫界碑</div>
+    <div class="ov-sub">界碑随机传送至此，裂开的传送门涌出各路敌人，目标只有一个——摧毁界碑。骑士在落地后迅速布置格子，沿巡逻路线踩格触发武器，击退来袭之敌。</div>
     <div class="ov-info">
-      符文可升级 Lv1→Lv2→Lv3（商店买同类自动合成）<br>
-      连续触发不同符文可触发连携：冻射 · 寒爆 · 冰碎 · 血印 · 追踪 · 引爆 · 共振<br>
-      三连携：★绝对零度 · ★同归于尽 · ★永冻域<br>
+      武器可升级 Lv1→Lv2→Lv3（商店购买同类自动合成）<br>
+      格子可独立附魔（冰霜·火焰·雷电·毒素·强化），叠加武器效果<br>
       小关×2 → 精英关（三选一遗物）→ Boss关
     </div>
     <button class="btn" id="btn-start">开始游戏</button>
@@ -143,7 +142,7 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
   <div id="prep" class="hidden">
     <div class="prep-top">
       <span class="prep-lbl" id="prep-lbl">第 1 关 · 小关 1 · 准备布局</span>
-      <span class="prep-hint">点手牌选中 → 再点格子放置；点格子取回符文</span>
+      <span class="prep-hint">点手牌选中 → 再点格子放置；点格子取回武器</span>
     </div>
     <div class="hand-row" id="hand-cards"></div>
     <button class="btn btn-sm" id="btn-go">开始本波 →</button>
@@ -158,7 +157,7 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 
   <!-- GAMEOVER -->
   <div class="overlay hidden" id="ov-over">
-    <div class="ov-title" style="color:#c04848">核心已陷落</div>
+    <div class="ov-title" style="color:#c04848">界碑已陷落</div>
     <div class="ov-stat" id="over-stat"></div>
     <button class="btn btn-danger" id="btn-retry">再试一次</button>
   </div>
@@ -167,7 +166,7 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
   <div class="overlay hidden" id="ov-win">
     <div class="ov-title">第一关通关！</div>
     <div class="ov-stat" id="win-stat"></div>
-    <div class="ov-sub">Boss 已击败。完整游戏将有 8 大关，每关三级难度。</div>
+    <div class="ov-sub">Boss 已击败，界碑完成传送。完整游戏将有 8 大关，穿越森林、雪原、熔岩直至天空要塞。</div>
     <button class="btn" id="btn-again">再玩一次</button>
   </div>
 </div>
@@ -176,13 +175,13 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
 'use strict';
 const W=800,H=520,CELL=86,KSPD_BASE=82;
 
-// ── RUNE DATABASE ──
+// ── WEAPON DATABASE ──
 const RUNES={
-  arrow:    {id:'arrow',    name:'箭矢', sym:'⟶', col:'#c8a040', cd:1.5, cost:12},
-  blade:    {id:'blade',    name:'战刀', sym:'⚔', col:'#c04848', cd:0.9, cost:15},
-  frost:    {id:'frost',   name:'冰冻', sym:'❄', col:'#56aed0', cd:2.5, cost:18},
-  bomb:     {id:'bomb',    name:'炮弹', sym:'◉', col:'#e06030', cd:5.0, cost:20},
-  moonblade:{id:'moonblade',name:'月刃', sym:'☽', col:'#9070d0', cd:2.0, cost:16},
+  arrow:    {id:'arrow',    name:'猎弓', sym:'🏹', col:'#c8a040', cd:1.5, cost:12},
+  blade:    {id:'blade',    name:'铁剑', sym:'⚔', col:'#c04848', cd:0.9, cost:15},
+  frost:    {id:'frost',   name:'冰霜法杖', sym:'❄', col:'#56aed0', cd:2.5, cost:18},
+  bomb:     {id:'bomb',    name:'火焰法杖', sym:'🪄', col:'#e06030', cd:5.0, cost:20},
+  moonblade:{id:'moonblade',name:'钢矛', sym:'🗡', col:'#9070d0', cd:2.0, cost:16},
 };
 
 // Level descriptions [lv1, lv2, lv3]
@@ -190,8 +189,8 @@ const RUNE_DESCS={
   arrow:    ['1枚箭 3伤','2枚箭 4伤','3枚穿透箭 6伤'],
   blade:    ['召唤战士 HP20 ATK5','召唤精英 HP40 ATK8','召唤双战士 HP30 ATK7'],
   frost:    ['减速70% 2.5秒','减速80% 4秒','冻结1.5秒+减速3秒'],
-  bomb:     ['爆炸12伤 r110','双重爆炸12伤','超级爆22伤 r150+火区'],
-  moonblade:['弹射2次','弹射4次+逐跳增伤','双刃各弹射3次'],
+  bomb:     ['范围爆炸12伤','双重爆炸12伤','超级爆22伤+灼烧区'],
+  moonblade:['穿透弹射2次','弹射4次+逐跳增伤','双矛各穿透3次'],
 };
 
 // ── COMBOS ──
@@ -212,8 +211,8 @@ const CHAINS3={
 
 // ── RELICS ──
 const ALL_RELICS=[
-  {id:'extraproj', name:'投掷物+1', sym:'↟', col:'#c8a040', desc:'箭矢和月刃额外多发一枚'},
-  {id:'speed',     name:'迅捷祝福', sym:'≋', col:'#d4a843', desc:'小人移速永久 +50%'},
+  {id:'extraproj', name:'投掷物+1', sym:'↟', col:'#c8a040', desc:'猎弓和钢矛额外多发一枚'},
+  {id:'speed',     name:'迅捷祝福', sym:'≋', col:'#d4a843', desc:'骑士移速永久 +50%'},
   {id:'dmg',       name:'力量祝福', sym:'⊕', col:'#c04848', desc:'所有伤害 +50%'},
 ];
 
@@ -849,10 +848,10 @@ function openRoute(waveType){
   const healAmt=Math.round(maxHP*.2);
   const opts=waveType==='elite'
     ?[{id:'relic',label:'遗物',desc:'选择一件遗物',col:'#9070d0'},
-      {id:'shop', label:'商店',desc:'购买或出售符文',col:'#c8a040'},
-      {id:'rest', label:'休息',desc:`恢复 ${healAmt} 点核心血量`,col:'#52a870'}]
-    :[{id:'shop',label:'商店',desc:'购买或出售符文',col:'#c8a040'},
-      {id:'rest',label:'休息',desc:`恢复 ${healAmt} 点核心血量`,col:'#52a870'}];
+      {id:'shop', label:'商店',desc:'购买或出售武器',col:'#c8a040'},
+      {id:'rest', label:'休息',desc:`恢复 ${healAmt} 点界碑耐久`,col:'#52a870'}]
+    :[{id:'shop',label:'商店',desc:'购买或出售武器',col:'#c8a040'},
+      {id:'rest',label:'休息',desc:`恢复 ${healAmt} 点界碑耐久`,col:'#52a870'}];
   opts.forEach(opt=>{
     const div=document.createElement('div');div.className='sc';
     div.style.setProperty('--col',opt.col);div.style.cursor='pointer';
@@ -861,7 +860,7 @@ function openRoute(waveType){
       document.getElementById('ov-route').classList.add('hidden');
       if(opt.id==='rest'){
         coreHP=Math.min(maxHP,coreHP+healAmt);
-        nums.push({x:W/2,y:H/2-20,v:`核心 +${healAmt} HP`,col:'#52a870',t:0,mt:1.8,big:true});
+        nums.push({x:W/2,y:H/2-20,v:`界碑 +${healAmt}`,col:'#52a870',t:0,mt:1.8,big:true});
         glows.push({x:W/2,y:H/2,r:80,col:'#52a870',t:0,mt:.8});
         waveIdx++;enterPrep();
       }else if(opt.id==='shop'){openShop();}
@@ -1001,7 +1000,7 @@ function drawCore(){
   const hf=coreHP/maxHP;
   ctx.fillStyle=hf>.5?'#52a870':hf>.25?'#d4a843':'#c04848';ctx.fillRect(bx,by,bw*hf,5);
   ctx.font='9px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='top';
-  ctx.fillStyle='#3a4860';ctx.fillText(`核心 ${coreHP}/${maxHP}`,cp.x,by+7);
+  ctx.fillStyle='#3a4860';ctx.fillText(`界碑 ${coreHP}/${maxHP}`,cp.x,by+7);
 }
 
 function drawKnight(){
@@ -1256,7 +1255,7 @@ function mkShop(){
       const mergeTag=hasLv1?(hasLv2?'→ Lv3合成':'→ Lv2合成'):'';
       const affixHint=hasLv1&&hasLv2?'<div class="affix-badge">★ 词缀解锁</div>':'';
       const desc=RUNE_DESCS[r.id]?.[0]||'';
-      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div>${affixHint}<span class="sc-tag tag-r">Lv1 符文</span>`;
+      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div>${affixHint}<span class="sc-tag tag-r">Lv1 武器</span>`;
       card.addEventListener('click',()=>buyRune(r));
     }
     con.appendChild(card);
