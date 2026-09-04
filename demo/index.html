@@ -142,7 +142,7 @@ canvas{display:block;width:100%;background:#182038;border:1px solid #253050;}
   <div id="prep" class="hidden">
     <div class="prep-top">
       <span class="prep-lbl" id="prep-lbl">第 1 关 · 小关 1 · 准备布局</span>
-      <span class="prep-hint">点手牌选中 → 再点格子放置；点格子取回武器</span>
+      <span class="prep-hint">选武器→点格子放置；选附魔→点格子叠加在武器上；点格子取回</span>
     </div>
     <div class="hand-row" id="hand-cards"></div>
     <button class="btn btn-sm" id="btn-go">开始本波 →</button>
@@ -191,6 +191,15 @@ const RUNE_DESCS={
   frost:    ['减速70% 2.5秒','减速80% 4秒','冻结1.5秒+减速3秒'],
   bomb:     ['范围爆炸12伤','双重爆炸12伤','超级爆22伤+灼烧区'],
   moonblade:['穿透弹射2次','弹射4次+逐跳增伤','双矛各穿透3次'],
+};
+
+// ── ENCHANT DATABASE ──
+const ENCHANTS={
+  fire:   {id:'fire',   kind:'enchant', name:'火焰', sym:'🔥', col:'#e06030', cost:14, desc:'灼烧区·3伤/s·2s'},
+  frostE: {id:'frostE', kind:'enchant', name:'冰霜', sym:'🧊', col:'#56aed0', cost:14, desc:'减速40%·2s·范围80'},
+  thunder:{id:'thunder',kind:'enchant', name:'雷电', sym:'⚡', col:'#d4d040', cost:16, desc:'50%概率弹射闪电'},
+  poison: {id:'poison', kind:'enchant', name:'毒素', sym:'☠', col:'#52a870', cost:14, desc:'1.5%maxHP/s·3s'},
+  power:  {id:'power',  kind:'enchant', name:'强化', sym:'✦', col:'#b090f0', cost:12, desc:'武器伤害+25%'},
 };
 
 // ── COMBOS ──
@@ -317,7 +326,7 @@ function initGrid(){
   grid=[];
   for(let r=0;r<3;r++)for(let c=0;c<3;c++){
     if(r===1&&c===1)continue; // center reserved for core
-    grid.push({row:r,col:c,rune:null});
+    grid.push({row:r,col:c,rune:null,enchant:null});
   }
   lf=grid.map(()=>-99);
   bladeCharge=grid.map(()=>0);
@@ -335,7 +344,8 @@ function mkEnemy(g){
   return{hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,
          slowed:0,slowFactor:.3,frozenUntil:0,
          sh:g.type==='a'?1:g.type==='e'?2:0,
-         atk,atkCd,atkT:0,ranged,healer,stopRange:healer?9999:ranged?170:22};
+         atk,atkCd,atkT:0,ranged,healer,stopRange:healer?9999:ranged?170:22,
+         poisonUntil:0,poisonDps:0};
 }
 function mkQ(wc){
   const q=[];
@@ -398,6 +408,8 @@ function updateComboState(id){prevFiredId=lastFiredId;lastFiredId=id;lastFiredT=
 function fireRune(ci,rune){
   const lv=rune.lv||1;
   const cell=grid[ci],p=cp2(cell.row,cell.col);
+  const enchant=cell.enchant||null;
+  const enchDmgMul=enchant?.id==='power'?1.25:1;
 
   // Blade is 2-step: combo check only on step 2
   if(rune.id==='blade'){
@@ -423,6 +435,7 @@ function fireRune(ci,rune){
         spawnWarrior(lastArrowTarget.x,lastArrowTarget.y,1,null);
       }
       updateComboState(rune.id);
+      applyEnchantEffect(ci,enchant);
     }
     return;
   }
@@ -434,7 +447,7 @@ function fireRune(ci,rune){
   if(rune.id==='arrow'){
     let shots=lv===3?3:lv===2?2:1;
     shots+=extraProj;
-    const dmg=Math.round((lv===3?6:lv===2?4:3)*dmgMul);
+    const dmg=Math.round((lv===3?6:lv===2?4:3)*dmgMul*enchDmgMul);
     const pierce=lv>=3;
     const isFrozenShot=combo?.name==='冻射'||combo?.name==='★绝对零度';
 
@@ -506,7 +519,7 @@ function fireRune(ci,rune){
         if(state!=='wave')return;
         exps.push({x:tx,y:ty,r:0,mr:br,t:0,mt:.55,col:rune.col});
         const hit=[];
-        enemies.forEach(e=>{if(Math.hypot(e.x-tx,e.y-ty)<br){dealDmg(e,Math.round(dmgAmt*dmgMul));hit.push(e);}});
+        enemies.forEach(e=>{if(Math.hypot(e.x-tx,e.y-ty)<br){dealDmg(e,Math.round(dmgAmt*dmgMul*enchDmgMul));hit.push(e);}});
         if(leaveSlow)slowZones.push({x:tx,y:ty,r:br*.65,t:0,mt:3,fire:false});
         if(lv>=3)slowZones.push({x:tx,y:ty,r:60,t:0,mt:fireMt,fire:true,dmgScale:fireDmgScale});
         // Chain affix: mini-explosion on each hit enemy
@@ -575,7 +588,47 @@ function fireRune(ci,rune){
     }
   }
 
+  applyEnchantEffect(ci,enchant);
   updateComboState(rune.id);
+}
+
+// ── ENCHANT EFFECTS ──
+function applyEnchantEffect(ci, enchant){
+  if(!enchant)return;
+  const cell=grid[ci],p=cp2(cell.row,cell.col);
+  const R=85;
+  if(enchant.id==='fire'){
+    slowZones.push({x:p.x,y:p.y,r:55,t:0,mt:2,fire:true,dmgScale:.5});
+    glows.push({x:p.x,y:p.y,r:42,col:'#e06030',t:0,mt:.5});
+  }else if(enchant.id==='frostE'){
+    enemies.forEach(e=>{
+      if(Math.hypot(e.x-p.x,e.y-p.y)<R){
+        e.slowed=Math.max(e.slowed,2);
+        e.slowFactor=Math.min((e.slowFactor||.3),.38);
+      }
+    });
+    glows.push({x:p.x,y:p.y,r:R*.7,col:'#56aed0',t:0,mt:.55});
+  }else if(enchant.id==='thunder'){
+    if(Math.random()<.5){
+      let nn=null,nd=9999;
+      enemies.forEach(e=>{const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<nd){nd=d;nn=e;}});
+      if(nn){
+        const a=Math.atan2(nn.y-p.y,nn.x-p.x);
+        proj.push({x:p.x,y:p.y,vx:Math.cos(a)*340,vy:Math.sin(a)*340,d:Math.round(5*dmgMul),col:'#d4d040',bounces:1,hitSet:new Set(),pierce:false});
+        glows.push({x:p.x,y:p.y,r:32,col:'#d4d040',t:0,mt:.35});
+      }
+    }
+  }else if(enchant.id==='poison'){
+    enemies.forEach(e=>{
+      if(Math.hypot(e.x-p.x,e.y-p.y)<R){
+        e.poisonUntil=t+3;
+        e.poisonDps=e.maxHp*.015;
+      }
+    });
+    glows.push({x:p.x,y:p.y,r:R*.6,col:'#52a870',t:0,mt:.45});
+  }
+  // power is handled inline in fireRune via enchDmgMul
+  nums.push({x:p.x-18,y:p.y-28,v:enchant.sym,col:enchant.col,t:0,mt:.75});
 }
 
 // ── RELICS ──
@@ -653,6 +706,10 @@ function update(dt){
       if(d>e.stopRange){e.x+=(dx/d)*s*dt;e.y+=(dy/d)*s*dt;}
     }
     if(e.slowed>0)e.slowed-=dt;
+    if(e.poisonUntil>t){
+      e.hp-=e.poisonDps*dt;
+      if(Math.random()<.04)glows.push({x:e.x,y:e.y,r:8,col:'#52a870',t:0,mt:.25});
+    }
   });
 
   // enemy attacks (core or heal allies)
@@ -978,6 +1035,16 @@ function drawGrid(){
       ctx.font='10px Noto Serif SC,serif';ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillStyle=state==='prep'?'#3a4868':'#253050';ctx.fillText('空',p.x,p.y);
     }
+    // Enchant badge (bottom-right corner)
+    if(cell.enchant){
+      ctx.font='bold 15px serif';ctx.textAlign='right';ctx.textBaseline='bottom';
+      ctx.globalAlpha=.88;
+      ctx.fillText(cell.enchant.sym,p.x+hs-4,p.y+hs-4);
+      ctx.globalAlpha=1;
+    }else if(state==='prep'){
+      ctx.font='9px Noto Serif SC,serif';ctx.textAlign='right';ctx.textBaseline='bottom';
+      ctx.fillStyle='#2a3450';ctx.fillText('附',p.x+hs-4,p.y+hs-4);
+    }
   });
 
   if(state==='prep'&&selHand>=0&&hand[selHand]){
@@ -1183,7 +1250,10 @@ function renderHand(){
     const card=document.createElement('div');
     card.className='hc'+(i===selHand?' sel':'');
     card.style.setProperty('--col',rune.col);
-    card.innerHTML=`<span class="hc-sym">${rune.sym}</span>${lv>1?`<div class="hc-lv" style="color:${rune.col}">Lv${lv}</div>`:''}<div class="hc-name">${rune.name}</div>`;
+    const isEnchant=rune.kind==='enchant';
+    const lvTag=lv>1?`<div class="hc-lv" style="color:${rune.col}">Lv${lv}</div>`:'';
+    const encTag=isEnchant?`<div class="hc-lv" style="color:${rune.col}">附魔</div>`:'';
+    card.innerHTML=`<span class="hc-sym">${rune.sym}</span>${lvTag||encTag}<div class="hc-name">${rune.name}</div>`;
     card.addEventListener('click',()=>{selHand=selHand===i?-1:i;renderHand();});
     con.appendChild(card);
   });
@@ -1196,13 +1266,25 @@ cv.addEventListener('click',e=>{
   if(ci===-1)return;
   const cell=grid[ci];
   if(selHand>=0){
-    const toPlace=hand[selHand],displaced=cell.rune?{...cell.rune}:null;
-    cell.rune={...toPlace};lf[ci]=-99;bladeCharge[ci]=0;
-    hand.splice(selHand,1);if(displaced)hand.push(displaced);
+    const toPlace=hand[selHand];
+    if(toPlace.kind==='enchant'){
+      const displaced=cell.enchant?{...cell.enchant}:null;
+      cell.enchant={...toPlace};
+      hand.splice(selHand,1);if(displaced)hand.push(displaced);
+    }else{
+      const displaced=cell.rune?{...cell.rune}:null;
+      cell.rune={...toPlace};lf[ci]=-99;bladeCharge[ci]=0;
+      hand.splice(selHand,1);if(displaced)hand.push(displaced);
+    }
     selHand=-1;renderHand();
-  }else if(cell.rune){
-    hand.push({...cell.rune});cell.rune=null;bladeCharge[ci]=0;
-    selHand=hand.length-1;renderHand();
+  }else{
+    if(cell.rune){
+      hand.push({...cell.rune,kind:'weapon'});cell.rune=null;bladeCharge[ci]=0;
+      selHand=hand.length-1;renderHand();
+    }else if(cell.enchant){
+      hand.push({...cell.enchant});cell.enchant=null;
+      selHand=hand.length-1;renderHand();
+    }
   }
 });
 
@@ -1237,27 +1319,40 @@ function mkShop(){
   document.getElementById('shop-gold').textContent=`💰 金币：${gold}`;
   document.getElementById('shop-refresh').textContent=`🔄 刷新 (${shopRefreshCost}💰)`;
   const con=document.getElementById('shop-cards');con.innerHTML='';
-  const pool=Object.values(RUNES),picks=[],used=new Set();
-  while(picks.length<3&&picks.length<pool.length){
-    const i=Math.floor(Math.random()*pool.length);
-    if(!used.has(pool[i].id)){picks.push(pool[i]);used.add(pool[i].id);}
+  // Pick 2 random weapons
+  const wPool=Object.values(RUNES),wPicks=[],wUsed=new Set();
+  while(wPicks.length<2&&wPicks.length<wPool.length){
+    const i=Math.floor(Math.random()*wPool.length);
+    if(!wUsed.has(wPool[i].id)){wPicks.push(wPool[i]);wUsed.add(wPool[i].id);}
   }
-  // Rune cards
-  picks.map(r=>({type:'r',data:r})).forEach(item=>{
-    const card=document.createElement('div'),cost=item.data.cost,can=gold>=cost;
+  // Pick 2 random enchants
+  const ePool=Object.values(ENCHANTS),ePicks=[],eUsed=new Set();
+  while(ePicks.length<2&&ePicks.length<ePool.length){
+    const i=Math.floor(Math.random()*ePool.length);
+    if(!eUsed.has(ePool[i].id)){ePicks.push(ePool[i]);eUsed.add(ePool[i].id);}
+  }
+  // Weapon cards
+  wPicks.forEach(r=>{
+    const cost=r.cost,can=gold>=cost;
+    const card=document.createElement('div');
     card.className='sc'+(can?'':' dim');
-    if(item.type==='r'){
-      const r=item.data;
-      card.style.setProperty('--col',r.col);
-      // Preview merge result in hand
-      const hasLv1=hand.some(h=>h.id===r.id&&(h.lv||1)===1)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===1);
-      const hasLv2=hand.some(h=>h.id===r.id&&(h.lv||1)===2)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===2);
-      const mergeTag=hasLv1?(hasLv2?'→ Lv3合成':'→ Lv2合成'):'';
-      const affixHint=hasLv1&&hasLv2?'<div class="affix-badge">★ 词缀解锁</div>':'';
-      const desc=RUNE_DESCS[r.id]?.[0]||'';
-      card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div>${affixHint}<span class="sc-tag tag-r">Lv1 武器</span>`;
-      card.addEventListener('click',()=>buyRune(r));
-    }
+    card.style.setProperty('--col',r.col);
+    const hasLv1=hand.some(h=>h.id===r.id&&(h.lv||1)===1)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===1);
+    const hasLv2=hand.some(h=>h.id===r.id&&(h.lv||1)===2)||grid.some(c=>c.rune&&c.rune.id===r.id&&(c.rune.lv||1)===2);
+    const mergeTag=hasLv1?(hasLv2?'→ Lv3合成':'→ Lv2合成'):'';
+    const desc=RUNE_DESCS[r.id]?.[0]||'';
+    card.innerHTML=`<span class="sc-sym">${r.sym}</span><div class="sc-name">${r.name}</div><div class="sc-cost">💰 ${r.cost}${mergeTag?` <span style="color:#52a870;font-size:.6rem">${mergeTag}</span>`:''}</div><div class="sc-desc">${desc}</div><span class="sc-tag tag-r">Lv1 武器</span>`;
+    card.addEventListener('click',()=>buyRune(r));
+    con.appendChild(card);
+  });
+  // Enchant cards
+  ePicks.forEach(enc=>{
+    const cost=enc.cost,can=gold>=cost;
+    const card=document.createElement('div');
+    card.className='sc'+(can?'':' dim');
+    card.style.setProperty('--col',enc.col);
+    card.innerHTML=`<span class="sc-sym">${enc.sym}</span><div class="sc-name">${enc.name}</div><div class="sc-cost">💰 ${enc.cost}</div><div class="sc-desc">${enc.desc}</div><span class="sc-tag" style="background:rgba(144,112,208,.14);border:1px solid rgba(144,112,208,.35);color:#b090f0">附魔</span>`;
+    card.addEventListener('click',()=>buyEnchant(enc));
     con.appendChild(card);
   });
   // Sell section
@@ -1267,9 +1362,11 @@ function mkShop(){
     sellHdr.style.display='block';
     hand.forEach((rune,i)=>{
       const lv=rune.lv||1;
-      const price=Math.floor(rune.cost*(lv===3?1:lv===2?.65:.4));
+      const isEnchant=rune.kind==='enchant';
+      const price=isEnchant?Math.floor(rune.cost*.5):Math.floor(rune.cost*(lv===3?1:lv===2?.65:.4));
+      const kindLbl=isEnchant?'附魔':'武器';
       const card=document.createElement('div');card.className='sell-card';
-      card.innerHTML=`<span style="color:${rune.col}">${rune.sym}</span><span>${rune.name}${lv>1?` Lv${lv}`:''}${rune.affix?` [${rune.affix.name}]`:''}</span><span style="color:#f0c040;margin-left:auto">卖 ${price}💰</span>`;
+      card.innerHTML=`<span style="color:${rune.col}">${rune.sym}</span><span>${rune.name}${lv>1?` Lv${lv}`:''} <span style="font-size:.62rem;color:#56aed0">[${kindLbl}]</span></span><span style="color:#f0c040;margin-left:auto">卖 ${price}💰</span>`;
       card.addEventListener('click',()=>{gold+=price;hand.splice(i,1);mkShop();});
       sellCon.appendChild(card);
     });
@@ -1289,7 +1386,7 @@ function buyRune(r){
   gold-=r.cost;
   let newLv=1;
   if(findAndRemove(r.id,1)){newLv=2;if(findAndRemove(r.id,2))newLv=3;}
-  const newRune={...r,lv:newLv};
+  const newRune={...r,lv:newLv,kind:'weapon'};
   if(newLv===3){
     const pool=AFFIXES[r.id]||[];
     if(pool.length)newRune.affix=pool[Math.floor(Math.random()*pool.length)];
@@ -1300,6 +1397,13 @@ function buyRune(r){
     nums.push({x:W/2,y:H/2-30,v:msg,col:r.col,t:0,mt:2.2,big:newLv===3});
     glows.push({x:W/2,y:H/2,r:newLv===3?110:80,col:r.col,t:0,mt:.7});
   }
+  closeShop();
+}
+
+function buyEnchant(enc){
+  if(gold<enc.cost){nums.push({x:W/2,y:H/2,v:'金币不足',col:'#c04848',t:0,mt:1.2});return;}
+  gold-=enc.cost;
+  hand.push({...enc});
   closeShop();
 }
 
@@ -1364,7 +1468,7 @@ function reset(){
   shopRefreshCost=1;
   lastFiredId=null;prevFiredId=null;lastFiredT=-99;lastArrowTarget=null;
   renderRelicBar();
-  hand=[{...RUNES.arrow,lv:1},{...RUNES.frost,lv:1}];
+  hand=[{...RUNES.arrow,lv:1,kind:'weapon'},{...RUNES.frost,lv:1,kind:'weapon'}];
   initGrid();enterPrep();
 }
 
