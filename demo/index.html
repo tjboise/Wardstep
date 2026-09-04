@@ -252,9 +252,9 @@ const AFFIXES={
 // ── WAVES ──
 const WAVES=[
   {label:'小关 1', type:'small',
-   enemies:[{count:3,hp:8,spd:22,type:'n'}]},
+   enemies:[{count:6,hp:3,spd:38,type:'w'},{count:2,hp:8,spd:22,type:'n'}]},
   {label:'小关 2', type:'small',
-   enemies:[{count:4,hp:9,spd:24,type:'n'},{count:1,hp:20,spd:14,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
+   enemies:[{count:4,hp:3,spd:40,type:'w'},{count:3,hp:9,spd:24,type:'n'},{count:1,hp:20,spd:14,type:'a'},{count:1,hp:30,spd:11,type:'e'}]},
   {label:'精英关', type:'elite',
    enemies:[{count:4,hp:10,spd:26,type:'n'},{count:2,hp:22,spd:15,type:'a'},{count:1,hp:32,spd:11,type:'e'},{count:1,hp:22,spd:22,type:'h'}]},
   {label:'Boss关', type:'boss',
@@ -339,12 +339,13 @@ function initGrid(){
 function mkEnemy(g){
   const ranged=g.type==='e';
   const healer=g.type==='h';
-  const atk=g.type==='b'?12:g.type==='e'?7:g.type==='a'?5:g.type==='h'?5:3;
-  const atkCd=g.type==='b'?2.5:g.type==='e'?2.0:g.type==='a'?1.2:g.type==='h'?2.2:1.5;
+  const fodder=g.type==='w';
+  const atk=g.type==='b'?12:g.type==='e'?7:g.type==='a'?5:g.type==='h'?5:g.type==='w'?1:3;
+  const atkCd=g.type==='b'?2.5:g.type==='e'?2.0:g.type==='a'?1.2:g.type==='h'?2.2:g.type==='w'?2.0:1.5;
   return{hp:g.hp,maxHp:g.hp,spd:g.spd,type:g.type,
          slowed:0,slowFactor:.3,frozenUntil:0,
          sh:g.type==='a'?1:g.type==='e'?2:0,
-         atk,atkCd,atkT:0,ranged,healer,stopRange:healer?9999:ranged?170:22,
+         atk,atkCd,atkT:0,ranged,healer,fodder,stopRange:healer?9999:ranged?170:22,
          poisonUntil:0,poisonDps:0};
 }
 function mkQ(wc){
@@ -871,7 +872,7 @@ function update(dt){
   enemies=enemies.filter(e=>{
     if(e.hp>0)return true;
     kills++;
-    const g=e.type==='b'?15:e.type==='e'?6:e.type==='h'?3:e.type==='a'?4:2;
+    const g=e.type==='b'?15:e.type==='e'?6:e.type==='h'?3:e.type==='a'?4:e.type==='w'?1:2;
     gold+=g;coins.push({x:e.x,y:e.y,vy:-60,t:0,mt:.9,v:g});
     glows.push({x:e.x,y:e.y,r:22,col:'#c04848',t:0,mt:.3});
     // Knight XP
@@ -1127,11 +1128,11 @@ function drawWarriors(){
 
 function drawEnemies(){
   enemies.forEach(e=>{
-    const sl=e.slowed>0,frozen=e.frozenUntil>t,boss=e.type==='b',elite=e.type==='e',healer=e.type==='h';
-    const sz=boss?20:elite?14:e.type==='a'?11:9;
+    const sl=e.slowed>0,frozen=e.frozenUntil>t,boss=e.type==='b',elite=e.type==='e',healer=e.type==='h',fodder=e.type==='w';
+    const sz=boss?20:elite?14:e.type==='a'?11:fodder?6:9;
     const fill=frozen?'#1a2848':sl?(boss?'#1a2a40':elite?'#2a1a40':healer?'#1a3828':'#1a3a50')
-               :boss?'#6a1a1a':elite?'#3a1a5a':healer?'#1a4030':e.type==='a'?'#2a3050':'#7a2020';
-    const bdr=frozen?'#8cd4f0':sl?'#56aed0':boss?'#e06060':elite?'#9060d0':healer?'#52c870':e.type==='a'?'#5070b0':'#c04848';
+               :boss?'#6a1a1a':elite?'#3a1a5a':healer?'#1a4030':e.type==='a'?'#2a3050':fodder?'#5a3030':'#7a2020';
+    const bdr=frozen?'#8cd4f0':sl?'#56aed0':boss?'#e06060':elite?'#9060d0':healer?'#52c870':e.type==='a'?'#5070b0':fodder?'#c07060':'#c04848';
     ctx.beginPath();ctx.ellipse(e.x,e.y+2,sz,sz*.4,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.3)';ctx.fill();
     ctx.fillStyle=fill;ctx.fillRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
     ctx.strokeStyle=bdr;ctx.lineWidth=boss?2.5:elite?2:1.5;ctx.strokeRect(e.x-sz,e.y-sz*2,sz*2,sz*2);
