@@ -1,3 +1,3 @@
 # 关卡设计
 
-[当前分支图鉴 / Current-branch catalogue](index.html) — 在浏览器打开可查看界面。 / Open in a browser to view the interface.
+[在线预览 / Online Preview (WS_dev)](https://htmlpreview.github.io/?https://github.com/tjboise/Wardstep/blob/WS_dev/design/stages/index.html) · [当前分支源码 / Current-branch source](index.html)
