@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wardstep · 武器图鉴</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;600&display=swap">
@@ -108,16 +111,18 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
   </header>
 
   <div class="stats-bar">
-    <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">已设计</div></div>
+    <div class="stat"><div class="stat-val" id="stat-count">0</div><div class="stat-lbl">武器总数 / Total Weapons</div></div>
+    <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">已设计 / Designed</div></div>
     <div class="stat"><div class="stat-val" id="stat-types">0</div><div class="stat-lbl">武器类型</div></div>
     <div class="stat"><div class="stat-val">3</div><div class="stat-lbl">升级等级</div></div>
     <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">附魔种类</div></div>
   </div>
 
   <div class="controls">
-    <input class="search" type="text" id="search" placeholder="搜索武器名称或效果…">
+    <input class="search" type="text" id="search" placeholder="搜索武器 / Search weapons…" aria-label="搜索武器 / Search weapons">
     <div class="filters" id="filters">
-      <button class="filter-btn active" data-tag="全部">全部</button>
+      <button class="filter-btn active" data-tag="全部">全部 / All</button>
+      <button class="filter-btn" id="new-weapons">新增武器 / New Weapons (6)</button>
     </div>
   </div>
 
@@ -398,7 +403,14 @@ const WEAPONS = [
 },
 ];
 
+const NEW_WEAPON_IDS = new Set(["chain-hook","heavy-crossbow","gravity-orb","runic-cannon","repulsion-bell","spike-array"]);
+
 function buildFilters(){
+  const newButton=document.getElementById("new-weapons");
+  newButton.addEventListener("click",()=>{
+    document.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));
+    newButton.classList.add("active");render();
+  });
   const all=new Set();
   WEAPONS.forEach(w=>w.tags.forEach(t=>all.add(t)));
   const bar=document.getElementById('filters');
@@ -423,10 +435,12 @@ function render(){
   const q=document.getElementById('search').value.trim().toLowerCase();
   const tag=activeTag();
   const list=WEAPONS.filter(w=>{
-    const tagOk=tag==='全部'||w.tags.includes(tag);
+    const newOnly=document.getElementById('new-weapons').classList.contains('active');
+    const tagOk=newOnly?NEW_WEAPON_IDS.has(w.id):(tag==='全部'||w.tags.includes(tag));
     const qOk=!q||w.name.toLowerCase().includes(q)||w.effect.toLowerCase().includes(q)||w.tags.some(t=>t.includes(q));
     return tagOk&&qOk;
   });
+  document.getElementById('stat-count').textContent=WEAPONS.length;
   document.getElementById('stat-total').textContent=WEAPONS.filter(w=>w.status==='designed').length;
   document.getElementById('stat-types').textContent=new Set(WEAPONS.flatMap(w=>w.tags.filter(t=>!['基础','进阶'].includes(t)))).size;
   const grid=document.getElementById('weapon-grid');
