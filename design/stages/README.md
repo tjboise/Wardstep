@@ -1,3 +1,3 @@
 # 关卡设计
 
-关卡设计文档即将上线。目前关卡结构见 [GDD.md](../../docs/GDD.md)。
+[当前分支图鉴 / Current-branch catalogue](index.html) — 在浏览器打开可查看界面。 / Open in a browser to view the interface.
