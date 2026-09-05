@@ -54,7 +54,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
 
 .weapon-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:transform .15s,border-color .2s;}
 .weapon-card:hover{transform:translateY(-3px);border-color:var(--card-col,var(--accent));}
-.card-top{padding:18px 18px 14px;position:relative;}
+.card-top{padding:38px 18px 14px;position:relative;}
 .card-top::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-col,var(--accent));}
 
 .card-sym-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
@@ -95,6 +95,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
 .enchant-desc{font-size:.8rem;color:var(--muted);line-height:1.5;}
 
 @media(max-width:600px){.weapon-grid,.enchant-grid{grid-template-columns:1fr;}.header-row{flex-direction:column;align-items:flex-start;}}
+.dev-notes{margin-top:12px;font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}.dev-notes summary{cursor:pointer;color:var(--accent)}.dev-notes p{margin-top:8px}.card-name,.lv-table td{overflow-wrap:anywhere}
 </style>
 
 <div class="page">
@@ -120,6 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','SimSun'
     </div>
   </div>
 
+  <p class="card-effect">新增六件武器的数值为待测试草案，尚未实装。<br>Values for the six new weapons are provisional and require playtesting. These weapons are not yet implemented.</p>
   <div class="weapon-grid" id="weapon-grid"></div>
   <div class="empty" id="empty" style="display:none">没有找到符合条件的武器</div>
 
@@ -202,6 +204,198 @@ const WEAPONS = [
       {lv:"Lv3", stat:"伤害 8",  trait:"永久激活·爆炸（触发后小范围溅射）"},
     ]
   },
+{
+  "id": "chain-hook",
+  "name": "锁链钩 / Chain Hook",
+  "symbol": "⛓",
+  "cd": "2.4s",
+  "cdPct": 60,
+  "color": "#56aed0",
+  "tags": [
+    "控制",
+    "近战"
+  ],
+  "effect": "骑士踩格时触发。 / Activated when the knight steps on this tile. 向范围内最近敌人发射钩索，造成伤害并拉向该格。 / Hooks the nearest enemy within range, dealing damage and pulling it toward this tile.",
+  "status": "designed",
+  "levels": [
+    {
+      "lv": "Lv1",
+      "stat": "伤害3 / Damage 3",
+      "trait": "短距离拉拽单个敌人。 / Pulls one enemy a short distance."
+    },
+    {
+      "lv": "Lv2",
+      "stat": "伤害5 / Damage 5",
+      "trait": "增加射程和拉拽距离。 / Increased range and pull distance."
+    },
+    {
+      "lv": "Lv3",
+      "stat": "伤害7 / Damage 7",
+      "trait": "同时钩住目标及附近最多两名敌人。 / Hooks the target and up to two nearby enemies."
+    }
+  ],
+  "notes": "Boss位移减弱，不拉出可通行区域。 / Bosses resist displacement; pulls stay within traversable areas."
+},
+{
+  "id": "heavy-crossbow",
+  "name": "重弩 / Heavy Crossbow",
+  "symbol": "🏹",
+  "cd": "3.0s",
+  "cdPct": 75,
+  "color": "#56aed0",
+  "tags": [
+    "弩类",
+    "远程"
+  ],
+  "effect": "骑士踩格时触发。 / Activated when the knight steps on this tile. 向范围内当前生命值最高的敌人射出重型弩箭。 / Fires a heavy bolt at the enemy with the highest current HP within range.",
+  "status": "designed",
+  "levels": [
+    {
+      "lv": "Lv1",
+      "stat": "伤害10 / Damage 10",
+      "trait": "单体重击。 / Heavy single-target shot."
+    },
+    {
+      "lv": "Lv2",
+      "stat": "伤害16 / Damage 16",
+      "trait": "射程增加。 / Increased range."
+    },
+    {
+      "lv": "Lv3",
+      "stat": "伤害22 / Damage 22",
+      "trait": "连续命中同一敌人，后续每击增伤15%，上限45%；更换目标重置。 / Consecutive hits on the same enemy gain 15% damage per subsequent hit, up to 45%; hitting a different target resets the bonus."
+    }
+  ],
+  "notes": "弩类不自动继承弓手的弓类无限射程与全穿透。 / Crossbows do not automatically inherit the Archer's unlimited bow range or full piercing."
+},
+{
+  "id": "gravity-orb",
+  "name": "引力球 / Gravity Orb",
+  "symbol": "◉",
+  "cd": "3.5s",
+  "cdPct": 88,
+  "color": "#56aed0",
+  "tags": [
+    "法系",
+    "控制"
+  ],
+  "effect": "骑士踩格时触发。 / Activated when the knight steps on this tile. 在范围内最近敌人当前位置生成固定引力场，持续聚拢附近敌人。 / Creates a stationary gravity field at the nearest enemy's current position within range, continuously pulling nearby enemies toward its center.",
+  "status": "designed",
+  "levels": [
+    {
+      "lv": "Lv1",
+      "stat": "持续1.2s / Duration 1.2s",
+      "trait": "小范围聚拢，无直接伤害。 / Small pulling field; no direct damage."
+    },
+    {
+      "lv": "Lv2",
+      "stat": "持续1.6s / Duration 1.6s",
+      "trait": "范围扩大，无直接伤害。 / Larger field; no direct damage."
+    },
+    {
+      "lv": "Lv3",
+      "stat": "持续2.0s / Duration 2.0s",
+      "trait": "结束时内爆，对场内敌人造成8点伤害。 / Implodes on expiry, dealing 8 damage to enemies inside."
+    }
+  ],
+  "notes": "Boss位移减弱，不拉出可通行区域；前两级无伤害时的附魔规则待定。 / Bosses resist displacement; pulls stay within traversable areas. Enchantment activation for the non-damaging first two levels remains to be defined."
+},
+{
+  "id": "runic-cannon",
+  "name": "符文炮 / Runic Cannon",
+  "symbol": "✦",
+  "cd": "3.0s",
+  "cdPct": 75,
+  "color": "#56aed0",
+  "tags": [
+    "法系",
+    "穿透"
+  ],
+  "effect": "骑士踩格时触发。 / Activated when the knight steps on this tile. 沿骑士进入该格的行进方向发射穿透光束；身后连续直连格延长射程，存在上限。 / Fires a piercing beam in the knight's incoming direction of travel. Consecutive connected tiles in a straight line behind the cannon extend its range, up to a limit.",
+  "status": "designed",
+  "levels": [
+    {
+      "lv": "Lv1",
+      "stat": "伤害5 / Damage 5",
+      "trait": "全穿透；基础射程2格，每个身后直连格+1，最多4格。 / Pierces all enemies along the beam. Base range: 2 tile lengths; +1 per aligned tile behind it, up to 4 total."
+    },
+    {
+      "lv": "Lv2",
+      "stat": "伤害8 / Damage 8",
+      "trait": "最大射程增至5格。 / Maximum range increases to 5 tile lengths."
+    },
+    {
+      "lv": "Lv3",
+      "stat": "伤害11 / Damage 11",
+      "trait": "保留Lv2射程；留下1.5秒轨迹，每0.5秒造成2点伤害。 / Retains Lv2 range; leaves a trail for 1.5s, dealing 2 damage every 0.5s."
+    }
+  ],
+  "notes": "折返时反向开火；按实际连接格计算射程，布防时应预览射线。 / Fires in the opposite direction on the return trip. Range uses actually connected tiles; preparation should preview the beam."
+},
+{
+  "id": "repulsion-bell",
+  "name": "退魔钟 / Repulsion Bell",
+  "symbol": "♧",
+  "cd": "2.8s",
+  "cdPct": 70,
+  "color": "#56aed0",
+  "tags": [
+    "防御",
+    "控制"
+  ],
+  "effect": "骑士踩格时触发。 / Activated when the knight steps on this tile. 朝范围内最近敌人释放锥形冲击波，造成少量伤害并将敌人推离该格。 / Releases a cone-shaped shockwave toward the nearest enemy within range, dealing light damage and pushing enemies away from this tile.",
+  "status": "designed",
+  "levels": [
+    {
+      "lv": "Lv1",
+      "stat": "伤害2 / Damage 2",
+      "trait": "窄锥形，短距离击退。 / Short knockback within a narrow cone."
+    },
+    {
+      "lv": "Lv2",
+      "stat": "伤害3 / Damage 3",
+      "trait": "扩大锥形和击退距离。 / Wider cone and increased push distance."
+    },
+    {
+      "lv": "Lv3",
+      "stat": "每波伤害4 / Damage 4 per pulse",
+      "trait": "0.6秒后沿同方向释放第二波。 / Releases a second pulse in the same direction after 0.6s."
+    }
+  ],
+  "notes": "Boss位移减弱，不推出可通行区域；摆放不当可能推向界碑。 / Bosses resist displacement; pushes stay within traversable areas. Poor placement may push enemies toward the Wardstone."
+},
+{
+  "id": "spike-array",
+  "name": "尖刺机关 / Spike Array",
+  "symbol": "⚙",
+  "cd": "2.6s",
+  "cdPct": 65,
+  "color": "#56aed0",
+  "tags": [
+    "机关",
+    "范围"
+  ],
+  "effect": "骑士踩格时触发。 / Activated when the knight steps on this tile. 格子四周伸出尖刺，对周围敌人造成周期伤害；骑士离开后持续至激活结束。 / Extends spikes around the tile, periodically damaging nearby enemies. Spikes remain active after the knight leaves until the duration expires.",
+  "status": "designed",
+  "levels": [
+    {
+      "lv": "Lv1",
+      "stat": "每击伤害2 / Damage 2 per hit",
+      "trait": "持续1.5秒，每0.5秒造成伤害。 / Active for 1.5s; deals damage every 0.5s."
+    },
+    {
+      "lv": "Lv2",
+      "stat": "每击伤害3 / Damage 3 per hit",
+      "trait": "持续2秒，每0.5秒造成伤害，范围扩大。 / Active for 2s; deals damage every 0.5s over a larger area."
+    },
+    {
+      "lv": "Lv3",
+      "stat": "每击伤害4 / Damage 4 per hit",
+      "trait": "持续2.5秒，每0.5秒造成伤害；激活瞬间额外突刺造成4伤害。 / Active for 2.5s; deals damage every 0.5s. An initial spike burst deals an additional 4 damage on activation."
+    }
+  ],
+  "notes": "固定于格子，不跟随或伤害骑士，不阻挡敌人。冷却结束后可再次激活，仅刷新持续时间，不叠加区域。由骑士踩格启动，区别于敌人触发的陷阱。 / Fixed around the tile; does not follow or damage the knight, or block enemies. Reactivation requires cooldown completion and refreshes duration without stacking fields. Triggered by the knight, unlike enemy-triggered traps."
+},
 ];
 
 function buildFilters(){
@@ -230,7 +424,7 @@ function render(){
   const tag=activeTag();
   const list=WEAPONS.filter(w=>{
     const tagOk=tag==='全部'||w.tags.includes(tag);
-    const qOk=!q||w.name.includes(q)||w.effect.includes(q)||w.tags.some(t=>t.includes(q));
+    const qOk=!q||w.name.toLowerCase().includes(q)||w.effect.toLowerCase().includes(q)||w.tags.some(t=>t.includes(q));
     return tagOk&&qOk;
   });
   document.getElementById('stat-total').textContent=WEAPONS.filter(w=>w.status==='designed').length;
@@ -264,11 +458,12 @@ function render(){
         <div class="card-tags">${w.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
       </div>
       <div class="card-bottom">
-        <div class="section-label">升级数据</div>
+        <div class="section-label">升级数据 / Level Progression</div>
         <table class="lv-table">
-          <thead><tr><th>等级</th><th>数值</th><th>特性</th></tr></thead>
+          <thead><tr><th>等级 / Level</th><th>数值 / Stats</th><th>特性 / Traits</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
+        ${w.notes ? `<details class="dev-notes"><summary>开发规则 / Development Notes</summary><p>${w.notes}</p></details>` : ''}
       </div>
     </div>`;
   });
