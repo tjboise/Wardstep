@@ -32,6 +32,7 @@
 ## 学习资源
 
 - [Godot 4 入门教程（B站）](https://www.bilibili.com/video/BV1684y147h4) — 引擎上手参考
+- [Godot 4 进阶教程（B站）](https://www.bilibili.com/video/BV1ugKB66ExJ) — 进阶学习资源
 
 ## 开发日志
 
