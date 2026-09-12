@@ -29,6 +29,10 @@
 | **[音乐图鉴](https://tjboise.github.io/Wardstep/design/music/)** | [design/music/](design/music/) | 4首程序性音轨设计（调性/BPM/音色层） |
 | 源代码 | [src/](src/) | 引擎待定 |
 
+## 学习资源
+
+- [Godot 4 入门教程（B站）](https://www.bilibili.com/video/BV1684y147h4) — 引擎上手参考
+
 ## 开发日志
 
 | 日期 | 里程碑 |
