@@ -1,0 +1,7 @@
+# Godot cache
+.godot/
+*.uid
+
+# OS
+.DS_Store
+Thumbs.db
